@@ -1,0 +1,137 @@
+[gd_scene load_steps=10 format=3 uid="uid://bh58c7wn1bdd1"]
+
+[ext_resource type="Script" uid="uid://dpuvfwalotfcx" path="res://scene/player/player.gd" id="1_cm2cf"]
+[ext_resource type="Texture2D" uid="uid://dvopr7qm824mo" path="res://texture/ppc-Sheet.png" id="1_v7pse"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_cm2cf"]
+friction = 0.0
+bounce = 0.1
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_cm2cf"]
+radius = 4.0
+height = 54.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_6smn3"]
+radius = 3.0000002
+height = 20.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_5lop3"]
+radius = 9.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_cm2cf"]
+radius = 9.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_6smn3"]
+radius = 11.0
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_cm2cf"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:rotation")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+properties/2/path = NodePath("Sprite2D:frame")
+properties/2/spawn = true
+properties/2/replication_mode = 1
+properties/3/path = NodePath("col2:position")
+properties/3/spawn = true
+properties/3/replication_mode = 1
+properties/4/path = NodePath("col3:position")
+properties/4/spawn = true
+properties/4/replication_mode = 1
+properties/5/path = NodePath(".:linear_velocity")
+properties/5/spawn = true
+properties/5/replication_mode = 1
+properties/6/path = NodePath(".:angular_velocity")
+properties/6/spawn = true
+properties/6/replication_mode = 1
+properties/7/path = NodePath(".:sleeping")
+properties/7/spawn = true
+properties/7/replication_mode = 1
+properties/8/path = NodePath(".:additional_force")
+properties/8/spawn = true
+properties/8/replication_mode = 2
+properties/9/path = NodePath(".:bounce")
+properties/9/spawn = true
+properties/9/replication_mode = 2
+properties/10/path = NodePath(".:torque_power")
+properties/10/spawn = true
+properties/10/replication_mode = 2
+properties/11/path = NodePath(".:jump_power")
+properties/11/spawn = true
+properties/11/replication_mode = 2
+properties/12/path = NodePath(".:sync_flip_h")
+properties/12/spawn = true
+properties/12/replication_mode = 2
+properties/13/path = NodePath(".:alive")
+properties/13/spawn = true
+properties/13/replication_mode = 2
+properties/14/path = NodePath(".:visible")
+properties/14/spawn = true
+properties/14/replication_mode = 2
+properties/15/path = NodePath(".:is_host_player")
+properties/15/spawn = true
+properties/15/replication_mode = 2
+properties/16/path = NodePath(".:alive_timer")
+properties/16/spawn = true
+properties/16/replication_mode = 2
+
+[node name="Player" type="RigidBody2D" groups=["player"]]
+collision_layer = 2
+collision_mask = 3
+physics_material_override = SubResource("PhysicsMaterial_cm2cf")
+gravity_scale = 0.5
+center_of_mass_mode = 1
+contact_monitor = true
+max_contacts_reported = 2
+angular_damp = 15.0
+script = ExtResource("1_cm2cf")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(0, -12)
+texture = ExtResource("1_v7pse")
+hframes = 2
+
+[node name="col1" type="CollisionShape2D" parent="."]
+position = Vector2(0, 11)
+shape = SubResource("CapsuleShape2D_cm2cf")
+
+[node name="col2" type="CollisionShape2D" parent="."]
+position = Vector2(6, 4)
+rotation = 1.5707964
+shape = SubResource("CapsuleShape2D_6smn3")
+
+[node name="col3" type="CollisionShape2D" parent="."]
+position = Vector2(0, -20)
+rotation = 1.5707964
+shape = SubResource("CircleShape2D_5lop3")
+
+[node name="Area2DFloor" type="Area2D" parent="."]
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2DFloor"]
+position = Vector2(0, 34)
+shape = SubResource("CircleShape2D_cm2cf")
+
+[node name="Area2DHead" type="Area2D" parent="."]
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2DHead"]
+position = Vector2(0, -20)
+shape = SubResource("CircleShape2D_6smn3")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_cm2cf")
+
+[node name="TimerRebirth" type="Timer" parent="."]
+wait_time = 3.0
+one_shot = true
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="body_exited" from="." to="." method="_on_body_exited"]
+[connection signal="body_entered" from="Area2DFloor" to="." method="_on_area_2d_floor_body_entered"]
+[connection signal="body_exited" from="Area2DFloor" to="." method="_on_area_2d_floor_body_exited"]
+[connection signal="body_entered" from="Area2DHead" to="." method="_on_area_2d_head_body_entered"]
+[connection signal="body_exited" from="Area2DHead" to="." method="_on_area_2d_head_body_exited"]
+[connection signal="timeout" from="TimerRebirth" to="." method="_on_timer_rebirth_timeout"]

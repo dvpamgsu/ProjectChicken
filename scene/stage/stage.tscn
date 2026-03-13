@@ -1,0 +1,38 @@
+[gd_scene load_steps=3 format=3 uid="uid://dqdqa03uv7qbe"]
+
+[ext_resource type="Script" uid="uid://7eiec3ticvn6" path="res://scene/stage/stage.gd" id="1_v4pcg"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_v4pcg"]
+size = Vector2(52, 108)
+
+[node name="stage" type="Node2D"]
+script = ExtResource("1_v4pcg")
+
+[node name="cam_bl" type="Node2D" parent="."]
+
+[node name="cam_tr" type="Node2D" parent="."]
+
+[node name="spawn1" type="Node2D" parent="."]
+
+[node name="spawn2" type="Node2D" parent="."]
+
+[node name="sprite_stage" type="Sprite2D" parent="."]
+
+[node name="collision" type="Node2D" parent="."]
+
+[node name="Area2DP1" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2DP1"]
+shape = SubResource("RectangleShape2D_v4pcg")
+
+[node name="Area2DP2" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2DP2"]
+shape = SubResource("RectangleShape2D_v4pcg")
+
+[connection signal="body_entered" from="Area2DP1" to="." method="_on_area_2dp_1_body_entered"]
+[connection signal="body_entered" from="Area2DP2" to="." method="_on_area_2dp_2_body_entered"]
