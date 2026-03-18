@@ -113,6 +113,7 @@ func _physics_process(delta: float) -> void:
 	var mat = sprite_2d.material as ShaderMaterial
 	mat.set_shader_parameter("dissolve_value", dissolve_value)
 	
+		
 	if !is_multiplayer_authority():
 		return
 		
@@ -127,8 +128,9 @@ func _physics_process(delta: float) -> void:
 		return
 		
 	if !alive:
-		#position.y = 100000
 		alive_timer = 0.0
+		linear_velocity = Vector2.ZERO
+		angular_velocity = 0
 		return
 	else:
 		alive_timer += delta

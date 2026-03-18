@@ -239,25 +239,24 @@ text = "WIN"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Cam_target" type="Node2D" parent="."]
-
-[node name="Camera2D" type="Camera2D" parent="Cam_target"]
+[node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(2, 2)
-position_smoothing_enabled = true
 position_smoothing_speed = 3.0
 
-[node name="boundary1" type="StaticBody2D" parent="Cam_target/Camera2D"]
+[node name="boundary1" type="StaticBody2D" parent="Camera2D"]
 position = Vector2(-760, 0)
 collision_mask = 0
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Cam_target/Camera2D/boundary1"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Camera2D/boundary1"]
 shape = SubResource("RectangleShape2D_v0l8b")
 
-[node name="boundary2" type="StaticBody2D" parent="Cam_target/Camera2D"]
+[node name="boundary2" type="StaticBody2D" parent="Camera2D"]
 position = Vector2(760, 0)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Cam_target/Camera2D/boundary2"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Camera2D/boundary2"]
 shape = SubResource("RectangleShape2D_v0l8b")
+
+[node name="Cam_target" type="Node2D" parent="."]
 
 [node name="TimerWin" type="Timer" parent="."]
 wait_time = 3.0

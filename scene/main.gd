@@ -36,7 +36,7 @@ var is_joining : bool = false
 
 @onready var member_list: VBoxContainer = $CanvasLayer/friend_lobbies/ScrollContainer/MemberList
 
-@onready var camera_2d: Camera2D = $Cam_target/Camera2D
+@onready var camera_2d: Camera2D = $Camera2D
 @onready var cam_target: Node2D = $Cam_target
 
 @onready var game_ui: Node2D = $CanvasLayer/Game_UI
@@ -147,8 +147,8 @@ func win(num):
 			p2 = players[pk]
 			
 	for id in players:
-		var p = players[id]
-		p.freeze = true
+		var p:Node2D = players[id]
+		p.set_deferred_thread_group("freeze", true)
 		p.end = true
 		print("freeze " + str(id))
 	game_ui.visible = true
@@ -182,6 +182,11 @@ func _process(delta: float) -> void:
 	#if state != STATE.GAME and state != STATE.GAMEWIN and stage:
 		#stage.queue_free()
 		#stage = null
+
+	if state != STATE.GAME:
+		cam_target.position = Vector2.ZERO
+		camera_2d.position = Vector2.ZERO		
+		
 		
 	match state:
 		STATE.MAIN:
@@ -193,12 +198,19 @@ func _process(delta: float) -> void:
 			#for id in players:
 				#print("ID: ", id, " | 노드 존재: ", is_instance_valid(players[id]), " | 방장여부: ", players[id].is_host_player)
 		
+			if Input.is_action_just_pressed("debug1"):
+				win.rpc(1)
+			if Input.is_action_just_pressed("debug2"):
+				win.rpc(2)
+		
 			if is_host:
-				$Cam_target/Camera2D/boundary1.collision_layer = 1
-				$Cam_target/Camera2D/boundary2.collision_layer = 4
+				$Camera2D/boundary1.collision_layer = 1
+				$Camera2D/boundary2.collision_layer = 4
 			else:
-				$Cam_target/Camera2D/boundary1.collision_layer = 4
-				$Cam_target/Camera2D/boundary2.collision_layer = 1
+				$Camera2D/boundary1.collision_layer = 4
+				$Camera2D/boundary2.collision_layer = 1
+				
+			camera_2d.position += (cam_target.position - camera_2d.position) * delta * 2.0
 		
 			var member_count = Steam.getNumLobbyMembers(lobby_id)
 			if member_count == 2 and players.size() == 2:
@@ -241,7 +253,7 @@ func _process(delta: float) -> void:
 								cam_target.position.x = p2.position.x + width/6
 					
 					var space_state = get_world_2d().direct_space_state
-					var query = PhysicsRayQueryParameters2D.create(Vector2(cam_target.position.x, -1000), Vector2(cam_target.position.x, 4000))
+					var query = PhysicsRayQueryParameters2D.create(Vector2(camera_2d.position.x, -1000), Vector2(camera_2d.position.x, 4000))
 					query.collision_mask = 1
 					var result = space_state.intersect_ray(query)
 					if result:
@@ -286,6 +298,16 @@ func _on_lobby_chat_update(l_id: int, changed_id: int, making_change_id: int, ch
 			var member_count = Steam.getNumLobbyMembers(l_id)
 			if member_count < 2:
 				print("플레이어가 부족하여 로비로 돌아가거나 방을 터뜨립니다.")
+				if stage:
+					stage.queue_free()
+					stage = null
+
+				for pk in players:
+					var p = players[pk]
+					if p:
+						p.queue_free()
+						#var p_steam_id = peer.get_steam_id_for_peer_id(p.name.to_int())
+					Steam.setLobbyMemberData(lobby_id, "ready", "0")
 				_bomb_lobby()
 		
 		# 3. 로비 UI 갱신 (아직 방이 유지되는 경우)
@@ -331,6 +353,8 @@ func update_lobby_members_ui() -> void:
 
 @rpc("authority", "call_local")
 func start_game() -> void:
+	
+	
 	camera_2d.position = Vector2.ZERO
 	if state != STATE.LOBBY:
 		return
@@ -342,6 +366,7 @@ func start_game() -> void:
 	if multiplayer.is_server():
 		for id in player_ids:
 			spawn_player(id)
+	
 
 func _bomb_lobby() -> void:
 	print("로비 파괴 프로세스 시작...")
@@ -368,7 +393,7 @@ func _bomb_lobby() -> void:
 		if is_instance_valid(p):
 			p.queue_free()
 	players.clear()
-	player_ids.clear() # ID 리스트도 초기화 필수
+	player_ids = [1]
 	
 	# 5. UI 상태 복구
 	state = STATE.MAIN
@@ -423,7 +448,7 @@ func get_steam_avatar(steam_id: int) -> ImageTexture:
 func host_lobby():
 	Steam.createLobby(Steam.LobbyType.LOBBY_TYPE_PUBLIC, 2)
 	is_host = true
-	player_ids = [multiplayer.get_unique_id()]
+	player_ids = [1]
 	
 func _on_lobby_created(result : int, lobby_id : int):
 	if result == Steam.RESULT_OK:
@@ -533,7 +558,7 @@ func _remove_player(id : int):
 	if has_node(str(id)):
 		get_node(str(id)).queue_free()
 		
-	player_ids = []
+	player_ids = [1]
 
 func _on_host_button_pressed() -> void:
 	host_lobby()
@@ -698,16 +723,14 @@ func _on_button_refresh_pressed() -> void:
 
 func _on_timer_win_timeout() -> void:
 	state = STATE.LOBBY
-	print(stage)
 	if stage:
 		stage.queue_free()
 		stage = null
-	print(stage)
 	for pk in players:
 		var p = players[pk]
-		if is_instance_valid(p):
+		if p:
 			p.queue_free()
-		var p_steam_id = peer.get_steam_id_for_peer_id(p.name.to_int())
+		#var p_steam_id = peer.get_steam_id_for_peer_id(p.name.to_int())
 		Steam.setLobbyMemberData(lobby_id, "ready", "0")
 		
 		
