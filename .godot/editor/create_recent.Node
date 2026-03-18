@@ -1,9 +1,9 @@
-Timer
 CollisionShape2D
+StaticBody2D
+Timer
 Area2D
 Label
 Node2D
-StaticBody2D
 Camera2D
 Sprite2D
 Button

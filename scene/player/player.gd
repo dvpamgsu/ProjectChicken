@@ -26,7 +26,6 @@ func _enter_tree() -> void:
 func _ready() -> void:
 	main = get_node("/root/Main")
 	main.players[name.to_int()] = self
-	#main.players[name.to_int()] = self
 	if is_multiplayer_authority():
 		if main.is_host:
 			position = main.stage.spawn_1.position
@@ -48,16 +47,21 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 	
 	if !is_multiplayer_authority():
 		return
-		
-	for i in state.get_contact_count():
-		var target = state.get_contact_collider_object(i)
-		if target is RigidBody2D and target.is_in_group("player"):
-			var my_vel = state.linear_velocity
-			var target_vel = target.linear_velocity
-			
-			var collision_normal = state.get_contact_local_normal(i)
-			var push_force = target_vel.length() * additional_force
-			state.linear_velocity += collision_normal * push_force
+	
+	if !alive:
+		linear_velocity = Vector2.ZERO
+		angular_velocity = 0
+		return
+	
+	#for i in state.get_contact_count():
+		#var target = state.get_contact_collider_object(i)
+		#if target is RigidBody2D and target.is_in_group("player"):
+			#var my_vel = state.linear_velocity
+			#var target_vel = target.linear_velocity
+			#
+			#var collision_normal = state.get_contact_local_normal(i)
+			#var push_force = target_vel.length() * additional_force
+			#state.linear_velocity += collision_normal * push_force
 			
 	var t = state.transform
 	
@@ -80,15 +84,20 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 		if t.origin.x < min_x:
 			dead()
 
-	state.transform = t
+	#state.transform = t
 			
 	#print(state.linear_velocity)
 	state.linear_velocity = state.linear_velocity.limit_length(300.0)
 	
+	if position.x < main.cam_bl_pos.x:
+		position.x = main.cam_bl_pos.x
+	if position.x > main.cam_tr_pos.x:
+		position.x = main.cam_tr_pos.x
 	
 var alter = null
 @export var alive_timer = 0.0
 var jump_cnt = 1
+@export var dissolve_value = 0.0
 func _physics_process(delta: float) -> void:
 	
 	if !alter:
@@ -101,8 +110,17 @@ func _physics_process(delta: float) -> void:
 	#print(position)
 	sprite_2d.flip_h = sync_flip_h
 	
+	var mat = sprite_2d.material as ShaderMaterial
+	mat.set_shader_parameter("dissolve_value", dissolve_value)
+	
 	if !is_multiplayer_authority():
 		return
+		
+	if !$TimerDissolveDie.is_stopped():
+		dissolve_value = 1.0-$TimerDissolveDie.time_left/$TimerDissolveDie.wait_time
+	if !$TimerDissolveBirth.is_stopped():
+		dissolve_value = $TimerDissolveBirth.time_left/$TimerDissolveBirth.wait_time
+	
 		
 	if end:
 		freeze = true
@@ -110,11 +128,9 @@ func _physics_process(delta: float) -> void:
 		
 	if !alive:
 		#position.y = 100000
-		visible = false
 		alive_timer = 0.0
 		return
 	else:
-		visible = true
 		alive_timer += delta
 		
 	# 머리가 땅에 닿았는지 체크
@@ -233,10 +249,6 @@ func set_initial_pos():
 		query.collision_mask = 1
 		var result = space_state.intersect_ray(query)
 		if result:
-			# result는 Dictionary 형태로 반환됩니다.
-			#print("충돌 위치: ", result.position)
-			#print("충돌 객체: ", result.collider)
-			#print("충돌 법선: ", result.normal)
 			initial_pos = result.position
 			break
 		else:
@@ -244,23 +256,38 @@ func set_initial_pos():
 		cnt += 1
 		if cnt > 1000:
 			break
+	var sign = 0
 	if initial_pos.x < main.cam_bl_pos.x + 16:
 		initial_pos.x = main.cam_bl_pos.x + 240
+		sign = 1
 	if initial_pos.x > main.cam_tr_pos.x - 16:
 		initial_pos.x = main.cam_tr_pos.x - 240
+		sign = -1
+	while sign!=0:
+		var query = PhysicsRayQueryParameters2D.create(initial_pos, initial_pos + Vector2(0, 4000))
+		query.collision_mask = 1
+		var result = space_state.intersect_ray(query)
+		if result:
+			initial_pos = result.position
+			break
+		else:
+			initial_pos.x += 4 * sign
+		cnt += 1
+		if cnt > 1000:
+			break
 	initial_pos.y -= 48
-	#print(initial_pos)
+	
 	linear_velocity = Vector2.ZERO
 	angular_velocity = 0
-	PhysicsServer2D.body_set_state(
-		get_rid(),
-		PhysicsServer2D.BODY_STATE_TRANSFORM,
-		Transform2D(0, initial_pos)
-	)
+	#PhysicsServer2D.body_set_state(
+		#get_rid(),
+		#PhysicsServer2D.BODY_STATE_TRANSFORM,
+		#Transform2D(0, initial_pos)
+	#)
 	global_position = initial_pos
 	
-	PhysicsServer2D.body_set_state(get_rid(), PhysicsServer2D.BODY_STATE_LINEAR_VELOCITY, Vector2.ZERO)
-	PhysicsServer2D.body_set_state(get_rid(), PhysicsServer2D.BODY_STATE_ANGULAR_VELOCITY, 0.0)
+	#PhysicsServer2D.body_set_state(get_rid(), PhysicsServer2D.BODY_STATE_LINEAR_VELOCITY, Vector2.ZERO)
+	#PhysicsServer2D.body_set_state(get_rid(), PhysicsServer2D.BODY_STATE_ANGULAR_VELOCITY, 0.0)
 	
 	# 이제 출력하면 값이 일치하거나 매우 근접하게 나옵니다.
 	print("반영된 위치 (position): ", position)
@@ -269,28 +296,24 @@ func dead():
 	if !alive:
 		return
 	if is_multiplayer_authority():
+		collision_layer = 4
+		collision_mask = 4
 		$TimerRebirth.start()
+		#set_deferred("freeze", true)
 		alive = false
-		visible = false
-		freeze = true
+		$TimerDissolveDie.start()
 		alive_timer = 0.0
 		linear_velocity = Vector2.ZERO
-		set_initial_pos()
-		collision_layer = 4
-		print(name, "번 플레이어 위치 초기화 완료")
-		#print(position)
+		#set_initial_pos()
 	
 var initial_pos = Vector2.ZERO	
 func initialize():
-	print("!")
-	# 1. 물리 엔진에게 이 노드의 상태를 강제로 변경한다고 알림
-	# RigidBody의 속도와 회전 속도를 즉시 정지시킵니다.
+	if !is_multiplayer_authority():
+		return
+		
 	linear_velocity = Vector2.ZERO
 	angular_velocity = 0
 	
-	# 2. 위치와 회전 초기화
-	# 직접 position을 수정하는 것보다 더 확실한 방법은 전역 변환을 사용하는 것입니다.
-	#global_position = initial_pos
 	rotation = 0
 	set_initial_pos()
 	
@@ -338,13 +361,19 @@ func _on_area_2d_head_body_entered(body: Node2D) -> void:
 
 
 func _on_timer_rebirth_timeout() -> void:
-	initialize()
 	print("rebirth")
-	alive = true
 	if is_multiplayer_authority():
+		initialize()
+		alive = true
 		collision_layer = 2
-		freeze = false # 다시 움직일 수 있도록 해제
+		collision_mask = 3
+		$TimerDissolveBirth.start()
+		#freeze = false # 다시 움직일 수 있도록 해제
 
 
 func _on_area_2d_head_body_exited(body: Node2D) -> void:
 	head_touch.erase(body)
+
+
+func _on_timer_dissolve_die_timeout() -> void:
+	set_initial_pos()

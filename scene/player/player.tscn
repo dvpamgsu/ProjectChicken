@@ -1,11 +1,24 @@
-[gd_scene load_steps=10 format=3 uid="uid://bh58c7wn1bdd1"]
+[gd_scene load_steps=14 format=3 uid="uid://bh58c7wn1bdd1"]
 
 [ext_resource type="Script" uid="uid://dpuvfwalotfcx" path="res://scene/player/player.gd" id="1_cm2cf"]
 [ext_resource type="Texture2D" uid="uid://dvopr7qm824mo" path="res://texture/ppc-Sheet.png" id="1_v7pse"]
+[ext_resource type="Shader" uid="uid://dclg7xsg2en3" path="res://shaders/dissolve.gdshader" id="2_6smn3"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_cm2cf"]
 friction = 0.0
 bounce = 0.1
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_5lop3"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_ajqqa"]
+resource_local_to_scene = true
+noise = SubResource("FastNoiseLite_5lop3")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_rkmeh"]
+resource_local_to_scene = true
+shader = ExtResource("2_6smn3")
+shader_parameter/dissolve_texture = SubResource("NoiseTexture2D_ajqqa")
+shader_parameter/dissolve_value = 0.0
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_cm2cf"]
 radius = 4.0
@@ -46,36 +59,39 @@ properties/5/replication_mode = 1
 properties/6/path = NodePath(".:angular_velocity")
 properties/6/spawn = true
 properties/6/replication_mode = 1
-properties/7/path = NodePath(".:sleeping")
+properties/7/path = NodePath(".:additional_force")
 properties/7/spawn = true
-properties/7/replication_mode = 1
-properties/8/path = NodePath(".:additional_force")
+properties/7/replication_mode = 2
+properties/8/path = NodePath(".:bounce")
 properties/8/spawn = true
 properties/8/replication_mode = 2
-properties/9/path = NodePath(".:bounce")
+properties/9/path = NodePath(".:torque_power")
 properties/9/spawn = true
 properties/9/replication_mode = 2
-properties/10/path = NodePath(".:torque_power")
+properties/10/path = NodePath(".:jump_power")
 properties/10/spawn = true
 properties/10/replication_mode = 2
-properties/11/path = NodePath(".:jump_power")
+properties/11/path = NodePath(".:sync_flip_h")
 properties/11/spawn = true
 properties/11/replication_mode = 2
-properties/12/path = NodePath(".:sync_flip_h")
+properties/12/path = NodePath(".:alive")
 properties/12/spawn = true
 properties/12/replication_mode = 2
-properties/13/path = NodePath(".:alive")
+properties/13/path = NodePath(".:visible")
 properties/13/spawn = true
 properties/13/replication_mode = 2
-properties/14/path = NodePath(".:visible")
+properties/14/path = NodePath(".:is_host_player")
 properties/14/spawn = true
 properties/14/replication_mode = 2
-properties/15/path = NodePath(".:is_host_player")
+properties/15/path = NodePath(".:alive_timer")
 properties/15/spawn = true
 properties/15/replication_mode = 2
-properties/16/path = NodePath(".:alive_timer")
+properties/16/path = NodePath(".:dissolve_value")
 properties/16/spawn = true
-properties/16/replication_mode = 2
+properties/16/replication_mode = 1
+properties/17/path = NodePath(".:scale")
+properties/17/spawn = true
+properties/17/replication_mode = 1
 
 [node name="Player" type="RigidBody2D" groups=["player"]]
 collision_layer = 2
@@ -83,12 +99,14 @@ collision_mask = 3
 physics_material_override = SubResource("PhysicsMaterial_cm2cf")
 gravity_scale = 0.5
 center_of_mass_mode = 1
+can_sleep = false
 contact_monitor = true
 max_contacts_reported = 2
 angular_damp = 15.0
 script = ExtResource("1_cm2cf")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_rkmeh")
 position = Vector2(0, -12)
 texture = ExtResource("1_v7pse")
 hframes = 2
@@ -128,6 +146,14 @@ replication_config = SubResource("SceneReplicationConfig_cm2cf")
 wait_time = 3.0
 one_shot = true
 
+[node name="TimerDissolveBirth" type="Timer" parent="."]
+wait_time = 0.5
+one_shot = true
+
+[node name="TimerDissolveDie" type="Timer" parent="."]
+wait_time = 0.5
+one_shot = true
+
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]
 [connection signal="body_exited" from="." to="." method="_on_body_exited"]
 [connection signal="body_entered" from="Area2DFloor" to="." method="_on_area_2d_floor_body_entered"]
@@ -135,3 +161,4 @@ one_shot = true
 [connection signal="body_entered" from="Area2DHead" to="." method="_on_area_2d_head_body_entered"]
 [connection signal="body_exited" from="Area2DHead" to="." method="_on_area_2d_head_body_exited"]
 [connection signal="timeout" from="TimerRebirth" to="." method="_on_timer_rebirth_timeout"]
+[connection signal="timeout" from="TimerDissolveDie" to="." method="_on_timer_dissolve_die_timeout"]

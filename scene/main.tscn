@@ -1,10 +1,13 @@
-[gd_scene load_steps=4 format=3 uid="uid://cr7wv4h5j6efm"]
+[gd_scene load_steps=5 format=3 uid="uid://cr7wv4h5j6efm"]
 
 [ext_resource type="Script" uid="uid://d28h4b1ulmne7" path="res://scene/main.gd" id="1_itxqv"]
 [ext_resource type="PackedScene" uid="uid://djnt8fbxvb051" path="res://scene/stage/stage_test.tscn" id="2_v0l8b"]
 
 [sub_resource type="Theme" id="Theme_v0l8b"]
 default_font_size = 48
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_v0l8b"]
+size = Vector2(944, 1920)
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_itxqv")
@@ -242,6 +245,19 @@ vertical_alignment = 1
 zoom = Vector2(2, 2)
 position_smoothing_enabled = true
 position_smoothing_speed = 3.0
+
+[node name="boundary1" type="StaticBody2D" parent="Cam_target/Camera2D"]
+position = Vector2(-760, 0)
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Cam_target/Camera2D/boundary1"]
+shape = SubResource("RectangleShape2D_v0l8b")
+
+[node name="boundary2" type="StaticBody2D" parent="Cam_target/Camera2D"]
+position = Vector2(760, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Cam_target/Camera2D/boundary2"]
+shape = SubResource("RectangleShape2D_v0l8b")
 
 [node name="TimerWin" type="Timer" parent="."]
 wait_time = 3.0

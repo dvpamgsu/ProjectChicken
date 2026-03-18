@@ -166,17 +166,18 @@ func _process(delta: float) -> void:
 	#print(state)
 	#print(lobby.visible)
 	
-	if players.size() == 2:
-		for pk in players:
-			label_bounce.text = str(players[pk].bounce)
-			label_additional.text = str(players[pk].additional_force)
-			label_torque.text = str(players[pk].torque_power)
-			label_jump.text = str(players[pk].jump_power)
-			break
+	#if players.size() == 2:
+		#for pk in players:
+			#if players[pk]:			
+				#label_bounce.text = str(players[pk].bounce)
+				#label_additional.text = str(players[pk].additional_force)
+				#label_torque.text = str(players[pk].torque_power)
+				#label_jump.text = str(players[pk].jump_power)
+				#break
 			
 	if stage:
-		cam_bl_pos = stage.cam_bl.position
-		cam_tr_pos = stage.cam_tr.position
+		cam_bl_pos = stage.cam_bl.global_position
+		cam_tr_pos = stage.cam_tr.global_position
 		
 	#if state != STATE.GAME and state != STATE.GAMEWIN and stage:
 		#stage.queue_free()
@@ -191,6 +192,13 @@ func _process(delta: float) -> void:
 			#print("현재 players 딕셔너리 내용: ", players)
 			#for id in players:
 				#print("ID: ", id, " | 노드 존재: ", is_instance_valid(players[id]), " | 방장여부: ", players[id].is_host_player)
+		
+			if is_host:
+				$Cam_target/Camera2D/boundary1.collision_layer = 1
+				$Cam_target/Camera2D/boundary2.collision_layer = 4
+			else:
+				$Cam_target/Camera2D/boundary1.collision_layer = 4
+				$Cam_target/Camera2D/boundary2.collision_layer = 1
 		
 			var member_count = Steam.getNumLobbyMembers(lobby_id)
 			if member_count == 2 and players.size() == 2:
@@ -250,7 +258,9 @@ func _process(delta: float) -> void:
 					#p1.position.y = clamp(p1.position.y, pos_center.y - height/2, pos_center.y + height/2)
 					#p2.position.x = min(p2.position.x, pos_center.x + width/2)
 					#p2.position.y = clamp(p2.position.y, pos_center.y - height/2, pos_center.y + height/2)
-				
+					#
+					#print(p1.position.x)
+					#print(cam_target.position.x - width/2)
 					if p1.position.x > cam_target.position.x + width/2:
 						p1.dead()
 					if p2.position.x < cam_target.position.x - width/2:
