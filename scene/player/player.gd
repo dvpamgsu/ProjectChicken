@@ -35,7 +35,7 @@ func _ready() -> void:
 			position = main.stage.spawn_2.position
 			initial_pos = position
 			flip_dir = -1
-	print(is_multiplayer_authority())
+	#print(is_multiplayer_authority())
 	if !is_multiplayer_authority():
 		freeze = true
 	if name.to_int() != 1:
@@ -53,15 +53,15 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 		angular_velocity = 0
 		return
 	
-	#for i in state.get_contact_count():
-		#var target = state.get_contact_collider_object(i)
-		#if target is RigidBody2D and target.is_in_group("player"):
-			#var my_vel = state.linear_velocity
-			#var target_vel = target.linear_velocity
-			#
-			#var collision_normal = state.get_contact_local_normal(i)
-			#var push_force = target_vel.length() * additional_force
-			#state.linear_velocity += collision_normal * push_force
+	for i in state.get_contact_count():
+		var target = state.get_contact_collider_object(i)
+		if target is RigidBody2D and target.is_in_group("player"):
+			var my_vel = state.linear_velocity
+			var target_vel = target.linear_velocity
+			
+			var collision_normal = state.get_contact_local_normal(i)
+			var push_force = target_vel.length() * additional_force
+			state.linear_velocity += collision_normal * push_force * 0.1
 			
 	var t = state.transform
 	
@@ -98,14 +98,18 @@ var alter = null
 @export var alive_timer = 0.0
 var jump_cnt = 1
 @export var dissolve_value = 0.0
-func _physics_process(delta: float) -> void:
-	
+func find_alter():
 	if !alter:
 		for pk in main.players:
 			var p = main.players[pk]
 			if p == self:
 				continue
 			alter = p
+			#print(alter)
+			
+func _physics_process(delta: float) -> void:
+	
+	find_alter()
 	#print(freeze)
 	#print(position)
 	sprite_2d.flip_h = sync_flip_h
@@ -199,6 +203,13 @@ func _physics_process(delta: float) -> void:
 		
 	physics_material_override.bounce = bounce
 	
+	check_flip()
+	# 낙사
+	if position.y > main.cam_bl_pos.y:
+		dead()
+		
+func check_flip():
+	#print(name)
 	for pk in main.players:
 		var p2 = main.players[pk]
 		if p2 == self:
@@ -217,10 +228,6 @@ func _physics_process(delta: float) -> void:
 			set_flip(1.0)
 		elif !is_host_player and alive_timer > alter.alive_timer+0.5:
 			set_flip(-1.0)
-			
-	# 낙사
-	if position.y > main.cam_bl_pos.y:
-		dead()
 		
 func set_flip(dir):
 	flip_dir = dir
@@ -230,14 +237,14 @@ func set_flip(dir):
 func set_initial_pos():
 	if !is_multiplayer_authority():
 		return
-	var alter
-	for pk in main.players:
-		var p = main.players[pk]
-		if p == self:
-			continue
-		alter = p
+	#var alter
+	#for pk in main.players:
+		#var p = main.players[pk]
+		#if p == self:
+			#continue
+		#alter = p
 	var offsetX = 0
-	if main.is_host:
+	if main.is_host or is_host_player:
 		offsetX = -240
 	else:
 		offsetX = 240
@@ -292,7 +299,7 @@ func set_initial_pos():
 	#PhysicsServer2D.body_set_state(get_rid(), PhysicsServer2D.BODY_STATE_ANGULAR_VELOCITY, 0.0)
 	
 	# 이제 출력하면 값이 일치하거나 매우 근접하게 나옵니다.
-	print("반영된 위치 (position): ", position)
+	#print("반영된 위치 (position): ", position)
 	
 func dead():
 	if !alive:
@@ -363,7 +370,7 @@ func _on_area_2d_head_body_entered(body: Node2D) -> void:
 
 
 func _on_timer_rebirth_timeout() -> void:
-	print("rebirth")
+	#print("rebirth")
 	if is_multiplayer_authority():
 		initialize()
 		alive = true

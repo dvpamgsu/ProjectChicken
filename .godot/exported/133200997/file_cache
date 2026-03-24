@@ -1,6 +1,6 @@
-res://scene/main.tscn::50ada9c39e0446fd057ec0997e4a68a9::1773807026::res://.godot/exported/133200997/export-fa9c8ff5b16a5ec23280afa6577b07ee-main.scn
+res://scene/main.tscn::42092a49865987343f3952d1fe46c654::1774360509::res://.godot/exported/133200997/export-fa9c8ff5b16a5ec23280afa6577b07ee-main.scn
 res://scene/player.tscn::8f19d2533d14312cd9adcb15ef63cf1c::1772623146::res://.godot/exported/133200997/export-34afcb3bda2393b8f6a0cd71512aeb81-player.scn
-res://scene/player/player.tscn::d45ade974e9a3f99ad91bda7d4c7ee40::1773805983::res://.godot/exported/133200997/export-3e038ebae82c2bbbd20a0c261d1078da-player.scn
+res://scene/player/player.tscn::ce158841e079f11b18692d2534e5e415::1774366777::res://.godot/exported/133200997/export-3e038ebae82c2bbbd20a0c261d1078da-player.scn
 res://samples/softbody2d/attach-to-character-controller/attach.tscn::1981d9d0fb62367a146fe0e616e98e6f::1772627226::res://.godot/exported/133200997/export-85c8cc1f2a1438288bf8b33d0380456e-attach.scn
 res://samples/softbody2d/car-demo/car.tscn::b1d3d2877fdf76e21517927a24d992d1::1772627226::res://.godot/exported/133200997/export-ba6652c9b952fdbb016c46a28897f015-car.scn
 res://samples/softbody2d/create-a-softbody/create.tscn::a3d3e628a954f06d1395c0417922a233::1772627226::res://.godot/exported/133200997/export-92bf1d9cc423ab48c5b88cdcaf350213-create.scn
@@ -9,6 +9,8 @@ res://samples/softbody2d/pickable_rigidbody.tscn::93a37b4bb5d23aca89b6f8b622746a
 res://samples/softbody2d/softbody2d_phys_bouncy.tres::57a4bc8af5a17d26eed09f5e8a6bc23a::1772627226::res://.godot/exported/133200997/export-fb44730d2b934bfa1a117edeee8a73bf-softbody2d_phys_bouncy.res
 res://samples/softbody2d/softbody2d_phys_slippery.tres::7bb2e1643bd69078026fcbba92b88b10::1772627226::res://.godot/exported/133200997/export-9c42b8c94296da65a37b355006b59122-softbody2d_phys_slippery.res
 res://samples/softbody2d/tutorial.tscn::05aa7e8c779604de1a28bb30f563ac7d::1772627226::res://.godot/exported/133200997/export-2628788171ecb435ff9cbf0eee333ed9-tutorial.scn
-res://scene/pm/pm_ground.tres::9499e3c50291fd76d98bb9498b96f0d1::1773321085::res://.godot/exported/133200997/export-0c4b4d5a2e6082f226e33406166d227a-pm_ground.res
-res://scene/stage/stage_test.tscn::2eab899c0086ba3f8993fd3cad679a73::1773667296::res://.godot/exported/133200997/export-4b7a17813a2c92aa00ae5facfdc2ea3a-stage_test.scn
-res://scene/stage/stage.tscn::81a769a7a8dfa3b9a74db33b64b73250::1773434979::res://.godot/exported/133200997/export-0de06b99a795985a40adfae85b131389-stage.scn
+res://scene/pm/pm_ground.tres::1ef0bade681e1fa99093da44e0f3f5e0::1774366800::res://.godot/exported/133200997/export-0c4b4d5a2e6082f226e33406166d227a-pm_ground.res
+res://scene/stage/stage_test.tscn::2eab899c0086ba3f8993fd3cad679a73::1774367415::res://.godot/exported/133200997/export-4b7a17813a2c92aa00ae5facfdc2ea3a-stage_test.scn
+res://scene/stage/stage.tscn::81a769a7a8dfa3b9a74db33b64b73250::1774359471::res://.godot/exported/133200997/export-0de06b99a795985a40adfae85b131389-stage.scn
+res://scene/player/player_single.tscn::a25fa86c8eb138b969f0755570e545e2::1774360350::res://.godot/exported/133200997/export-0615eb83cc26edda66f0855488dd8457-player_single.scn
+res://scene/player/player_ai.tscn::dec17fa201f2a139b86b8af5adf8fb02::1774366380::res://.godot/exported/133200997/export-75f3bc87ffb0c80a79e30b56e9f9b5a1-player_ai.scn

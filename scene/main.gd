@@ -6,6 +6,8 @@ var is_host : bool = false
 var is_joining : bool = false
 
 @onready var host_button: Button = $CanvasLayer/mainmenu/host_button
+@onready var single_button: Button = $CanvasLayer/mainmenu/single_button
+
 
 @onready var value_bounce: LineEdit = $CanvasLayer/debug/value_bounce
 @onready var value_additional: LineEdit = $CanvasLayer/debug/value_additional
@@ -16,6 +18,8 @@ var is_joining : bool = false
 @onready var label_additional: Label = $CanvasLayer/debug/Label_additional
 @onready var label_torque: Label = $CanvasLayer/debug/Label_torque
 @onready var label_jump: Label = $CanvasLayer/debug/Label_jump
+
+
 
 @onready var button_bounce: Button = $CanvasLayer/debug/Button_bounce
 @onready var button_additional: Button = $CanvasLayer/debug/Button_additional
@@ -28,6 +32,8 @@ var is_joining : bool = false
 @onready var debug: Node2D = $CanvasLayer/debug
 @onready var lobby: Node2D = $CanvasLayer/lobby
 @onready var friend_lobbies: Node2D = $CanvasLayer/friend_lobbies
+@onready var lobby_single: Node2D = $CanvasLayer/lobby_single
+
 
 @onready var label_player_1: Label = $CanvasLayer/lobby/Label_player1
 @onready var label_player_2: Label = $CanvasLayer/lobby/Label_player2
@@ -59,7 +65,7 @@ const PLAYER = preload("uid://bh58c7wn1bdd1")
 
 var players = {}
 
-enum STATE {MAIN, LOBBY, FRIEND_LOBBIES, GAME, GAMEWIN}
+enum STATE {MAIN, LOBBY, FRIEND_LOBBIES, GAME, GAMEWIN, LOBBY_SINGLE, GAME_SINGLE, GAMEWIN_SINGLE}
 var state : STATE = STATE.MAIN
 
 func _ready() -> void:
@@ -69,6 +75,7 @@ func _ready() -> void:
 	lobby.visible = false
 	friend_lobbies.visible = false
 	game_ui.visible = false
+	lobby_single.visible = false
 	
 	label_players.append(label_player_1)
 	label_players.append(label_player_2)
@@ -136,7 +143,6 @@ func win(num):
 	state = STATE.GAMEWIN
 	var p1 = null
 	var p2 = null
-	#print(players
 	for pk in players:
 		var p = players[pk]
 		if !p:
@@ -183,7 +189,7 @@ func _process(delta: float) -> void:
 		#stage.queue_free()
 		#stage = null
 
-	if state != STATE.GAME:
+	if state != STATE.GAME and state != STATE.GAME_SINGLE:
 		cam_target.position = Vector2.ZERO
 		camera_2d.position = Vector2.ZERO		
 		
@@ -193,32 +199,36 @@ func _process(delta: float) -> void:
 			pass
 		STATE.LOBBY:
 			pass
-		STATE.GAME:
-			#print("현재 players 딕셔너리 내용: ", players)
-			#for id in players:
-				#print("ID: ", id, " | 노드 존재: ", is_instance_valid(players[id]), " | 방장여부: ", players[id].is_host_player)
+		STATE.GAME, STATE.GAME_SINGLE:
+			if state == STATE.GAME:
+				if Input.is_action_just_pressed("debug1"):
+					win.rpc(1)
+				if Input.is_action_just_pressed("debug2"):
+					win.rpc(2)
 		
-			if Input.is_action_just_pressed("debug1"):
-				win.rpc(1)
-			if Input.is_action_just_pressed("debug2"):
-				win.rpc(2)
-		
-			if is_host:
-				$Camera2D/boundary1.collision_layer = 1
-				$Camera2D/boundary2.collision_layer = 4
-			else:
-				$Camera2D/boundary1.collision_layer = 4
-				$Camera2D/boundary2.collision_layer = 1
+				if is_host:
+					$Camera2D/boundary1.collision_layer = 1
+					$Camera2D/boundary2.collision_layer = 8
+				else:
+					$Camera2D/boundary1.collision_layer = 8
+					$Camera2D/boundary2.collision_layer = 1
+			if state == STATE.GAME_SINGLE:
+				$Camera2D/boundary1.collision_layer = 8
+				$Camera2D/boundary2.collision_layer = 16
 				
 			camera_2d.position += (cam_target.position - camera_2d.position) * delta * 2.0
-		
-			var member_count = Steam.getNumLobbyMembers(lobby_id)
+			
+			var member_count
+			if state == STATE.GAME:
+				member_count = Steam.getNumLobbyMembers(lobby_id)
+			else:
+				member_count = 2
+				
 			if member_count == 2 and players.size() == 2:
 				var pos_center = Vector2.ZERO
 				var p1 = null
 				var p2 = null
 				#print(players)
-				var host_steam_id = Steam.getLobbyOwner(lobby_id)
 				var alive_cnt = 0
 				for pk in players:
 					var p = players[pk]
@@ -232,7 +242,6 @@ func _process(delta: float) -> void:
 						pos_center += players[pk].position
 						alive_cnt += 1
 				if p1 and p2:
-					
 					if alive_cnt == 2:
 						pos_center /= alive_cnt
 					else:
@@ -259,20 +268,9 @@ func _process(delta: float) -> void:
 					if result:
 						cam_target.position.y = result.position.y - 64
 					
-					#cam_target.position.y = min(p1.position.y, p2.position.y)
-						
 					cam_target.position.x = clamp(cam_target.position.x, cam_bl_pos.x + width/2, cam_tr_pos.x - width/2)
 					cam_target.position.y = clamp(cam_target.position.y, cam_tr_pos.y + height/2, cam_bl_pos.y - height/2)
 					
-					#p1.position.x = max(p1.position.x, pos_center.x - width/2)
-					#if p1.position.x > pos_center.x - width/2:
-						#p1.
-					#p1.position.y = clamp(p1.position.y, pos_center.y - height/2, pos_center.y + height/2)
-					#p2.position.x = min(p2.position.x, pos_center.x + width/2)
-					#p2.position.y = clamp(p2.position.y, pos_center.y - height/2, pos_center.y + height/2)
-					#
-					#print(p1.position.x)
-					#print(cam_target.position.x - width/2)
 					if p1.position.x > cam_target.position.x + width/2:
 						p1.dead()
 					if p2.position.x < cam_target.position.x - width/2:
@@ -355,6 +353,7 @@ func update_lobby_members_ui() -> void:
 func start_game() -> void:
 	
 	
+	is_single_game = false
 	camera_2d.position = Vector2.ZERO
 	if state != STATE.LOBBY:
 		return
@@ -741,3 +740,83 @@ func _on_timer_win_timeout() -> void:
 	game_ui.visible = false
 	lobby.visible = true
 	
+
+
+func _on_single_button_pressed() -> void:
+	mainmenu.visible = false
+	lobby_single.visible = true
+	state = STATE.LOBBY_SINGLE
+
+
+func _on_single_start_button_pressed() -> void:
+	lobby_single.visible = false
+	state = STATE.GAME_SINGLE
+	single_game_start()
+	
+const PLAYER_SINGLE = preload("uid://cwqqe8ake83qo")
+const PLAYER_AI = preload("uid://c26cids0j3463")
+
+var is_single_game = false
+func single_game_start():
+	
+	is_single_game = true
+	camera_2d.position = Vector2.ZERO
+	state = STATE.GAME_SINGLE
+	var s = stages[0].instantiate()
+	add_child(s)
+	stage = s
+	var p
+	p = PLAYER_SINGLE.instantiate()
+	p.name = "1"
+	p.is_host_player = true
+	add_child(p)
+	p = PLAYER_AI.instantiate()
+	p.name = "2"
+	add_child(p)
+	
+func single_win(num):
+	if state != STATE.GAME_SINGLE:
+		return
+	print("win " + str(num))
+	state = STATE.GAMEWIN_SINGLE
+	var p1 = null
+	var p2 = null
+	for pk in players:
+		var p = players[pk]
+		if !p:
+			continue
+		if p.is_host_player:
+			p1 = players[pk]
+		else:
+			p2 = players[pk]
+			
+	for id in players:
+		var p:Node2D = players[id]
+		p.set_deferred_thread_group("freeze", true)
+		p.end = true
+		print("freeze " + str(id))
+	game_ui.visible = true
+	if num == 1:
+		var member_name = Steam.getPersonaName()
+		label_win.text = member_name + " won"
+	else:
+		var member_name = "AI"
+		label_win.text = member_name + " won"
+	$TimerWinSingle.start()
+	
+func _on_timer_win_single_timeout() -> void:
+	state = STATE.LOBBY_SINGLE
+	if stage:
+		stage.queue_free()
+		stage = null
+	for pk in players:
+		var p = players[pk]
+		if p:
+			p.queue_free()
+		
+		
+	players.clear()
+	mainmenu.visible = false
+	friend_lobbies.visible = false
+	game_ui.visible = false
+	lobby_single.visible = true

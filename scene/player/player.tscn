@@ -6,7 +6,7 @@
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_cm2cf"]
 friction = 0.0
-bounce = 0.1
+bounce = 0.4
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_5lop3"]
 

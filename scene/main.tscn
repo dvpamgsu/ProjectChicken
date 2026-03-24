@@ -45,6 +45,20 @@ offset_right = 635.0
 offset_bottom = 399.0
 text = "friend lobbies"
 
+[node name="single_button" type="Button" parent="CanvasLayer/mainmenu"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 528.0
+offset_top = 424.0
+offset_right = 624.0
+offset_bottom = 455.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "singleplay"
+
 [node name="debug" type="Node2D" parent="CanvasLayer"]
 visible = false
 
@@ -137,6 +151,7 @@ offset_bottom = 303.0
 text = "reset pos"
 
 [node name="lobby" type="Node2D" parent="CanvasLayer"]
+visible = false
 
 [node name="Label_player1" type="Label" parent="CanvasLayer/lobby"]
 anchors_preset = 8
@@ -202,6 +217,7 @@ grow_vertical = 2
 expand_mode = 1
 
 [node name="friend_lobbies" type="Node2D" parent="CanvasLayer"]
+visible = false
 
 [node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer/friend_lobbies"]
 offset_left = 384.0
@@ -221,6 +237,7 @@ text = "refresh
 "
 
 [node name="Game_UI" type="Node2D" parent="CanvasLayer"]
+visible = false
 
 [node name="LabelWin" type="Label" parent="CanvasLayer/Game_UI"]
 anchors_preset = 8
@@ -239,13 +256,22 @@ text = "WIN"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="lobby_single" type="Node2D" parent="CanvasLayer"]
+visible = false
+
+[node name="single_start_button" type="Button" parent="CanvasLayer/lobby_single"]
+offset_left = 545.0
+offset_top = 307.0
+offset_right = 609.0
+offset_bottom = 344.0
+text = "start"
+
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(2, 2)
 position_smoothing_speed = 3.0
 
 [node name="boundary1" type="StaticBody2D" parent="Camera2D"]
 position = Vector2(-760, 0)
-collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Camera2D/boundary1"]
 shape = SubResource("RectangleShape2D_v0l8b")
@@ -254,6 +280,7 @@ shape = SubResource("RectangleShape2D_v0l8b")
 position = Vector2(760, 0)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Camera2D/boundary2"]
+position = Vector2(0, -8)
 shape = SubResource("RectangleShape2D_v0l8b")
 
 [node name="Cam_target" type="Node2D" parent="."]
@@ -262,8 +289,13 @@ shape = SubResource("RectangleShape2D_v0l8b")
 wait_time = 3.0
 one_shot = true
 
+[node name="TimerWinSingle" type="Timer" parent="."]
+wait_time = 3.0
+one_shot = true
+
 [connection signal="pressed" from="CanvasLayer/mainmenu/host_button" to="." method="_on_host_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/mainmenu/lobby_button" to="." method="_on_lobby_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/mainmenu/single_button" to="." method="_on_single_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/debug/Button_bounce" to="." method="_on_button_bounce_pressed"]
 [connection signal="pressed" from="CanvasLayer/debug/Button_additional" to="." method="_on_button_additional_pressed"]
 [connection signal="pressed" from="CanvasLayer/debug/Button_torque" to="." method="_on_button_torque_pressed"]
@@ -271,4 +303,6 @@ one_shot = true
 [connection signal="pressed" from="CanvasLayer/debug/Button_reset" to="." method="_on_button_reset_pressed"]
 [connection signal="pressed" from="CanvasLayer/lobby/Button_ready" to="." method="_on_button_ready_pressed"]
 [connection signal="pressed" from="CanvasLayer/friend_lobbies/Button_refresh" to="." method="_on_button_refresh_pressed"]
+[connection signal="pressed" from="CanvasLayer/lobby_single/single_start_button" to="." method="_on_single_start_button_pressed"]
 [connection signal="timeout" from="TimerWin" to="." method="_on_timer_win_timeout"]
+[connection signal="timeout" from="TimerWinSingle" to="." method="_on_timer_win_single_timeout"]

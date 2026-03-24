@@ -1,12 +1,13 @@
+RayCast2D
+Timer
+Button
+Node2D
 CollisionShape2D
 StaticBody2D
-Timer
 Area2D
 Label
-Node2D
 Camera2D
 Sprite2D
-Button
 ScrollContainer
 VBoxContainer
 TextureRect
