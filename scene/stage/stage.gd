@@ -10,7 +10,7 @@ extends Node2D
 
 func _on_area_2dp_1_body_entered(body: Node2D) -> void:
 	#print("area1, " + str(body))
-	if main.is_single_game and body.name == "1":
+	if (main.is_single_game or main.is_local_game) and body.name == "1":
 		main.single_win(1)
 		return
 	if multiplayer.is_server():
@@ -20,7 +20,7 @@ func _on_area_2dp_1_body_entered(body: Node2D) -> void:
 
 func _on_area_2dp_2_body_entered(body: Node2D) -> void:
 	#print("area2, " + str(body))
-	if main.is_single_game and body.name != "1":
+	if (main.is_single_game or main.is_local_game) and body.name != "1":
 		main.single_win(2)
 		return
 	if !multiplayer.is_server():

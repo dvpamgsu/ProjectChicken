@@ -1,7 +1,7 @@
-RayCast2D
-Timer
 Button
 Node2D
+RayCast2D
+Timer
 CollisionShape2D
 StaticBody2D
 Area2D
@@ -12,4 +12,3 @@ ScrollContainer
 VBoxContainer
 TextureRect
 Node
-ColorRect

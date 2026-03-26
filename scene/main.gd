@@ -48,6 +48,8 @@ var is_joining : bool = false
 @onready var game_ui: Node2D = $CanvasLayer/Game_UI
 @onready var label_win: Label = $CanvasLayer/Game_UI/LabelWin
 
+@onready var local_button: Button = $CanvasLayer/mainmenu/local_Button
+@onready var lobby_local: Node2D = $CanvasLayer/lobby_local
 
 
 @export var stages = []
@@ -65,7 +67,7 @@ const PLAYER = preload("uid://bh58c7wn1bdd1")
 
 var players = {}
 
-enum STATE {MAIN, LOBBY, FRIEND_LOBBIES, GAME, GAMEWIN, LOBBY_SINGLE, GAME_SINGLE, GAMEWIN_SINGLE}
+enum STATE {MAIN, LOBBY, FRIEND_LOBBIES, GAME, GAMEWIN, LOBBY_SINGLE, GAME_SINGLE, GAMEWIN_SINGLE, LOBBY_LOCAL, GAME_LOCAL, GAMEWIN_LOCAL}
 var state : STATE = STATE.MAIN
 
 func _ready() -> void:
@@ -76,6 +78,7 @@ func _ready() -> void:
 	friend_lobbies.visible = false
 	game_ui.visible = false
 	lobby_single.visible = false
+	lobby_local.visible = false
 	
 	label_players.append(label_player_1)
 	label_players.append(label_player_2)
@@ -189,7 +192,7 @@ func _process(delta: float) -> void:
 		#stage.queue_free()
 		#stage = null
 
-	if state != STATE.GAME and state != STATE.GAME_SINGLE:
+	if state != STATE.GAME and state != STATE.GAME_SINGLE and state != STATE.GAME_LOCAL:
 		cam_target.position = Vector2.ZERO
 		camera_2d.position = Vector2.ZERO		
 		
@@ -199,7 +202,7 @@ func _process(delta: float) -> void:
 			pass
 		STATE.LOBBY:
 			pass
-		STATE.GAME, STATE.GAME_SINGLE:
+		STATE.GAME, STATE.GAME_SINGLE, STATE.GAME_LOCAL:
 			if state == STATE.GAME:
 				if Input.is_action_just_pressed("debug1"):
 					win.rpc(1)
@@ -212,7 +215,7 @@ func _process(delta: float) -> void:
 				else:
 					$Camera2D/boundary1.collision_layer = 8
 					$Camera2D/boundary2.collision_layer = 1
-			if state == STATE.GAME_SINGLE:
+			if state == STATE.GAME_SINGLE or state == STATE.GAME_LOCAL:
 				$Camera2D/boundary1.collision_layer = 8
 				$Camera2D/boundary2.collision_layer = 16
 				
@@ -251,7 +254,7 @@ func _process(delta: float) -> void:
 							pos_center.x -= width/4
 						else:
 							pos_center.x = (p1.position.x + p2.position.x)/2
-
+					
 					cam_target.position.x = pos_center.x
 					
 					if p1.alive and p2.alive:
@@ -354,6 +357,7 @@ func start_game() -> void:
 	
 	
 	is_single_game = false
+	is_local_game = false
 	camera_2d.position = Vector2.ZERO
 	if state != STATE.LOBBY:
 		return
@@ -760,6 +764,7 @@ var is_single_game = false
 func single_game_start():
 	
 	is_single_game = true
+	is_local_game = false
 	camera_2d.position = Vector2.ZERO
 	state = STATE.GAME_SINGLE
 	var s = stages[0].instantiate()
@@ -775,10 +780,13 @@ func single_game_start():
 	add_child(p)
 	
 func single_win(num):
-	if state != STATE.GAME_SINGLE:
+	if state != STATE.GAME_SINGLE and state != STATE.GAME_LOCAL:
 		return
 	print("win " + str(num))
-	state = STATE.GAMEWIN_SINGLE
+	if state == STATE.GAME_SINGLE:
+		state = STATE.GAMEWIN_SINGLE
+	else:
+		state = STATE.GAMEWIN_LOCAL
 	var p1 = null
 	var p2 = null
 	for pk in players:
@@ -797,15 +805,19 @@ func single_win(num):
 		print("freeze " + str(id))
 	game_ui.visible = true
 	if num == 1:
+		
 		var member_name = Steam.getPersonaName()
+		if state == STATE.GAMEWIN_LOCAL:
+			member_name = "Player 1"
 		label_win.text = member_name + " won"
 	else:
 		var member_name = "AI"
+		if state == STATE.GAMEWIN_LOCAL:
+			member_name = "Player 2"
 		label_win.text = member_name + " won"
 	$TimerWinSingle.start()
 	
 func _on_timer_win_single_timeout() -> void:
-	state = STATE.LOBBY_SINGLE
 	if stage:
 		stage.queue_free()
 		stage = null
@@ -819,4 +831,41 @@ func _on_timer_win_single_timeout() -> void:
 	mainmenu.visible = false
 	friend_lobbies.visible = false
 	game_ui.visible = false
-	lobby_single.visible = true
+	if state == STATE.GAMEWIN_SINGLE:
+		lobby_single.visible = true
+		state = STATE.LOBBY_SINGLE
+	else:
+		lobby_local.visible = true
+		state = STATE.LOBBY_LOCAL
+
+
+func _on_local_button_pressed() -> void:
+	mainmenu.visible = false
+	lobby_local.visible = true
+	state = STATE.LOBBY_LOCAL
+
+
+func _on_local_start_button_pressed() -> void:
+	lobby_local.visible = false
+	state = STATE.GAME_LOCAL
+	local_game_start()
+	
+const PLAYER_LOCAL_ALTER = preload("uid://bnw6ygsrlbhmt")	
+var is_local_game = false
+func local_game_start():
+	
+	is_local_game = true
+	is_single_game = false
+	camera_2d.position = Vector2.ZERO
+	state = STATE.GAME_LOCAL
+	var s = stages[0].instantiate()
+	add_child(s)
+	stage = s
+	var p
+	p = PLAYER_SINGLE.instantiate()
+	p.name = "1"
+	p.is_host_player = true
+	add_child(p)
+	p = PLAYER_LOCAL_ALTER.instantiate()
+	p.name = "2"
+	add_child(p)

@@ -1,0 +1,24 @@
+[gd_scene load_steps=7 format=3 uid="uid://bnw6ygsrlbhmt"]
+
+[ext_resource type="PackedScene" uid="uid://bh58c7wn1bdd1" path="res://scene/player/player.tscn" id="1_04ss7"]
+[ext_resource type="Script" uid="uid://cmua4vkd7mgve" path="res://scene/player/player_local_alter.gd" id="2_2w4un"]
+[ext_resource type="Shader" uid="uid://dclg7xsg2en3" path="res://shaders/dissolve.gdshader" id="2_utsnf"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_5lop3"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_2w4un"]
+resource_local_to_scene = true
+noise = SubResource("FastNoiseLite_5lop3")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_iiq17"]
+resource_local_to_scene = true
+shader = ExtResource("2_utsnf")
+shader_parameter/dissolve_texture = SubResource("NoiseTexture2D_2w4un")
+shader_parameter/dissolve_value = 0.0
+
+[node name="Player" instance=ExtResource("1_04ss7")]
+collision_mask = 19
+script = ExtResource("2_2w4un")
+
+[node name="Sprite2D" parent="." index="0"]
+material = SubResource("ShaderMaterial_iiq17")

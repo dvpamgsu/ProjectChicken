@@ -59,6 +59,13 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "singleplay"
 
+[node name="local_Button" type="Button" parent="CanvasLayer/mainmenu"]
+offset_left = 528.0
+offset_top = 480.0
+offset_right = 624.0
+offset_bottom = 512.0
+text = "localplay"
+
 [node name="debug" type="Node2D" parent="CanvasLayer"]
 visible = false
 
@@ -266,6 +273,17 @@ offset_right = 609.0
 offset_bottom = 344.0
 text = "start"
 
+[node name="lobby_local" type="Node2D" parent="CanvasLayer"]
+visible = false
+
+[node name="local_start_button" type="Button" parent="CanvasLayer/lobby_local"]
+offset_left = 545.0
+offset_top = 307.0
+offset_right = 608.0
+offset_bottom = 342.0
+text = "start
+"
+
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(2, 2)
 position_smoothing_speed = 3.0
@@ -280,7 +298,7 @@ shape = SubResource("RectangleShape2D_v0l8b")
 position = Vector2(760, 0)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Camera2D/boundary2"]
-position = Vector2(0, -8)
+position = Vector2(48, -56)
 shape = SubResource("RectangleShape2D_v0l8b")
 
 [node name="Cam_target" type="Node2D" parent="."]
@@ -296,6 +314,7 @@ one_shot = true
 [connection signal="pressed" from="CanvasLayer/mainmenu/host_button" to="." method="_on_host_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/mainmenu/lobby_button" to="." method="_on_lobby_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/mainmenu/single_button" to="." method="_on_single_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/mainmenu/local_Button" to="." method="_on_local_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/debug/Button_bounce" to="." method="_on_button_bounce_pressed"]
 [connection signal="pressed" from="CanvasLayer/debug/Button_additional" to="." method="_on_button_additional_pressed"]
 [connection signal="pressed" from="CanvasLayer/debug/Button_torque" to="." method="_on_button_torque_pressed"]
@@ -304,5 +323,6 @@ one_shot = true
 [connection signal="pressed" from="CanvasLayer/lobby/Button_ready" to="." method="_on_button_ready_pressed"]
 [connection signal="pressed" from="CanvasLayer/friend_lobbies/Button_refresh" to="." method="_on_button_refresh_pressed"]
 [connection signal="pressed" from="CanvasLayer/lobby_single/single_start_button" to="." method="_on_single_start_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/lobby_local/local_start_button" to="." method="_on_local_start_button_pressed"]
 [connection signal="timeout" from="TimerWin" to="." method="_on_timer_win_timeout"]
 [connection signal="timeout" from="TimerWinSingle" to="." method="_on_timer_win_single_timeout"]
