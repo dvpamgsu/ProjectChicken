@@ -1,12 +1,12 @@
 [gd_scene load_steps=14 format=3 uid="uid://bh58c7wn1bdd1"]
 
 [ext_resource type="Script" uid="uid://dpuvfwalotfcx" path="res://scene/player/player.gd" id="1_cm2cf"]
-[ext_resource type="Texture2D" uid="uid://dvopr7qm824mo" path="res://texture/ppc-Sheet.png" id="1_v7pse"]
 [ext_resource type="Shader" uid="uid://dclg7xsg2en3" path="res://shaders/dissolve.gdshader" id="2_6smn3"]
+[ext_resource type="Texture2D" uid="uid://c8opi2cft2wbu" path="res://texture/ppc-Sheet2.png" id="3_6smn3"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_cm2cf"]
 friction = 0.0
-bounce = 0.4
+bounce = 0.1
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_5lop3"]
 
@@ -113,9 +113,9 @@ script = ExtResource("1_cm2cf")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 material = SubResource("ShaderMaterial_rkmeh")
-position = Vector2(0, -12)
-texture = ExtResource("1_v7pse")
-hframes = 2
+position = Vector2(0, -1)
+texture = ExtResource("3_6smn3")
+hframes = 3
 
 [node name="col1" type="CollisionShape2D" parent="."]
 position = Vector2(0, 11)
