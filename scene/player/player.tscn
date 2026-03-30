@@ -6,7 +6,6 @@
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_cm2cf"]
 friction = 0.0
-bounce = 0.1
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_5lop3"]
 
@@ -98,6 +97,9 @@ properties/18/replication_mode = 1
 properties/19/path = NodePath(".:collision_mask")
 properties/19/spawn = true
 properties/19/replication_mode = 1
+properties/20/path = NodePath(".:lv")
+properties/20/spawn = true
+properties/20/replication_mode = 1
 
 [node name="Player" type="RigidBody2D" groups=["player"]]
 collision_layer = 2
@@ -110,6 +112,7 @@ contact_monitor = true
 max_contacts_reported = 2
 angular_damp = 15.0
 script = ExtResource("1_cm2cf")
+bounce = 0.5
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 material = SubResource("ShaderMaterial_rkmeh")

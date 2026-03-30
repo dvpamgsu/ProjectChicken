@@ -374,38 +374,36 @@ func start_game() -> void:
 func _bomb_lobby() -> void:
 	print("로비 파괴 프로세스 시작...")
 	
-	# 1. Steam 로비 탈출 및 초기화
+	# 1. Steam 로비 탈출
 	if lobby_id > 0:
 		Steam.leaveLobby(lobby_id)
 		lobby_id = 0
 	
-	# 2. 멀티플레이어 피어 완전히 제거
+	# 2. 멀티플레이어 피어 초기화 (Offline모드로 전환)
 	if multiplayer.multiplayer_peer:
-		multiplayer.multiplayer_peer.close() # 피어 소켓 닫기
-		multiplayer.multiplayer_peer = null
+		multiplayer.multiplayer_peer.close()
+	
+	# 단순히 null보다 OfflineMultiplayerPeer를 넣는 것이 로컬 권한(ID 1) 복구에 유리합니다.
+	multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
 	
 	# 3. 인게임 노드 제거
 	if stage:
 		stage.queue_free()
 		stage = null
 	
-	# 4. 플레이어 노드 및 딕셔너리 정리
-	# players 딕셔너리에 담긴 실제 노드들을 트리에서 제거합니다.
-	for pk in players:
+	# 4. 플레이어 데이터 정리
+	for pk in players.keys():
 		var p = players[pk]
 		if is_instance_valid(p):
 			p.queue_free()
 	players.clear()
-	player_ids = [1]
+	player_ids = [1] # 기본 ID 리셋
 	
-	# 5. UI 상태 복구
+	# 5. UI 및 상태 복구
 	state = STATE.MAIN
 	lobby.visible = false
 	friend_lobbies.visible = false
-	#game_ui.visible = false # 만약 인게임 UI가 따로 있다면 추가
 	mainmenu.visible = true
-	
-	print("모든 네트워크 리소스가 정리되었습니다. 메인 메뉴 복귀.")
 
 func get_steam_avatar(steam_id: int) -> ImageTexture:
 	var image_handle = Steam.getMediumFriendAvatar(steam_id)
@@ -869,3 +867,4 @@ func local_game_start():
 	p = PLAYER_LOCAL_ALTER.instantiate()
 	p.name = "2"
 	add_child(p)
+	

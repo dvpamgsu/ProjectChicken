@@ -22,3 +22,8 @@ script = ExtResource("2_lqv4w")
 
 [node name="Sprite2D" parent="." index="0"]
 material = SubResource("ShaderMaterial_u2tta")
+
+[node name="Polygon2D" type="Polygon2D" parent="." index="9"]
+position = Vector2(32, -4)
+scale = Vector2(5, 5)
+polygon = PackedVector2Array(-1, -1, -1, 1, 1, 1, 1, -1)

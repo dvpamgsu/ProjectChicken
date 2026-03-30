@@ -1,3 +1,8 @@
 res://scene/player/player.tscn
 res://shaders/dissolve.gdshader
 res://scene/player/player_ai.tscn
+res://scene/player/player_ai.gd
+res://scene/main.gd
+res://scene/player/player.gd
+res://scene/player/player_local_alter.gd
+res://scene/stage/stage_test.tscn
