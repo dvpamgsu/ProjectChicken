@@ -6,3 +6,4 @@ res://scene/main.gd
 res://scene/player/player.gd
 res://scene/player/player_local_alter.gd
 res://scene/stage/stage_test.tscn
+res://scene/player/player_single.tscn

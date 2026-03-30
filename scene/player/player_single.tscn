@@ -20,5 +20,5 @@ shader_parameter/dissolve_value = 0.0
 collision_mask = 11
 script = ExtResource("2_j1ief")
 
-[node name="Sprite2D" parent="." index="0"]
+[node name="Sprite2D" parent="." index="1"]
 material = SubResource("ShaderMaterial_5wag3")

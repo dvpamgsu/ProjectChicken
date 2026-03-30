@@ -7,6 +7,7 @@ extends RigidBody2D
 @onready var col_1: CollisionShape2D = $col1
 @onready var col_2: CollisionShape2D = $col2
 @onready var col_3: CollisionShape2D = $col3
+@onready var footpos: Node2D = $footpos
 
 @onready var main
 
@@ -59,6 +60,8 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 	if !alive:
 		state.linear_velocity = Vector2.ZERO
 		state.angular_velocity = 0
+		if $TimerDissolveDie.is_stopped():
+			rotation = 0
 		return
 
 	# 2. 쿨다운 진행 (0.05~0.1초 정도의 아주 짧은 무적 시간)
@@ -338,15 +341,19 @@ func set_initial_pos():
 	
 	var cnt = 0
 	var space_state = get_world_2d().direct_space_state
+	var flag = false
 	while true:
 		var query = PhysicsRayQueryParameters2D.create(initial_pos, initial_pos + Vector2(0, 4000))
 		query.collision_mask = 1
 		var result = space_state.intersect_ray(query)
 		if result:
 			initial_pos = result.position
+			if flag:
+				initial_pos.x += sign(offsetX) * 80
 			break
 		else:
 			initial_pos.x += 4 * sign(offsetX)
+			flag = true
 		cnt += 1
 		if cnt > 1000:
 			break
