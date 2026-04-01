@@ -1,24 +1,8 @@
-[gd_scene load_steps=7 format=3 uid="uid://cwqqe8ake83qo"]
+[gd_scene load_steps=3 format=3 uid="uid://cwqqe8ake83qo"]
 
 [ext_resource type="PackedScene" uid="uid://bh58c7wn1bdd1" path="res://scene/player/player.tscn" id="1_myuan"]
-[ext_resource type="Shader" uid="uid://dclg7xsg2en3" path="res://shaders/dissolve.gdshader" id="2_fvach"]
 [ext_resource type="Script" uid="uid://bochvemmt7eed" path="res://scene/player/player_single.gd" id="2_j1ief"]
-
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_5lop3"]
-
-[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_j1ief"]
-resource_local_to_scene = true
-noise = SubResource("FastNoiseLite_5lop3")
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_5wag3"]
-resource_local_to_scene = true
-shader = ExtResource("2_fvach")
-shader_parameter/dissolve_texture = SubResource("NoiseTexture2D_j1ief")
-shader_parameter/dissolve_value = 0.0
 
 [node name="Player_single" instance=ExtResource("1_myuan")]
 collision_mask = 11
 script = ExtResource("2_j1ief")
-
-[node name="Sprite2D" parent="." index="1"]
-material = SubResource("ShaderMaterial_5wag3")

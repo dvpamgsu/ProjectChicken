@@ -20,6 +20,7 @@ const jump_time_max = 1.0
 var flip_dir = 1
 
 @export var bounce = 0.1
+var spare_timer = 0.0
 # 스크립트 상단에 쿨다운 변수를 추가해 주세요.
 func _enter_tree() -> void:
 	set_multiplayer_authority(name.to_int())
@@ -27,6 +28,13 @@ func _enter_tree() -> void:
 func _ready() -> void:
 	main = get_node("/root/Main")
 	main.players[name.to_int()] = self
+	
+	var rim = main.stage.rim
+	var shadow = main.stage.shadow
+	var mat = sprite_2d.material as ShaderMaterial
+	mat.set_shader_parameter("rim_intensity", rim)
+	mat.set_shader_parameter("shadow_intensity", shadow)
+	
 	if is_multiplayer_authority():
 		if main.is_host:
 			position = main.stage.spawn_1.position
@@ -201,8 +209,13 @@ func _physics_process(delta: float) -> void:
 	sprite_2d.flip_h = sync_flip_h
 	
 	var mat = sprite_2d.material as ShaderMaterial
-	mat.set_shader_parameter("dissolve_value", dissolve_value)
-	
+	mat.set_shader_parameter("dissolve_amount", dissolve_value)
+	var ld = Vector2.DOWN
+	if flip_dir > 0:
+		ld = ld.rotated(-rotation)
+	else:
+		ld = ld.rotated(rotation)
+	mat.set_shader_parameter("light_direction", ld)
 		
 	if !is_multiplayer_authority():
 		return
@@ -212,6 +225,8 @@ func _physics_process(delta: float) -> void:
 		dissolve_value = 1.0-$TimerDissolveDie.time_left/$TimerDissolveDie.wait_time
 	if !$TimerDissolveBirth.is_stopped():
 		dissolve_value = $TimerDissolveBirth.time_left/$TimerDissolveBirth.wait_time
+	if alive and $TimerDissolveBirth.is_stopped():
+		dissolve_value = 0.0
 	
 		
 	if end:
@@ -293,7 +308,9 @@ func _physics_process(delta: float) -> void:
 	physics_material_override.bounce = bounce
 	
 	# 낙사
-	if position.y > main.cam_bl_pos.y:
+	if spare_timer < 1.0:
+		spare_timer += delta
+	if position.y > main.cam_bl_pos.y and spare_timer > 0.5:
 		dead()
 		
 func check_flip():

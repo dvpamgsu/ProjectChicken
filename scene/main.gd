@@ -363,7 +363,7 @@ func start_game() -> void:
 		return
 	lobby.visible = false
 	state = STATE.GAME
-	var s = stages[0].instantiate()
+	var s = stages[1].instantiate()
 	add_child(s)
 	stage = s
 	if multiplayer.is_server():
@@ -765,7 +765,7 @@ func single_game_start():
 	is_local_game = false
 	camera_2d.position = Vector2.ZERO
 	state = STATE.GAME_SINGLE
-	var s = stages[0].instantiate()
+	var s = stages[1].instantiate()
 	add_child(s)
 	stage = s
 	var p
@@ -856,7 +856,7 @@ func local_game_start():
 	is_single_game = false
 	camera_2d.position = Vector2.ZERO
 	state = STATE.GAME_LOCAL
-	var s = stages[0].instantiate()
+	var s = stages[1].instantiate()
 	add_child(s)
 	stage = s
 	var p

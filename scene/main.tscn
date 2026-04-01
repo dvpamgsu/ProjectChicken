@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://cr7wv4h5j6efm"]
+[gd_scene load_steps=6 format=3 uid="uid://cr7wv4h5j6efm"]
 
 [ext_resource type="Script" uid="uid://d28h4b1ulmne7" path="res://scene/main.gd" id="1_itxqv"]
 [ext_resource type="PackedScene" uid="uid://djnt8fbxvb051" path="res://scene/stage/stage_test.tscn" id="2_v0l8b"]
+[ext_resource type="PackedScene" uid="uid://dt2gtnj2wolrf" path="res://scene/stage/stage001.tscn" id="3_wp4xf"]
 
 [sub_resource type="Theme" id="Theme_v0l8b"]
 default_font_size = 48
@@ -11,7 +12,7 @@ size = Vector2(944, 1920)
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_itxqv")
-stages = [ExtResource("2_v0l8b")]
+stages = [ExtResource("2_v0l8b"), ExtResource("3_wp4xf")]
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
 _spawnable_scenes = PackedStringArray("uid://bh58c7wn1bdd1")

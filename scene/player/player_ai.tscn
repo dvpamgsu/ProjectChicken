@@ -1,29 +1,39 @@
 [gd_scene load_steps=7 format=3 uid="uid://c26cids0j3463"]
 
 [ext_resource type="PackedScene" uid="uid://bh58c7wn1bdd1" path="res://scene/player/player.tscn" id="1_xfw8x"]
-[ext_resource type="Shader" uid="uid://dclg7xsg2en3" path="res://shaders/dissolve.gdshader" id="2_5ws1u"]
 [ext_resource type="Script" uid="uid://feminn4f5tvi" path="res://scene/player/player_ai.gd" id="2_lqv4w"]
+[ext_resource type="Shader" uid="uid://5hthfdgao58a" path="res://shaders/dissolve_and_rimlight.gdshader" id="3_5ws1u"]
 
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_5lop3"]
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_6smn3"]
+frequency = 0.02
 
-[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_lqv4w"]
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_5lop3"]
+noise = SubResource("FastNoiseLite_6smn3")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_lqv4w"]
 resource_local_to_scene = true
-noise = SubResource("FastNoiseLite_5lop3")
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_u2tta"]
-resource_local_to_scene = true
-shader = ExtResource("2_5ws1u")
-shader_parameter/dissolve_texture = SubResource("NoiseTexture2D_lqv4w")
-shader_parameter/dissolve_value = 0.0
+shader = ExtResource("3_5ws1u")
+shader_parameter/noise_tex = SubResource("NoiseTexture2D_5lop3")
+shader_parameter/dissolve_amount = 0.0
+shader_parameter/edge_color = Color(1, 0.5, 0.1, 1)
+shader_parameter/edge_thickness = 0.05
+shader_parameter/noise_scale = 1.0
+shader_parameter/rim_color = Color(1, 0.68098646, 0.4261788, 1)
+shader_parameter/rim_thickness = 4.00000019
+shader_parameter/light_direction = Vector2(0, 1)
+shader_parameter/rim_intensity = 0.0
+shader_parameter/shadow_intensity = 0.0
+shader_parameter/rim_softness = 1.0
 
 [node name="Player_AI" instance=ExtResource("1_xfw8x")]
 collision_mask = 19
 script = ExtResource("2_lqv4w")
 
-[node name="Sprite2D" parent="." index="0"]
-material = SubResource("ShaderMaterial_u2tta")
+[node name="Sprite2D" parent="." index="1"]
+material = SubResource("ShaderMaterial_lqv4w")
 
 [node name="Polygon2D" type="Polygon2D" parent="." index="9"]
+visible = false
 position = Vector2(32, -4)
 scale = Vector2(5, 5)
 polygon = PackedVector2Array(-1, -1, -1, 1, 1, 1, 1, -1)

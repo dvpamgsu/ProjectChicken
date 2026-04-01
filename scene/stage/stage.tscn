@@ -1,12 +1,19 @@
-[gd_scene load_steps=3 format=3 uid="uid://dqdqa03uv7qbe"]
+[gd_scene load_steps=4 format=3 uid="uid://dqdqa03uv7qbe"]
 
 [ext_resource type="Script" uid="uid://7eiec3ticvn6" path="res://scene/stage/stage.gd" id="1_v4pcg"]
+
+[sub_resource type="Environment" id="Environment_v4pcg"]
+background_mode = 3
+glow_enabled = true
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_v4pcg"]
 size = Vector2(52, 108)
 
 [node name="stage" type="Node2D"]
 script = ExtResource("1_v4pcg")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_v4pcg")
 
 [node name="cam_bl" type="Node2D" parent="."]
 
@@ -17,6 +24,9 @@ script = ExtResource("1_v4pcg")
 [node name="spawn2" type="Node2D" parent="."]
 
 [node name="sprite_stage" type="Sprite2D" parent="."]
+z_index = 1
+
+[node name="background" type="Sprite2D" parent="."]
 
 [node name="collision" type="Node2D" parent="."]
 
