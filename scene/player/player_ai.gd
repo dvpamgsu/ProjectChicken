@@ -15,11 +15,15 @@ func _ready() -> void:
 	mat.set_shader_parameter("shadow_intensity", shadow)
 	mat.set_shader_parameter("rim_thickness", rimt)
 	
+	jumpcharge.visible = false
+	
 	position = main.stage.spawn_2.position
 	initial_pos = position
 	flip_dir = -1
 	ai_target_position = position
 	first_touch = false
+	
+	sprite_2d.texture = load("res://texture/player/skin002.png")
 	
 var is_jump = false
 var pre_jump = false

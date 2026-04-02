@@ -1,6 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://dqdqa03uv7qbe"]
+[gd_scene load_steps=9 format=3 uid="uid://dqdqa03uv7qbe"]
 
 [ext_resource type="Script" uid="uid://7eiec3ticvn6" path="res://scene/stage/stage.gd" id="1_v4pcg"]
+[ext_resource type="Shader" uid="uid://q063ryg6carc" path="res://shaders/firebar.gdshader" id="2_pj41a"]
 
 [sub_resource type="Environment" id="Environment_v4pcg"]
 background_mode = 3
@@ -8,6 +9,46 @@ glow_enabled = true
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_v4pcg"]
 size = Vector2(52, 108)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_wlpnx"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_7efvv"]
+noise = SubResource("FastNoiseLite_wlpnx")
+seamless = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_wlpnx"]
+shader = ExtResource("2_pj41a")
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_7efvv")
+shader_parameter/color_core = Color(1, 1, 1, 1)
+shader_parameter/color_mid = Color(0.7380574, 0.35508984, 1.92523e-07, 1)
+shader_parameter/color_edge = Color(0.5157796, 0.21298963, 0.08749289, 1)
+shader_parameter/speed = 0.84600003692512
+shader_parameter/noise_density = 1.21500005445262
+shader_parameter/beam_thickness = 0.11700000485898
+shader_parameter/exponential_power = 1.0
+shader_parameter/impact_spread = 1.92400004389
+shader_parameter/impact_start = 0.99000004376512
+shader_parameter/mid_width_ratio = 0.6930000329175
+shader_parameter/core_width_ratio = 0.39600001881
+shader_parameter/cut_off_point = 1.0
+shader_parameter/bluntness = 10.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_7efvv"]
+shader = ExtResource("2_pj41a")
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_7efvv")
+shader_parameter/color_core = Color(1, 1, 1, 1)
+shader_parameter/color_mid = Color(2.2140146e-06, 0.52760917, 0.67571306, 1)
+shader_parameter/color_edge = Color(0.08251756, 0.34335324, 0.47745603, 1)
+shader_parameter/speed = 0.84600003692512
+shader_parameter/noise_density = 1.21500005445262
+shader_parameter/beam_thickness = 0.11700000485898
+shader_parameter/exponential_power = 1.0
+shader_parameter/impact_spread = 1.92400004389
+shader_parameter/impact_start = 0.99000004376512
+shader_parameter/mid_width_ratio = 0.6930000329175
+shader_parameter/core_width_ratio = 0.39600001881
+shader_parameter/cut_off_point = 1.0
+shader_parameter/bluntness = 10.0
 
 [node name="stage" type="Node2D"]
 script = ExtResource("1_v4pcg")
@@ -43,6 +84,23 @@ collision_mask = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2DP2"]
 shape = SubResource("RectangleShape2D_v4pcg")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="bar1" type="ColorRect" parent="CanvasLayer"]
+material = SubResource("ShaderMaterial_wlpnx")
+offset_left = 64.0
+offset_top = 64.0
+offset_right = 576.0
+offset_bottom = 104.0
+
+[node name="bar2" type="ColorRect" parent="CanvasLayer"]
+material = SubResource("ShaderMaterial_7efvv")
+offset_left = 1088.0
+offset_top = 64.0
+offset_right = 1600.0
+offset_bottom = 104.0
+scale = Vector2(-1, 1)
 
 [connection signal="body_entered" from="Area2DP1" to="." method="_on_area_2dp_1_body_entered"]
 [connection signal="body_entered" from="Area2DP2" to="." method="_on_area_2dp_2_body_entered"]

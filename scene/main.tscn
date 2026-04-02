@@ -7,8 +7,9 @@
 [sub_resource type="Theme" id="Theme_v0l8b"]
 default_font_size = 48
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_v0l8b"]
-size = Vector2(944, 1920)
+[sub_resource type="SegmentShape2D" id="SegmentShape2D_wp4xf"]
+a = Vector2(0, -344)
+b = Vector2(0, 320)
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_itxqv")
@@ -290,17 +291,16 @@ zoom = Vector2(2, 2)
 position_smoothing_speed = 3.0
 
 [node name="boundary1" type="StaticBody2D" parent="Camera2D"]
-position = Vector2(-760, 0)
+position = Vector2(-288, 0)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Camera2D/boundary1"]
-shape = SubResource("RectangleShape2D_v0l8b")
+shape = SubResource("SegmentShape2D_wp4xf")
 
 [node name="boundary2" type="StaticBody2D" parent="Camera2D"]
-position = Vector2(760, 0)
+position = Vector2(288, 0)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Camera2D/boundary2"]
-position = Vector2(48, -56)
-shape = SubResource("RectangleShape2D_v0l8b")
+shape = SubResource("SegmentShape2D_wp4xf")
 
 [node name="Cam_target" type="Node2D" parent="."]
 

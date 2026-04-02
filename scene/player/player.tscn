@@ -1,9 +1,9 @@
-[gd_scene load_steps=15 format=3 uid="uid://bh58c7wn1bdd1"]
+[gd_scene load_steps=16 format=3 uid="uid://bh58c7wn1bdd1"]
 
 [ext_resource type="Script" uid="uid://dpuvfwalotfcx" path="res://scene/player/player.gd" id="1_cm2cf"]
-[ext_resource type="Texture2D" uid="uid://do5vux4c2v0sp" path="res://texture/arrow.png" id="2_5lop3"]
+[ext_resource type="Texture2D" uid="uid://do5vux4c2v0sp" path="res://texture/player/arrow.png" id="2_5lop3"]
 [ext_resource type="Shader" uid="uid://5hthfdgao58a" path="res://shaders/dissolve_and_rimlight.gdshader" id="2_6smn3"]
-[ext_resource type="Texture2D" uid="uid://c8opi2cft2wbu" path="res://texture/ppc-Sheet2.png" id="3_6smn3"]
+[ext_resource type="Texture2D" uid="uid://c8opi2cft2wbu" path="res://texture/player/skin001.png" id="3_6smn3"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_cm2cf"]
 friction = 0.0
@@ -40,6 +40,10 @@ height = 54.0
 radius = 3.0000002
 height = 20.0
 
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_5lop3"]
+radius = 5.0
+height = 24.0
+
 [sub_resource type="CircleShape2D" id="CircleShape2D_5lop3"]
 radius = 9.0
 
@@ -47,7 +51,7 @@ radius = 9.0
 radius = 11.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_cm2cf"]
-radius = 9.0
+radius = 7.0
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_cm2cf"]
 properties/0/path = NodePath(".:position")
@@ -149,18 +153,26 @@ material = SubResource("ShaderMaterial_rkmeh")
 position = Vector2(0, -1)
 texture = ExtResource("3_6smn3")
 hframes = 3
-frame = 1
 
 [node name="col1" type="CollisionShape2D" parent="."]
 position = Vector2(0, 11)
 shape = SubResource("CapsuleShape2D_cm2cf")
 
 [node name="col2" type="CollisionShape2D" parent="."]
+z_index = 5
 position = Vector2(6, 4)
 rotation = 1.5707964
 shape = SubResource("CapsuleShape2D_6smn3")
 
+[node name="Area2DFLeg" type="Area2D" parent="col2" groups=["leg"]]
+collision_layer = 16
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="col2/Area2DFLeg"]
+shape = SubResource("CapsuleShape2D_5lop3")
+
 [node name="col3" type="CollisionShape2D" parent="."]
+z_index = 5
 position = Vector2(0, -20)
 rotation = 1.5707964
 shape = SubResource("CircleShape2D_5lop3")
@@ -169,13 +181,14 @@ shape = SubResource("CircleShape2D_5lop3")
 position = Vector2(20, -8.742278e-07)
 rotation = -1.5707964
 collision_layer = 0
+collision_mask = 17
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="col3/Area2DHead"]
 position = Vector2(0, -20)
 shape = SubResource("CircleShape2D_6smn3")
 
-[node name="Area2DFloor" type="Area2D" parent="."]
-collision_layer = 0
+[node name="Area2DFloor" type="Area2D" parent="." groups=["leg"]]
+collision_layer = 16
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2DFloor"]
 position = Vector2(0, 34)
@@ -198,6 +211,7 @@ one_shot = true
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]
 [connection signal="body_exited" from="." to="." method="_on_body_exited"]
+[connection signal="area_entered" from="col3/Area2DHead" to="." method="_on_area_2d_head_area_entered"]
 [connection signal="body_entered" from="col3/Area2DHead" to="." method="_on_area_2d_head_body_entered"]
 [connection signal="body_exited" from="col3/Area2DHead" to="." method="_on_area_2d_head_body_exited"]
 [connection signal="body_entered" from="Area2DFloor" to="." method="_on_area_2d_floor_body_entered"]

@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 window/size/resizable=false
 window/stretch/mode="canvas_items"
+window/stretch/aspect="keep_width"
 
 [editor_plugins]
 
@@ -27,6 +28,8 @@ enabled=PackedStringArray("res://addons/softbody2d/plugin.cfg")
 [global_group]
 
 player=""
+head=""
+leg=""
 
 [input]
 
@@ -93,6 +96,8 @@ fullscreen={
 2d_physics/layer_1="ground"
 2d_physics/layer_2="player"
 2d_physics/layer_3="corpse"
+2d_physics/layer_4="head"
+2d_physics/layer_5="leg"
 
 [rendering]
 

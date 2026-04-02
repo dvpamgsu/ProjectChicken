@@ -54,8 +54,8 @@ var is_joining : bool = false
 
 @export var stages = []
 
-const width = 1152/2
-const height = 648/2
+var width = 1152/2
+var height = 648/2
 
 var stage
 
@@ -79,8 +79,24 @@ func toggle_fullscreen():
 		# 전체화면(또는 최대화 등)일 경우 다시 창 모드로 전환
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 		
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton:
+		if event.is_pressed():
+			if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+				camera_2d.zoom.x *= 1.1
+				camera_2d.zoom.y = camera_2d.zoom.x
+			if event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+				camera_2d.zoom.x *= 1.0/1.1
+				camera_2d.zoom.y = camera_2d.zoom.x
+		width = 1152.0 / camera_2d.zoom.x
+		height = 648.0 / camera_2d.zoom.x
+		$Camera2D/boundary1.position.x = -width/2.0
+		$Camera2D/boundary2.position.x = width/2.0
+
 func _ready() -> void:
 	
+	width = 1152.0 / camera_2d.zoom.x
+	height = 648.0 / camera_2d.zoom.x
 	mainmenu.visible = true
 	debug.visible = false
 	lobby.visible = false
@@ -110,6 +126,9 @@ func _ready() -> void:
 	
 	await get_tree().create_timer(1.0).timeout
 	_check_steam_launch_args()
+	
+	$Camera2D/boundary1.position.x = -width/2.0
+	$Camera2D/boundary2.position.x = width/2.0
 
 func _on_peer_connected(id: int) -> void:
 	# 새로운 유저가 접속하면 서버가 그 유저에게 Steam ID를 물어봄

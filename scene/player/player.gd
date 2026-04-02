@@ -53,6 +53,8 @@ func _ready() -> void:
 	#print(is_multiplayer_authority())
 	if !is_multiplayer_authority():
 		freeze = true
+		jumpcharge.visible = false
+		sprite_2d.texture = load("res://texture/player/skin002.png")
 	if name.to_int() != 1:
 		flip_dir = -1
 	
@@ -316,10 +318,15 @@ func _physics_process(delta: float) -> void:
 		if floor_cnt <= 0:
 			jump_cnt -= 1
 	if jump_result == 0 or jump_result == 3:
+		if floor_cnt > 0:
+			$Sprite2D.frame = 0
+			col_2.position.y = 4.0
+			col_3.position.y = -20.0
+		else:
+			$Sprite2D.frame = 2
+			col_2.position.y = 4.0
+			col_3.position.y = -24.0
 		jump_timer = 0.0
-		$Sprite2D.frame = 0
-		col_2.position.y = 4.0
-		col_3.position.y = -20.0
 		
 	physics_material_override.bounce = bounce
 	
@@ -474,7 +481,6 @@ func _on_area_2d_floor_body_entered(body: Node2D) -> void:
 	
 func _on_area_2d_floor_body_exited(body: Node2D) -> void:
 	floor_cnt -= 1
-	#jump_cnt = 2
 
 var forced = false
 func _on_body_entered(body: Node) -> void:
@@ -488,6 +494,12 @@ func _on_body_exited(body: Node) -> void:
 
 var head_touch = []
 func _on_area_2d_head_body_entered(body: Node2D) -> void:
+
+	#print("X")	
+	#if body.is_in_group("leg"):
+		#hit()
+		#return
+	
 	head_touch.append(body)
 	# 1. 물리 서버 상태 가져오기
 	var space_state = get_world_2d().direct_space_state
@@ -505,10 +517,17 @@ func _on_area_2d_head_body_entered(body: Node2D) -> void:
 		# result.normal이 (0, -1)에 가깝다면 그것은 '바닥'의 윗면입니다.
 		if result.normal.dot(Vector2.UP) > 0.7: 
 			# dot product가 0.7 이상이면 대략 45도 미만의 평평한 바닥임을 의미
+			if hit_timer <= 0.0 and alive and hp > 1:
+				shock_timer = 0.0
+				shock = true
 			hit()
 			
 var shock = false
 func hit():
+	if hit_timer > 0.0:
+		return
+	if !alive:
+		return
 	hp -= 1
 	mat.set_shader_parameter("hit_strength", 0.35)
 	hit_timer = 0.1
@@ -522,8 +541,7 @@ func hit():
 		## 로컬 방향을 현재 글로벌 회전값에 맞춰 변환 (오프셋만 필요하므로 basis 사용)
 		#
 		#apply_impulse(Vector2.UP * 400.0, local_pos)
-		shock_timer = 0.0
-		shock = true
+		pass
 
 func _on_timer_rebirth_timeout() -> void:
 	#print("rebirth")
@@ -556,3 +574,9 @@ func get_jump():
 	if Input.is_action_just_released("jump"):
 		return 3
 	return 0
+
+
+func _on_area_2d_head_area_entered(area: Area2D) -> void:
+	if area.is_in_group("leg"):
+		if alive:
+			hit()
