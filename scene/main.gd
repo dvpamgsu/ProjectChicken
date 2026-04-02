@@ -70,6 +70,15 @@ var players = {}
 enum STATE {MAIN, LOBBY, FRIEND_LOBBIES, GAME, GAMEWIN, LOBBY_SINGLE, GAME_SINGLE, GAMEWIN_SINGLE, LOBBY_LOCAL, GAME_LOCAL, GAMEWIN_LOCAL}
 var state : STATE = STATE.MAIN
 
+func toggle_fullscreen():
+	var current_mode = DisplayServer.window_get_mode()
+	if current_mode == DisplayServer.WINDOW_MODE_WINDOWED:
+		# 창 모드일 경우 전체화면으로 전환
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+	else:
+		# 전체화면(또는 최대화 등)일 경우 다시 창 모드로 전환
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+		
 func _ready() -> void:
 	
 	mainmenu.visible = true
@@ -278,6 +287,9 @@ func _process(delta: float) -> void:
 						p1.dead()
 					if p2.position.x < cam_target.position.x - width/2:
 						p2.dead()
+		
+	if Input.is_action_just_pressed("fullscreen"):
+		toggle_fullscreen()
 			
 func _on_lobby_data_update(l_id: int, member_id: int, success: int) -> void:
 	# 데이터 변경 성공 시 UI 갱신

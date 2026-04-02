@@ -1,15 +1,4 @@
-res://shaders/dissolve.gdshader
-res://scene/stage/stage001.tscn
-res://scene/stage/stage.tscn
 res://scene/player/player.tscn
-res://scene/stage/stage.gd
-res://scene/main.tscn
-res://scene/main.gd
-res://scene/player/player_single.tscn
 res://shaders/dissolve_and_rimlight.gdshader
-res://scene/player/player.gd
-res://scene/player/player_ai.tscn
-res://scene/player/player_local_alter.tscn
-res://scene/player/player_ai.gd
-res://scene/player/player_local_alter.gd
-res://scene/player/player_single.gd
+res://shaders/dissolve.gdshader
+res://scene/main.gd

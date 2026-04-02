@@ -101,6 +101,7 @@ size = Vector2(36, 80)
 [node name="stage" instance=ExtResource("1_1l11k")]
 rim = 1.5
 shadow = 0.6
+rim_thickness = 5.0
 
 [node name="cam_bl" parent="." index="1"]
 position = Vector2(-3014, 176)
@@ -376,14 +377,14 @@ position = Vector2(-2683, -33)
 shape = SubResource("RectangleShape2D_alhdj")
 
 [node name="Area2DP1" parent="." index="8"]
-position = Vector2(-2968, -118)
+position = Vector2(2992, -118)
 
 [node name="CollisionShape2D" parent="Area2DP1" index="0"]
 position = Vector2(-12, 2)
 shape = SubResource("RectangleShape2D_vxm7k")
 
 [node name="Area2DP2" parent="." index="9"]
-position = Vector2(2968, -132)
+position = Vector2(-2992, -132)
 
 [node name="CollisionShape2D" parent="Area2DP2" index="0"]
 position = Vector2(12, 16)

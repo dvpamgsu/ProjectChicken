@@ -11,6 +11,7 @@ extends Node2D
 
 @export var rim = 0.0
 @export var shadow = 0.0
+@export var rim_thickness = 0.0
 
 func _on_area_2dp_1_body_entered(body: Node2D) -> void:
 	#print("area1, " + str(body))

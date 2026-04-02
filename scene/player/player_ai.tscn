@@ -1,39 +1,29 @@
-[gd_scene load_steps=7 format=3 uid="uid://c26cids0j3463"]
+[gd_scene load_steps=4 format=3 uid="uid://c26cids0j3463"]
 
 [ext_resource type="PackedScene" uid="uid://bh58c7wn1bdd1" path="res://scene/player/player.tscn" id="1_xfw8x"]
 [ext_resource type="Script" uid="uid://feminn4f5tvi" path="res://scene/player/player_ai.gd" id="2_lqv4w"]
-[ext_resource type="Shader" uid="uid://5hthfdgao58a" path="res://shaders/dissolve_and_rimlight.gdshader" id="3_5ws1u"]
 
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_6smn3"]
-frequency = 0.02
-
-[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_5lop3"]
-noise = SubResource("FastNoiseLite_6smn3")
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_lqv4w"]
-resource_local_to_scene = true
-shader = ExtResource("3_5ws1u")
-shader_parameter/noise_tex = SubResource("NoiseTexture2D_5lop3")
-shader_parameter/dissolve_amount = 0.0
-shader_parameter/edge_color = Color(1, 0.5, 0.1, 1)
-shader_parameter/edge_thickness = 0.05
-shader_parameter/noise_scale = 1.0
-shader_parameter/rim_color = Color(1, 0.68098646, 0.4261788, 1)
-shader_parameter/rim_thickness = 4.00000019
-shader_parameter/light_direction = Vector2(0, 1)
-shader_parameter/rim_intensity = 0.0
-shader_parameter/shadow_intensity = 0.0
-shader_parameter/rim_softness = 1.0
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_5ws1u"]
+radius = 8.0
+height = 40.0
 
 [node name="Player_AI" instance=ExtResource("1_xfw8x")]
 collision_mask = 19
 script = ExtResource("2_lqv4w")
-
-[node name="Sprite2D" parent="." index="1"]
-material = SubResource("ShaderMaterial_lqv4w")
 
 [node name="Polygon2D" type="Polygon2D" parent="." index="9"]
 visible = false
 position = Vector2(32, -4)
 scale = Vector2(5, 5)
 polygon = PackedVector2Array(-1, -1, -1, 1, 1, 1, 1, -1)
+
+[node name="Area2DKnee" type="Area2D" parent="." index="11"]
+z_index = 15
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2DKnee" index="0"]
+position = Vector2(0, 4)
+rotation = 1.5707964
+shape = SubResource("CapsuleShape2D_5ws1u")
+
+[connection signal="body_entered" from="Area2DKnee" to="." method="_on_area_2d_knee_body_entered"]
+[connection signal="body_exited" from="Area2DKnee" to="." method="_on_area_2d_knee_body_exited"]

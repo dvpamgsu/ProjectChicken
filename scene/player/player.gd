@@ -14,8 +14,14 @@ extends RigidBody2D
 @export var torque_power := 650.0
 @export var jump_power := 300.0
 @export var jump_torque_power := 8000.0
+
+@onready var jumpcharge: TextureProgressBar = $jumpcharge
+
+@onready var mat = sprite_2d.material as ShaderMaterial
 var jump_timer = 0.0
 const jump_time_max = 1.0
+
+var hit_timer = 0.0
 
 var flip_dir = 1
 
@@ -31,10 +37,10 @@ func _ready() -> void:
 	
 	var rim = main.stage.rim
 	var shadow = main.stage.shadow
-	var mat = sprite_2d.material as ShaderMaterial
+	var rimt = main.stage.rim_thickness
 	mat.set_shader_parameter("rim_intensity", rim)
 	mat.set_shader_parameter("shadow_intensity", shadow)
-	
+	mat.set_shader_parameter("rim_thickness", rimt)
 	if is_multiplayer_authority():
 		if main.is_host:
 			position = main.stage.spawn_1.position
@@ -191,6 +197,7 @@ func shock_f(delta):
 		
 		apply_force(force_dir * final_force, offset)
 		apply_force(-force_dir * final_force, -offset)
+		apply_impulse(1.0*Vector2.UP, Vector2.ZERO)
 	
 		# 6. 타이머 관리
 		shock_timer += delta
@@ -208,7 +215,6 @@ func _physics_process(delta: float) -> void:
 	#print(position)
 	sprite_2d.flip_h = sync_flip_h
 	
-	var mat = sprite_2d.material as ShaderMaterial
 	mat.set_shader_parameter("dissolve_amount", dissolve_value)
 	var ld = Vector2.DOWN
 	if flip_dir > 0:
@@ -233,10 +239,18 @@ func _physics_process(delta: float) -> void:
 		freeze = true
 		return
 		
+	if hit_timer > 0.0:
+		mat.set_shader_parameter("hit_strength", 0.35 * hit_timer / 0.1)
+		hit_timer -= delta
+	else:
+		mat.set_shader_parameter("hit_strength", 0.0)
+		
 	if !alive:
 		alive_timer = 0.0
 		linear_velocity = Vector2.ZERO
 		angular_velocity = 0
+		jump_timer = 0.0
+		$jumpcharge.value = 0
 		return
 	else:
 		alive_timer += delta
@@ -265,6 +279,8 @@ func _physics_process(delta: float) -> void:
 	
 	var direction
 	direction = get_direction()
+	
+	flip_dir = get_flip()
 	#var rp = clampf(abs(rotation), PI/2.0, PI) * 50.0
 	#apply_torque(direction * torque_power)
 	
@@ -313,26 +329,40 @@ func _physics_process(delta: float) -> void:
 	if position.y > main.cam_bl_pos.y and spare_timer > 0.5:
 		dead()
 		
+	# jump progress bar
+	jumpcharge.value = jumpcharge.max_value * jump_timer / jump_time_max
+	if jump_timer < 0.05:
+		jumpcharge.tint_under = Color(1,1,1,0)
+	else:
+		jumpcharge.tint_under = Color(1,1,1,0.5)
+		
+		
 func check_flip():
 	#print(name)
-	for pk in main.players:
-		var p2 = main.players[pk]
-		if p2 == self:
-			continue
-		if !p2:
-			continue
-		if p2.position.x > position.x:
-			set_flip(1.0)
-		elif p2.position.x < position.x:
-			set_flip(-1.0)
-		if is_host_player and !alter.alive:
-			set_flip(1.0)
-		elif !is_host_player and !alter.alive:
-			set_flip(-1.0)
-		if is_host_player and alive_timer > alter.alive_timer+0.5:
-			set_flip(1.0)
-		elif !is_host_player and alive_timer > alter.alive_timer+0.5:
-			set_flip(-1.0)
+	#for pk in main.players:
+		#var p2 = main.players[pk]
+		#if p2 == self:
+			#continue
+		#if !p2:
+			#continue
+		#if p2.position.x > position.x:
+			#set_flip(1.0)
+		#elif p2.position.x < position.x:
+			#set_flip(-1.0)
+		#if is_host_player and !alter.alive:
+			#set_flip(1.0)
+		#elif !is_host_player and !alter.alive:
+			#set_flip(-1.0)
+		#if is_host_player and alive_timer > alter.alive_timer+0.5:
+			#set_flip(1.0)
+		#elif !is_host_player and alive_timer > alter.alive_timer+0.5:
+			#set_flip(-1.0)
+	set_flip(flip_dir)
+	
+func get_flip():
+	if Input.is_action_just_pressed("flip"):
+		return flip_dir*(-1)
+	return flip_dir
 		
 func set_flip(dir):
 	flip_dir = dir
@@ -480,6 +510,8 @@ func _on_area_2d_head_body_entered(body: Node2D) -> void:
 var shock = false
 func hit():
 	hp -= 1
+	mat.set_shader_parameter("hit_strength", 0.35)
+	hit_timer = 0.1
 	if hp <= 0:
 		hp = 3
 		dead()

@@ -1,6 +1,7 @@
-[gd_scene load_steps=14 format=3 uid="uid://bh58c7wn1bdd1"]
+[gd_scene load_steps=15 format=3 uid="uid://bh58c7wn1bdd1"]
 
 [ext_resource type="Script" uid="uid://dpuvfwalotfcx" path="res://scene/player/player.gd" id="1_cm2cf"]
+[ext_resource type="Texture2D" uid="uid://do5vux4c2v0sp" path="res://texture/arrow.png" id="2_5lop3"]
 [ext_resource type="Shader" uid="uid://5hthfdgao58a" path="res://shaders/dissolve_and_rimlight.gdshader" id="2_6smn3"]
 [ext_resource type="Texture2D" uid="uid://c8opi2cft2wbu" path="res://texture/ppc-Sheet2.png" id="3_6smn3"]
 
@@ -23,11 +24,13 @@ shader_parameter/edge_thickness = 0.05
 shader_parameter/edge_intensity = 3.0
 shader_parameter/noise_scale = 1.0
 shader_parameter/rim_color = Color(1, 0.68098646, 0.4261788, 1)
-shader_parameter/rim_thickness = 5.0
+shader_parameter/rim_thickness = 0.0
 shader_parameter/light_direction = Vector2(0, 1)
 shader_parameter/rim_intensity = 0.0
 shader_parameter/rim_softness = 1.0
 shader_parameter/shadow_intensity = 0.0
+shader_parameter/hit_color = Color(0.98274976, 6.08854e-06, 1.540184e-06, 1)
+shader_parameter/hit_strength = 0.0
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_cm2cf"]
 radius = 4.0
@@ -112,6 +115,7 @@ properties/20/spawn = true
 properties/20/replication_mode = 1
 
 [node name="Player" type="RigidBody2D" groups=["player"]]
+z_index = 10
 collision_layer = 2
 collision_mask = 3
 physics_material_override = SubResource("PhysicsMaterial_cm2cf")
@@ -124,15 +128,28 @@ angular_damp = 15.0
 script = ExtResource("1_cm2cf")
 bounce = 0.5
 
+[node name="jumpcharge" type="TextureProgressBar" parent="."]
+offset_left = -15.0
+offset_top = -47.0
+offset_bottom = -32.0
+scale = Vector2(2, 2)
+rounded = true
+fill_mode = 3
+texture_under = ExtResource("2_5lop3")
+texture_progress = ExtResource("2_5lop3")
+tint_under = Color(1, 1, 1, 0.19607843)
+tint_progress = Color(1, 1, 1, 0.8509804)
+
 [node name="footpos" type="Node2D" parent="."]
 position = Vector2(0, 34)
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-z_index = 10
+z_index = 1
 material = SubResource("ShaderMaterial_rkmeh")
 position = Vector2(0, -1)
 texture = ExtResource("3_6smn3")
 hframes = 3
+frame = 1
 
 [node name="col1" type="CollisionShape2D" parent="."]
 position = Vector2(0, 11)

@@ -8,9 +8,10 @@ func _ready() -> void:
 	main.players[name.to_int()] = self
 	var rim = main.stage.rim
 	var shadow = main.stage.shadow
-	var mat = sprite_2d.material as ShaderMaterial
+	var rimt = main.stage.rim_thickness
 	mat.set_shader_parameter("rim_intensity", rim)
 	mat.set_shader_parameter("shadow_intensity", shadow)
+	mat.set_shader_parameter("rim_thickness", rimt)
 	
 	position = main.stage.spawn_2.position
 	initial_pos = position
@@ -22,6 +23,10 @@ func _physics_process(delta: float) -> void:
 	super(delta)
 	
 	
+func get_flip():
+	if Input.is_action_just_pressed("flip2"):
+		return flip_dir * -1
+	return flip_dir
 func get_jump():
 	if Input.is_action_just_pressed("jump2"):
 		return 1
