@@ -1,28 +1,19 @@
 extends "res://scene/player/player.gd"
 
 func _enter_tree() -> void:
-	set_multiplayer_authority(1)
+	pass
 	
 func _ready() -> void:
 	main = get_node("/root/Main")
 	main.players[name.to_int()] = self
-	var rim = main.stage.rim
-	var shadow = main.stage.shadow
-	var rimt = main.stage.rim_thickness
-	mat.set_shader_parameter("rim_intensity", rim)
-	mat.set_shader_parameter("shadow_intensity", shadow)
-	mat.set_shader_parameter("rim_thickness", rimt)
+	sprite_2d.material = sprite_2d.material.duplicate()
+	mat = sprite_2d.material as ShaderMaterial
 	
 	position = main.stage.spawn_2.position
 	initial_pos = position
 	flip_dir = -1
 	
 	sprite_2d.texture = load("res://texture/player/skin002.png")
-
-func _physics_process(delta: float) -> void:
-	
-	super(delta)
-	
 	
 func get_direction():
 	return Input.get_axis("left2", "right2")

@@ -7,11 +7,8 @@ extends Node2D
 
 
 @onready var main = get_node("/root/Main")
-
-
-@export var rim = 0.0
+@onready var lights: Node2D = $lights
 @export var shadow = 0.0
-@export var rim_thickness = 0.0
 
 func _on_area_2dp_1_body_entered(body: Node2D) -> void:
 	#print("area1, " + str(body))
@@ -52,6 +49,8 @@ func _process(delta: float) -> void:
 			p1 = main.players[pk]
 		else:
 			p2 = main.players[pk]
+	if p1 == null or p2 == null:
+		return
 	if p1.alive_timer > p2.alive_timer + 0.5:
 		target_progress_value = get_relative_value(p1.footpos.global_position.x)
 	elif p1.alive_timer + 0.5 < p2.alive_timer:
@@ -71,6 +70,10 @@ func _process(delta: float) -> void:
 	bar_2.scale.x = (progress_value-100.0)/50.0
 	var mat2 = bar_2.material as ShaderMaterial
 	mat2.set_shader_parameter("beam_thickness", 0.18 * (0.5 - bar_2.scale.x / 3.0))
+	
+	for l in lights.get_children():
+		if l.is_fixed:
+			l.global_position = main.camera_2d.global_position + l.offset
 		
 func get_relative_value(x):
 	return clamp(100.0*(x-cam_bl.global_position.x)/(cam_tr.global_position.x - cam_bl.global_position.x), 0, 100)

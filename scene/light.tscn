@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://vnso7nmt3aw"]
+
+[ext_resource type="Script" uid="uid://bajwsecr2tce0" path="res://scene/light.gd" id="1_esuvq"]
+
+[node name="light" type="Node2D"]
+script = ExtResource("1_esuvq")

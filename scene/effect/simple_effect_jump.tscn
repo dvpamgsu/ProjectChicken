@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://c854n0n8nyq0o"]
+
+[ext_resource type="PackedScene" uid="uid://cfa6kvdnksof5" path="res://scene/effect/simple_effect.tscn" id="1_08s07"]
+[ext_resource type="Texture2D" uid="uid://cyx11bohcgh8d" path="res://texture/player/jump-Sheet.png" id="2_ay5yu"]
+
+[node name="simple_effect_jump" instance=ExtResource("1_08s07")]
+texture = ExtResource("2_ay5yu")
+offset = Vector2(0, -25)
+hframes = 7
+rate = 0.068

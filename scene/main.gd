@@ -27,6 +27,9 @@ var is_joining : bool = false
 @onready var button_jump: Button = $CanvasLayer/debug/Button_jump
 @onready var button_reset: Button = $CanvasLayer/debug/Button_reset
 
+@onready var button_back: Button = $CanvasLayer/ButtonBack
+
+
 @onready var mainmenu: Node2D = $CanvasLayer/mainmenu
 
 @onready var debug: Node2D = $CanvasLayer/debug
@@ -200,30 +203,23 @@ func win(num):
 	
 func _process(delta: float) -> void:
 	
-	#print(state)
-	#print(lobby.visible)
-	
-	#if players.size() == 2:
-		#for pk in players:
-			#if players[pk]:			
-				#label_bounce.text = str(players[pk].bounce)
-				#label_additional.text = str(players[pk].additional_force)
-				#label_torque.text = str(players[pk].torque_power)
-				#label_jump.text = str(players[pk].jump_power)
-				#break
-			
 	if stage:
 		cam_bl_pos = stage.cam_bl.global_position
 		cam_tr_pos = stage.cam_tr.global_position
-		
-	#if state != STATE.GAME and state != STATE.GAMEWIN and stage:
-		#stage.queue_free()
-		#stage = null
 
 	if state != STATE.GAME and state != STATE.GAME_SINGLE and state != STATE.GAME_LOCAL:
 		cam_target.position = Vector2.ZERO
 		camera_2d.position = Vector2.ZERO		
-		
+		for e in effects:
+			if e:
+				effects.erase(e)
+				e.queue_free()
+				
+	match state:
+		STATE.LOBBY, STATE.LOBBY_SINGLE, STATE.LOBBY_LOCAL, STATE.FRIEND_LOBBIES:
+			button_back.visible = true
+		_:
+			button_back.visible = false
 		
 	match state:
 		STATE.MAIN:
@@ -547,16 +543,25 @@ func _on_lobby_joined(lobby_id : int, _permission : int, _locked : bool, respons
 		
 	is_joining = false
 	
-
-#func _add_player(id: int = 1):
-	#if not multiplayer.is_server():
-		#return
-#
-	#if has_node(str(id)):
-		#return
-		##
+var effects = []
+@export var effect_package = {}
+const SIMPLE_EFFECT = preload("uid://cfa6kvdnksof5")
+@rpc("any_peer", "call_local")
+func gen_effect(e_code, _position, _flip_h, _z_index): 
+	
+	if not multiplayer.is_server():
+		return
 		
-
+	if !effect_package.has(e_code):
+		return
+		
+	var se = effect_package[e_code].instantiate() as Sprite2D
+	se.set_multiplayer_authority(1)
+	se.flip_h = _flip_h
+	se.position = _position
+	se.z_index = _z_index
+	add_child(se, true)
+	
 func spawn_player(id: int = 1):
 	if has_node(str(id)):
 		print("이미 존재하는 플레이어입니다: ", id)
@@ -899,3 +904,13 @@ func local_game_start():
 	p.name = "2"
 	add_child(p)
 	
+
+func _on_button_back_pressed() -> void:
+	lobby.visible = false
+	lobby_single.visible = false
+	lobby_local.visible = false
+	friend_lobbies.visible = false
+	state = STATE.MAIN
+	mainmenu.visible = true
+	
+	pass # Replace with function body.

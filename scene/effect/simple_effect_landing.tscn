@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://dbsx3dipfeqda"]
+
+[ext_resource type="PackedScene" uid="uid://cfa6kvdnksof5" path="res://scene/effect/simple_effect.tscn" id="1_gwcdf"]
+[ext_resource type="Texture2D" uid="uid://bllmslfobi3dp" path="res://texture/player/landing-Sheet.png" id="2_jh0q2"]
+
+[node name="simple_effect_landing" instance=ExtResource("1_gwcdf")]
+texture = ExtResource("2_jh0q2")
+offset = Vector2(0, -25)
+hframes = 6
+rate = 0.068

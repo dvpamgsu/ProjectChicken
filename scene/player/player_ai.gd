@@ -8,13 +8,10 @@ func _enter_tree() -> void:
 func _ready() -> void:
 	main = get_node("/root/Main")
 	main.players[name.to_int()] = self
-	var rim = main.stage.rim
-	var shadow = main.stage.shadow
-	var rimt = main.stage.rim_thickness
-	mat.set_shader_parameter("rim_intensity", rim)
-	mat.set_shader_parameter("shadow_intensity", shadow)
-	mat.set_shader_parameter("rim_thickness", rimt)
+	sprite_2d.material = sprite_2d.material.duplicate()
+	mat = sprite_2d.material as ShaderMaterial
 	
+	#sprite_2d.material = sprite_2d.material.duplicate()
 	jumpcharge.visible = false
 	
 	position = main.stage.spawn_2.position

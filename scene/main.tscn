@@ -1,8 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://cr7wv4h5j6efm"]
+[gd_scene load_steps=8 format=3 uid="uid://cr7wv4h5j6efm"]
 
 [ext_resource type="Script" uid="uid://d28h4b1ulmne7" path="res://scene/main.gd" id="1_itxqv"]
 [ext_resource type="PackedScene" uid="uid://djnt8fbxvb051" path="res://scene/stage/stage_test.tscn" id="2_v0l8b"]
 [ext_resource type="PackedScene" uid="uid://dt2gtnj2wolrf" path="res://scene/stage/stage001.tscn" id="3_wp4xf"]
+[ext_resource type="PackedScene" uid="uid://c854n0n8nyq0o" path="res://scene/effect/simple_effect_jump.tscn" id="4_brvut"]
+[ext_resource type="PackedScene" uid="uid://dbsx3dipfeqda" path="res://scene/effect/simple_effect_landing.tscn" id="5_0ha60"]
 
 [sub_resource type="Theme" id="Theme_v0l8b"]
 default_font_size = 48
@@ -14,9 +16,13 @@ b = Vector2(0, 320)
 [node name="Main" type="Node2D"]
 script = ExtResource("1_itxqv")
 stages = [ExtResource("2_v0l8b"), ExtResource("3_wp4xf")]
+effect_package = {
+"jump": ExtResource("4_brvut"),
+"landing": ExtResource("5_0ha60")
+}
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
-_spawnable_scenes = PackedStringArray("uid://bh58c7wn1bdd1")
+_spawnable_scenes = PackedStringArray("uid://bh58c7wn1bdd1", "uid://cfa6kvdnksof5", "uid://c854n0n8nyq0o", "uid://dbsx3dipfeqda")
 spawn_path = NodePath("..")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
@@ -286,6 +292,14 @@ offset_bottom = 342.0
 text = "start
 "
 
+[node name="ButtonBack" type="Button" parent="CanvasLayer"]
+offset_left = 1024.0
+offset_top = 32.0
+offset_right = 1088.0
+offset_bottom = 64.0
+text = "Back
+"
+
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(2, 2)
 position_smoothing_speed = 3.0
@@ -325,5 +339,6 @@ one_shot = true
 [connection signal="pressed" from="CanvasLayer/friend_lobbies/Button_refresh" to="." method="_on_button_refresh_pressed"]
 [connection signal="pressed" from="CanvasLayer/lobby_single/single_start_button" to="." method="_on_single_start_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/lobby_local/local_start_button" to="." method="_on_local_start_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/ButtonBack" to="." method="_on_button_back_pressed"]
 [connection signal="timeout" from="TimerWin" to="." method="_on_timer_win_timeout"]
 [connection signal="timeout" from="TimerWinSingle" to="." method="_on_timer_win_single_timeout"]

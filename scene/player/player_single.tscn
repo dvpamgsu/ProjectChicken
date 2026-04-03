@@ -1,8 +1,37 @@
-[gd_scene load_steps=3 format=3 uid="uid://cwqqe8ake83qo"]
+[gd_scene load_steps=7 format=3 uid="uid://cwqqe8ake83qo"]
 
 [ext_resource type="PackedScene" uid="uid://bh58c7wn1bdd1" path="res://scene/player/player.tscn" id="1_myuan"]
 [ext_resource type="Script" uid="uid://bochvemmt7eed" path="res://scene/player/player_single.gd" id="2_j1ief"]
+[ext_resource type="Shader" uid="uid://5hthfdgao58a" path="res://shaders/dissolve_and_rimlight.gdshader" id="3_fvach"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_6smn3"]
+frequency = 0.02
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_rkmeh"]
+noise = SubResource("FastNoiseLite_6smn3")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_j1ief"]
+resource_local_to_scene = true
+shader = ExtResource("3_fvach")
+shader_parameter/noise_tex = SubResource("NoiseTexture2D_rkmeh")
+shader_parameter/dissolve_amount = 0.0
+shader_parameter/edge_color = Color(1, 0.5, 0.1, 1)
+shader_parameter/edge_thickness = 0.05
+shader_parameter/edge_intensity = 3.0
+shader_parameter/noise_scale = 1.0
+shader_parameter/light_count = 0
+shader_parameter/light_directions = PackedVector2Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+shader_parameter/light_colors = PackedColorArray(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+shader_parameter/light_intensities = PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0)
+shader_parameter/rim_thickness = 5.0000002375
+shader_parameter/rim_softness = 0.800000038
+shader_parameter/shadow_intensity = 0.0
+shader_parameter/hit_color = Color(0.98274976, 6.08854e-06, 1.540184e-06, 1)
+shader_parameter/hit_strength = 0.0
 
 [node name="Player_single" instance=ExtResource("1_myuan")]
 collision_mask = 11
 script = ExtResource("2_j1ief")
+
+[node name="Sprite2D" parent="." index="2"]
+material = SubResource("ShaderMaterial_j1ief")

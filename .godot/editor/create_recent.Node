@@ -1,3 +1,9 @@
+Button
+Timer
+MultiplayerSynchronizer
+RayCast2D
+Sprite2D
+Node2D
 ColorRect
 TextureRect
 Line2D
@@ -7,8 +13,3 @@ ProgressBar
 CollisionShape2D
 StaticBody2D
 Area2D
-WorldEnvironment
-Sprite2D
-Node2D
-Polygon2D
-Timer

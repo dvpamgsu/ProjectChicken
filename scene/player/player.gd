@@ -9,7 +9,7 @@ extends RigidBody2D
 @onready var col_3: CollisionShape2D = $col3
 @onready var footpos: Node2D = $footpos
 
-@onready var main
+@onready var main:Node2D
 
 @export var torque_power := 650.0
 @export var jump_power := 300.0
@@ -17,11 +17,11 @@ extends RigidBody2D
 
 @onready var jumpcharge: TextureProgressBar = $jumpcharge
 
-@onready var mat = sprite_2d.material as ShaderMaterial
+var mat
 var jump_timer = 0.0
 const jump_time_max = 1.0
 
-var hit_timer = 0.0
+@export var hit_timer = 0.0
 
 var flip_dir = 1
 
@@ -34,13 +34,9 @@ func _enter_tree() -> void:
 func _ready() -> void:
 	main = get_node("/root/Main")
 	main.players[name.to_int()] = self
+	sprite_2d.material = sprite_2d.material.duplicate()
+	mat = sprite_2d.material as ShaderMaterial
 	
-	var rim = main.stage.rim
-	var shadow = main.stage.shadow
-	var rimt = main.stage.rim_thickness
-	mat.set_shader_parameter("rim_intensity", rim)
-	mat.set_shader_parameter("shadow_intensity", shadow)
-	mat.set_shader_parameter("rim_thickness", rimt)
 	if is_multiplayer_authority():
 		if main.is_host:
 			position = main.stage.spawn_1.position
@@ -86,8 +82,6 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 		return
 
 	var hit_applied = false
-
-	
 
 	# 3. 충돌 지점 전수 조사
 	for i in state.get_contact_count():
@@ -158,6 +152,52 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 		position.x = main.cam_bl_pos.x
 	if position.x > main.cam_tr_pos.x:
 		position.x = main.cam_tr_pos.x
+		
+	check_landing(state)
+
+@onready var foot_ray_cast_2d: RayCast2D = $Area2DFloor/FootRayCast2D
+func gen_jump_effect():
+	
+	foot_ray_cast_2d.target_position = Vector2(0,15).rotated(-rotation)
+	
+	if !foot_ray_cast_2d.is_colliding():
+		return
+	var pos = foot_ray_cast_2d.get_collision_point() + Vector2(0,1)
+	var e_code = "jump"
+	var _flip_h = rotation <= 0.0
+	main.rpc_id(1, "gen_effect", e_code, pos, _flip_h, 5)
+	
+var pre_is_touching_floor = false
+var air_timer = 1.0
+func check_landing(state):
+	var itf = is_touching_floor(state)
+	if itf:
+		if !pre_is_touching_floor and air_timer > 0.1:
+			var pos = last_contact_pos
+			var e_code = "landing"
+			var _flip_h = rotation > 0.0
+			main.rpc_id(1, "gen_effect", e_code, pos, _flip_h, 5)
+		air_timer = 0.0
+	else:
+		if air_timer < 2.0:
+			air_timer += state.step
+	pre_is_touching_floor = itf
+	
+var last_contact_pos := Vector2.ZERO
+func is_touching_floor(state: PhysicsDirectBodyState2D) -> bool:
+	# 현재 발생한 모든 충돌 지점을 순회
+	for i in range(state.get_contact_count()):
+		# 충돌 지점의 법선(Normal) 벡터 확인
+		# 법선은 충돌 면에서 수직으로 나오는 방향입니다.
+		var normal = state.get_contact_local_normal(i)
+		
+		# 법선 벡터와 Vector2.UP을 내적(dot)하여 방향 비교
+		# 결과값이 0.5보다 크면 바닥(위쪽을 향하는 면)으로 판단합니다.
+		if normal.dot(Vector2.UP) > 0.5 and state.get_contact_local_position(i).y > 0:
+			last_contact_pos = state.get_contact_collider_position(i)
+			return true
+			
+	return false
 	
 var alter = null
 @export var alive_timer = 0.0
@@ -217,16 +257,57 @@ func _physics_process(delta: float) -> void:
 	#print(position)
 	sprite_2d.flip_h = sync_flip_h
 	
-	mat.set_shader_parameter("dissolve_amount", dissolve_value)
-	var ld = Vector2.DOWN
-	if flip_dir > 0:
-		ld = ld.rotated(-rotation)
+	# [A] 공통 비주얼 업데이트 (권한 체크 위)
+	if main and main.stage and main.stage.has_node("lights"):
+		var lights = main.stage.lights.get_children()
+		
+		# .exe 호환성을 위해 PackedArray를 미리 생성
+		var lds = PackedVector2Array()
+		var lcs = PackedColorArray()
+		var lis = PackedFloat32Array()
+		
+		# 반드시 8개를 꽉 채워서 보냅니다 (빌드 환경에서는 가변 배열이 위험함)
+		for i in range(8):
+			if i < lights.size():
+				var l = lights[i]
+				var dist = global_position.distance_to(l.global_position)
+				var ld = (global_position - l.global_position).normalized()
+				
+				ld = ld.rotated(-rotation)
+				if flip_dir < 0:
+					ld.x *= -1.0
+					
+				lds.append(ld)
+				lcs.append(l.light_color)
+				var intensity = l.intensity if l.is_fixed else l.intensity / max(dist, 1.0)
+				lis.append(intensity)
+			else:
+				# 빈 슬롯은 0이 아닌 안전한 기본값으로 채움
+				lds.append(Vector2.ZERO)
+				lcs.append(Color(0,0,0,0))
+				lis.append(0.0)
+		
+		# 매 프레임 set_shader_parameter 호출
+		mat.set_shader_parameter("light_count", min(lights.size(), 8))
+		mat.set_shader_parameter("light_directions", lds)
+		mat.set_shader_parameter("light_colors", lcs)
+		mat.set_shader_parameter("light_intensities", lis)
+		mat.set_shader_parameter("dissolve_amount", dissolve_value)
+		mat.set_shader_parameter("shadow_intensity", main.stage.shadow)
+
+	# [B] 피격 효과 (권한 체크 위)
+	if hit_timer > 0.0:
+		mat.set_shader_parameter("hit_strength", 0.35 * hit_timer / 0.1)
 	else:
-		ld = ld.rotated(rotation)
-	mat.set_shader_parameter("light_direction", ld)
+		mat.set_shader_parameter("hit_strength", 0.0)
 		
 	if !is_multiplayer_authority():
 		return
+		
+	if hit_timer > 0.0:
+		hit_timer -= delta
+	else:
+		hit_timer = 0.0
 		
 	lv = linear_velocity
 	if !$TimerDissolveDie.is_stopped():
@@ -241,11 +322,6 @@ func _physics_process(delta: float) -> void:
 		freeze = true
 		return
 		
-	if hit_timer > 0.0:
-		mat.set_shader_parameter("hit_strength", 0.35 * hit_timer / 0.1)
-		hit_timer -= delta
-	else:
-		mat.set_shader_parameter("hit_strength", 0.0)
 		
 	if !alive:
 		alive_timer = 0.0
@@ -258,24 +334,6 @@ func _physics_process(delta: float) -> void:
 		alive_timer += delta
 
 	shock_f(delta)
-		
-	# 머리가 땅에 닿았는지 체크
-	#for b in head_touch:
-		#var space_state = get_world_2d().direct_space_state
-	#
-		## 충돌한 지점의 '각도'를 알기 위함입니다.
-		#var query = PhysicsRayQueryParameters2D.create(col_3.global_position, col_3.global_position + Vector2(0, 10))
-		#query.collision_mask = 1 # 바닥 레이어
-		#query.exclude = [get_rid()] # 자기 자신 제외
-	#
-		#var result = space_state.intersect_ray(query)
-	#
-		#if result:
-			## result.normal이 (0, -1)에 가깝다면 그것은 '바닥'의 윗면입니다.
-			#if result.normal.dot(Vector2.UP) > 0.7: 
-				## dot product가 0.7 이상이면 대략 45도 미만의 평평한 바닥임을 의미
-				#hit()
-				#return
 		
 	rotation = wrapf(rotation, -PI, PI)
 	
@@ -312,6 +370,7 @@ func _physics_process(delta: float) -> void:
 			#PhysicsServer2D.body_set_state(get_rid(), PhysicsServer2D.BODY_STATE_LINEAR_VELOCITY, Vector2.ZERO)
 			apply_impulse(jump_power*jump_dir*(jump_timer+0.5))
 		if floor_cnt > 0:
+			gen_jump_effect()
 			apply_impulse(jump_power*jump_dir*(jump_timer+0.5))
 			var r = sign(rotation)*min(abs(rotation),PI/8.0)
 			apply_torque_impulse(-r*jump_torque_power)
@@ -342,7 +401,8 @@ func _physics_process(delta: float) -> void:
 		jumpcharge.tint_under = Color(1,1,1,0)
 	else:
 		jumpcharge.tint_under = Color(1,1,1,0.5)
-		
+	
+
 		
 func check_flip():
 	#print(name)
@@ -414,10 +474,13 @@ func set_initial_pos():
 	var sign = 0
 	if initial_pos.x < main.cam_bl_pos.x + 16:
 		initial_pos.x = main.cam_bl_pos.x + 240
+		initial_pos.y = -1000
 		sign = 1
 	if initial_pos.x > main.cam_tr_pos.x - 16:
 		initial_pos.x = main.cam_tr_pos.x - 240
+		initial_pos.y = -1000
 		sign = -1
+	cnt = 0
 	while sign!=0:
 		var query = PhysicsRayQueryParameters2D.create(initial_pos, initial_pos + Vector2(0, 4000))
 		query.collision_mask = 1
@@ -468,6 +531,7 @@ func initialize():
 		
 	linear_velocity = Vector2.ZERO
 	angular_velocity = 0
+	air_timer = 1.0
 	
 	rotation = 0
 	set_initial_pos()
@@ -524,6 +588,8 @@ func _on_area_2d_head_body_entered(body: Node2D) -> void:
 			
 var shock = false
 func hit():
+	if !is_multiplayer_authority():
+		return
 	if hit_timer > 0.0:
 		return
 	if !alive:
@@ -578,5 +644,5 @@ func get_jump():
 
 func _on_area_2d_head_area_entered(area: Area2D) -> void:
 	if area.is_in_group("leg"):
-		if alive:
+		if alive and area.alive:
 			hit()

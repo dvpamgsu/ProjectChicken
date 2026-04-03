@@ -1,9 +1,10 @@
-[gd_scene load_steps=33 format=3 uid="uid://dt2gtnj2wolrf"]
+[gd_scene load_steps=34 format=3 uid="uid://dt2gtnj2wolrf"]
 
 [ext_resource type="PackedScene" uid="uid://dqdqa03uv7qbe" path="res://scene/stage/stage.tscn" id="1_1l11k"]
 [ext_resource type="Texture2D" uid="uid://d1g5mgrm7wdcn" path="res://texture/stage/stage1_.png" id="2_3dm8t"]
 [ext_resource type="Texture2D" uid="uid://d3lps5xxsxfuh" path="res://texture/stage/stage1_back.png" id="3_3dm8t"]
 [ext_resource type="PhysicsMaterial" uid="uid://dp2krnycrluou" path="res://scene/pm/pm_ground.tres" id="4_8dltt"]
+[ext_resource type="PackedScene" uid="uid://vnso7nmt3aw" path="res://scene/light.tscn" id="5_at007"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1l11k"]
 size = Vector2(894, 72)
@@ -99,9 +100,7 @@ size = Vector2(36, 80)
 size = Vector2(36, 80)
 
 [node name="stage" instance=ExtResource("1_1l11k")]
-rim = 1.5
 shadow = 0.6
-rim_thickness = 5.0
 
 [node name="cam_bl" parent="." index="1"]
 position = Vector2(-3014, 176)
@@ -389,3 +388,8 @@ position = Vector2(-2992, -132)
 [node name="CollisionShape2D" parent="Area2DP2" index="0"]
 position = Vector2(12, 16)
 shape = SubResource("RectangleShape2D_2cilj")
+
+[node name="light" parent="lights" index="0" instance=ExtResource("5_at007")]
+position = Vector2(0, 40)
+light_color = Color(0.99999994, 0.8925102, 0.5815923, 1)
+is_fixed = true
