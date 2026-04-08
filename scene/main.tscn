@@ -1,13 +1,52 @@
-[gd_scene load_steps=8 format=3 uid="uid://cr7wv4h5j6efm"]
+[gd_scene load_steps=17 format=3 uid="uid://cr7wv4h5j6efm"]
 
 [ext_resource type="Script" uid="uid://d28h4b1ulmne7" path="res://scene/main.gd" id="1_itxqv"]
 [ext_resource type="PackedScene" uid="uid://djnt8fbxvb051" path="res://scene/stage/stage_test.tscn" id="2_v0l8b"]
 [ext_resource type="PackedScene" uid="uid://dt2gtnj2wolrf" path="res://scene/stage/stage001.tscn" id="3_wp4xf"]
 [ext_resource type="PackedScene" uid="uid://c854n0n8nyq0o" path="res://scene/effect/simple_effect_jump.tscn" id="4_brvut"]
 [ext_resource type="PackedScene" uid="uid://dbsx3dipfeqda" path="res://scene/effect/simple_effect_landing.tscn" id="5_0ha60"]
+[ext_resource type="PackedScene" uid="uid://d3p6cvj65jyjb" path="res://scene/effect/simple_effect_air_jump.tscn" id="6_4j5ol"]
+[ext_resource type="PackedScene" uid="uid://c2ks8rvs536o4" path="res://scene/effect/simple_effect_hit_1.tscn" id="7_b5f6u"]
+[ext_resource type="Shader" uid="uid://34gyp4r03b4t" path="res://shaders/blast.gdshader" id="7_p1hux"]
+[ext_resource type="Shader" uid="uid://ctbfwrigx12vx" path="res://shaders/crack.gdshader" id="8_of57s"]
+[ext_resource type="PackedScene" uid="uid://ogqrso2b1tut" path="res://scene/effect/simple_effect_hit_2.tscn" id="8_tqoya"]
+[ext_resource type="Shader" uid="uid://dcpgu6k362oxo" path="res://shaders/wave.gdshader" id="11_k65ib"]
 
 [sub_resource type="Theme" id="Theme_v0l8b"]
 default_font_size = 48
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_b5f6u"]
+shader = ExtResource("8_of57s")
+shader_parameter/center = Vector2(0, 0)
+shader_parameter/direction = Vector2(1, 0)
+shader_parameter/force = 1.0
+shader_parameter/blast = 1.0
+shader_parameter/fading_radius = 0.0
+shader_parameter/seed = 1.0
+shader_parameter/iterations = 10
+shader_parameter/split_angle = 3.142
+shader_parameter/crack_width = 0.005
+shader_parameter/crack_color = Color(0.95, 0.95, 1, 0.5568628)
+shader_parameter/DEBUG_MODE = false
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_of57s"]
+shader = ExtResource("7_p1hux")
+shader_parameter/center = Vector2(0, 0)
+shader_parameter/force = 0.0
+shader_parameter/size = 0.2
+shader_parameter/blast = 0.0
+shader_parameter/direction = Vector2(0, 0)
+shader_parameter/aperture = 0.400000019
+shader_parameter/red_offset = 1.0000000475
+shader_parameter/green_offset = 1.0000000475
+shader_parameter/blue_offset = 1.0000000475
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_wscrc"]
+shader = ExtResource("11_k65ib")
+shader_parameter/direction = Vector2(1, 0)
+shader_parameter/amplitude = 0.04
+shader_parameter/wave_phase = -0.1
+shader_parameter/wave_width = 0.1
 
 [sub_resource type="SegmentShape2D" id="SegmentShape2D_wp4xf"]
 a = Vector2(0, -344)
@@ -17,17 +56,21 @@ b = Vector2(0, 320)
 script = ExtResource("1_itxqv")
 stages = [ExtResource("2_v0l8b"), ExtResource("3_wp4xf")]
 effect_package = {
+"airjump": ExtResource("6_4j5ol"),
+"hit1": ExtResource("7_b5f6u"),
+"hit2": ExtResource("8_tqoya"),
 "jump": ExtResource("4_brvut"),
 "landing": ExtResource("5_0ha60")
 }
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
-_spawnable_scenes = PackedStringArray("uid://bh58c7wn1bdd1", "uid://cfa6kvdnksof5", "uid://c854n0n8nyq0o", "uid://dbsx3dipfeqda")
+_spawnable_scenes = PackedStringArray("uid://bh58c7wn1bdd1", "uid://cfa6kvdnksof5", "uid://c854n0n8nyq0o", "uid://dbsx3dipfeqda", "uid://c2ks8rvs536o4", "uid://ogqrso2b1tut", "uid://d3p6cvj65jyjb")
 spawn_path = NodePath("..")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
 [node name="mainmenu" type="Node2D" parent="CanvasLayer"]
+z_index = 10
 
 [node name="host_button" type="Button" parent="CanvasLayer/mainmenu"]
 anchors_preset = 8
@@ -76,6 +119,7 @@ text = "localplay"
 
 [node name="debug" type="Node2D" parent="CanvasLayer"]
 visible = false
+z_index = 10
 
 [node name="value_bounce" type="LineEdit" parent="CanvasLayer/debug"]
 offset_left = 896.0
@@ -167,6 +211,7 @@ text = "reset pos"
 
 [node name="lobby" type="Node2D" parent="CanvasLayer"]
 visible = false
+z_index = 10
 
 [node name="Label_player1" type="Label" parent="CanvasLayer/lobby"]
 anchors_preset = 8
@@ -233,6 +278,7 @@ expand_mode = 1
 
 [node name="friend_lobbies" type="Node2D" parent="CanvasLayer"]
 visible = false
+z_index = 10
 
 [node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer/friend_lobbies"]
 offset_left = 384.0
@@ -253,6 +299,7 @@ text = "refresh
 
 [node name="Game_UI" type="Node2D" parent="CanvasLayer"]
 visible = false
+z_index = 10
 
 [node name="LabelWin" type="Label" parent="CanvasLayer/Game_UI"]
 anchors_preset = 8
@@ -273,6 +320,7 @@ vertical_alignment = 1
 
 [node name="lobby_single" type="Node2D" parent="CanvasLayer"]
 visible = false
+z_index = 10
 
 [node name="single_start_button" type="Button" parent="CanvasLayer/lobby_single"]
 offset_left = 545.0
@@ -283,6 +331,7 @@ text = "start"
 
 [node name="lobby_local" type="Node2D" parent="CanvasLayer"]
 visible = false
+z_index = 10
 
 [node name="local_start_button" type="Button" parent="CanvasLayer/lobby_local"]
 offset_left = 545.0
@@ -293,12 +342,57 @@ text = "start
 "
 
 [node name="ButtonBack" type="Button" parent="CanvasLayer"]
+z_index = 10
 offset_left = 1024.0
 offset_top = 32.0
 offset_right = 1088.0
 offset_bottom = 64.0
 text = "Back
 "
+
+[node name="BackBufferCopy_crack" type="BackBufferCopy" parent="CanvasLayer"]
+copy_mode = 2
+
+[node name="crackeffect" type="ColorRect" parent="CanvasLayer/BackBufferCopy_crack"]
+material = SubResource("ShaderMaterial_b5f6u")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 952.0
+offset_bottom = 448.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="BackBufferCopy_blast" type="BackBufferCopy" parent="CanvasLayer"]
+z_index = 1
+copy_mode = 2
+
+[node name="blasteffect" type="ColorRect" parent="CanvasLayer/BackBufferCopy_blast"]
+material = SubResource("ShaderMaterial_of57s")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 952.0
+offset_bottom = 448.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="BackBufferCopy_wave" type="BackBufferCopy" parent="CanvasLayer"]
+z_index = 1
+copy_mode = 2
+
+[node name="waveeffect" type="ColorRect" parent="CanvasLayer/BackBufferCopy_wave"]
+material = SubResource("ShaderMaterial_wscrc")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 952.0
+offset_bottom = 448.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
 
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(2, 2)

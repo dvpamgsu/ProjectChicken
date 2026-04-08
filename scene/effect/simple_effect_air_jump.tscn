@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3 uid="uid://d3p6cvj65jyjb"]
+
+[ext_resource type="PackedScene" uid="uid://cfa6kvdnksof5" path="res://scene/effect/simple_effect.tscn" id="1_0dba7"]
+[ext_resource type="Texture2D" uid="uid://c8c7ueoi37xfm" path="res://texture/player/airjump.png" id="2_jweaj"]
+
+[node name="simple_effect_air_jump" instance=ExtResource("1_0dba7")]
+texture = ExtResource("2_jweaj")
+hframes = 6

@@ -73,6 +73,8 @@ var players = {}
 enum STATE {MAIN, LOBBY, FRIEND_LOBBIES, GAME, GAMEWIN, LOBBY_SINGLE, GAME_SINGLE, GAMEWIN_SINGLE, LOBBY_LOCAL, GAME_LOCAL, GAMEWIN_LOCAL}
 var state : STATE = STATE.MAIN
 
+@onready var rng = RandomNumberGenerator.new()
+
 func toggle_fullscreen():
 	var current_mode = DisplayServer.window_get_mode()
 	if current_mode == DisplayServer.WINDOW_MODE_WINDOWED:
@@ -107,6 +109,8 @@ func _ready() -> void:
 	game_ui.visible = false
 	lobby_single.visible = false
 	lobby_local.visible = false
+	blasteffect.visible = false
+	crackeffect.visible = false
 	
 	label_players.append(label_player_1)
 	label_players.append(label_player_2)
@@ -200,13 +204,69 @@ func win(num):
 		label_win.text = member_name + " won"
 	$TimerWin.start()
 	
+
+@rpc("any_peer", "call_remote", "reliable")
+func request_player_info():
+	if !multiplayer.is_server():
+		return
+	for id in players:
+		set_player_info.rpc(id, multiplayer.multiplayer_peer.get_steam_id_for_peer_id(id), players[id].player_name)
+
+@rpc("any_peer", "call_local", "reliable")
+func request_hit_stop(by_player = false, ptype = 0):
+	var slow_scale = 0.1
+	var stop_duration = 0.5
+	var recovery_duration = 0.1
+
+	# 1. 즉시 느리게 설정
+	Engine.time_scale = slow_scale
 	
+	if by_player:
+		camera_action(true, ptype, Vector2(4,4))
+	# 2. 현실 시간 기준 0.5초 정지
+	# SceneTreeTimer는 'true' 설정 시 현실 시간을 기다리므로 보정이 필요 없습니다.
+	var timer = get_tree().create_timer(stop_duration * slow_scale, true)
+	
+	timer.timeout.connect(func():
+		var recovery_tween = create_tween()
+		
+		# [핵심] 엔진이 느려진 만큼 트윈의 작동 시간을 강제로 줄입니다.
+		# 0.2초 / 0.01 = 실제로는 엔진 시간상 아주 찰나의 시간만 주면 
+		# 느려진 엔진이 이를 0.2초처럼 처리합니다.
+		var adjusted_time = recovery_duration * slow_scale
+		# 트윈이 타임스케일의 영향을 받도록 기본 모드(기본값)로 둡니다.
+		# (set_pause_mode를 쓰지 않습니다)
+		recovery_tween.tween_property(Engine, "time_scale", 1.0, adjusted_time)\
+			.set_trans(Tween.TRANS_SINE)\
+			.set_ease(Tween.EASE_OUT)
+		if by_player:
+			camera_action(false)
+	)
+	
+
+var is_effect_on = false
 func _process(delta: float) -> void:
 	
 	if stage:
 		cam_bl_pos = stage.cam_bl.global_position
 		cam_tr_pos = stage.cam_tr.global_position
 
+				
+	match state:
+		STATE.LOBBY, STATE.LOBBY_SINGLE, STATE.LOBBY_LOCAL, STATE.FRIEND_LOBBIES:
+			button_back.visible = true
+		_:
+			button_back.visible = false
+	
+	normal_process(delta)
+		
+	if Input.is_action_just_pressed("fullscreen"):
+		toggle_fullscreen()
+		
+	if Input.is_action_just_pressed("debug3"):
+		is_effect_on = !is_effect_on
+			
+func _physics_process(delta: float) -> void:
 	if state != STATE.GAME and state != STATE.GAME_SINGLE and state != STATE.GAME_LOCAL:
 		cam_target.position = Vector2.ZERO
 		camera_2d.position = Vector2.ZERO		
@@ -214,19 +274,29 @@ func _process(delta: float) -> void:
 			if e:
 				effects.erase(e)
 				e.queue_free()
-				
-	match state:
-		STATE.LOBBY, STATE.LOBBY_SINGLE, STATE.LOBBY_LOCAL, STATE.FRIEND_LOBBIES:
-			button_back.visible = true
-		_:
-			button_back.visible = false
-		
 	match state:
 		STATE.MAIN:
 			pass
 		STATE.LOBBY:
 			pass
 		STATE.GAME, STATE.GAME_SINGLE, STATE.GAME_LOCAL:
+			
+			
+			if state == STATE.GAME:
+				if !multiplayer.is_server():
+					var p1 = null
+					var p2 = null
+					for pk in players:
+						var p = players[pk]
+						if !p:
+							continue
+						if p.is_host_player:
+							p1 = players[pk]
+						else:
+							p2 = players[pk]
+					if p1.player_name == "" or p2.player_name == "" or p1.id == 0 or p2.id == 0:
+						request_player_info.rpc_id(1)
+			
 			if state == STATE.GAME:
 				if Input.is_action_just_pressed("debug1"):
 					win.rpc(1)
@@ -243,7 +313,10 @@ func _process(delta: float) -> void:
 				$Camera2D/boundary1.collision_layer = 8
 				$Camera2D/boundary2.collision_layer = 16
 				
-			camera_2d.position += (cam_target.position - camera_2d.position) * delta * 2.0
+			
+			camera_2d.position = camera_2d.position.lerp(cam_target.position, 5.0 * delta)
+			if is_camera_action:
+				camera_2d.position = cam_target.position
 			
 			var member_count
 			if state == STATE.GAME:
@@ -268,7 +341,7 @@ func _process(delta: float) -> void:
 					if players[pk].alive:
 						pos_center += players[pk].position
 						alive_cnt += 1
-				if p1 and p2:
+				if p1 and p2 and !is_camera_action:
 					if alive_cnt == 2:
 						pos_center /= alive_cnt
 					else:
@@ -287,6 +360,10 @@ func _process(delta: float) -> void:
 								cam_target.position.x = p1.position.x - width/6
 							elif p1.alive_timer+0.5 < p2.alive_timer:
 								cam_target.position.x = p2.position.x + width/6
+						#blasteffect.visible = false
+					else:
+						pass
+						#blasteffect.visible = true
 					
 					var space_state = get_world_2d().direct_space_state
 					var query = PhysicsRayQueryParameters2D.create(Vector2(camera_2d.position.x, -1000), Vector2(camera_2d.position.x, 4000))
@@ -302,10 +379,17 @@ func _process(delta: float) -> void:
 						p1.dead()
 					if p2.position.x < cam_target.position.x - width/2:
 						p2.dead()
-		
-	if Input.is_action_just_pressed("fullscreen"):
-		toggle_fullscreen()
-			
+				elif p1 and p2 and is_camera_action:
+					if camera_action_target == 1:
+						cam_target.position = p1.col_3.global_position
+					else:
+						cam_target.position = p2.col_3.global_position
+						
+func normal_process(delta):
+	pass
+
+					
+					
 func _on_lobby_data_update(l_id: int, member_id: int, success: int) -> void:
 	# 데이터 변경 성공 시 UI 갱신
 	if success:
@@ -389,13 +473,13 @@ func start_game() -> void:
 	if state != STATE.LOBBY:
 		return
 	lobby.visible = false
-	state = STATE.GAME
 	var s = stages[1].instantiate()
 	add_child(s)
 	stage = s
 	if multiplayer.is_server():
 		for id in player_ids:
 			spawn_player(id)
+	state = STATE.GAME
 	
 
 func _bomb_lobby() -> void:
@@ -547,7 +631,7 @@ var effects = []
 @export var effect_package = {}
 const SIMPLE_EFFECT = preload("uid://cfa6kvdnksof5")
 @rpc("any_peer", "call_local")
-func gen_effect(e_code, _position, _flip_h, _z_index): 
+func gen_effect(e_code, _position, _rotation, _flip_h, _z_index): 
 	
 	if not multiplayer.is_server():
 		return
@@ -559,6 +643,7 @@ func gen_effect(e_code, _position, _flip_h, _z_index):
 	se.set_multiplayer_authority(1)
 	se.flip_h = _flip_h
 	se.position = _position
+	se.rotation = _rotation
 	se.z_index = _z_index
 	add_child(se, true)
 	
@@ -567,25 +652,42 @@ func spawn_player(id: int = 1):
 		print("이미 존재하는 플레이어입니다: ", id)
 		return
 	var player = PLAYER.instantiate()
+	var current_steam_id : int = 0
+	if id == multiplayer.get_unique_id():
+		current_steam_id = Steam.getSteamID() # 서버에 물어보지 않고 내 스팀에서 직접 가져옴
+		print("로컬 플레이어 ID 설정 완료: ", current_steam_id)
+	else:
+		# 2. 타인인 경우 (Remote Player)
+		current_steam_id = peer.get_steam_id_for_peer_id(id)
+		# 만약 아직 ID를 못 가져왔다면 0일 수 있음
+		if current_steam_id == 0:
+			print("경고: 상대방의 Steam ID를 아직 가져오지 못함 (Peer ID: ", id, ")")
 	player.name = str(id)
+	player.player_name = Steam.getFriendPersonaName(current_steam_id)
+	player.id = current_steam_id
 	#player.set_multiplayer_authority(id)
 	var host_steam_id = Steam.getLobbyOwner(lobby_id)
 	var member_steam_id = peer.get_steam_id_for_peer_id(id)
 	if id == 1 or member_steam_id == host_steam_id:
 		player.is_host_player = true
-		if stage:
-			player.position = stage.spawn_1.position
+		player.position = stage.get_node("spawn1").global_position
 		print("host player spawned")
 	else:
 		player.is_host_player = false
-		if stage:
-			player.position = stage.spawn_2.position
+		player.position = stage.get_node("spawn2").global_position
 		print("client player spawned")
 	
 	
 	add_child(player, true)
 	
 	print("플레이어 스폰 완료 ID : " + str(id))
+	
+@rpc("authority", "call_local", "reliable")
+func set_player_info(multiplayer_id = 0, steam_id = 0, name = ""):
+	if players.has(multiplayer_id):
+		var p = players[multiplayer_id]
+		p.id = steam_id
+		p.player_name = name
 	
 func _remove_player(id : int):
 	#player_info.erase(id)
@@ -800,18 +902,24 @@ func single_game_start():
 	is_single_game = true
 	is_local_game = false
 	camera_2d.position = Vector2.ZERO
-	state = STATE.GAME_SINGLE
 	var s = stages[1].instantiate()
 	add_child(s)
 	stage = s
 	var p
 	p = PLAYER_SINGLE.instantiate()
 	p.name = "1"
+	p.player_name = Steam.getPersonaName()
+	
+	#p.player_profile = get_steam_avatar(Steam.getSteamID())
 	p.is_host_player = true
+	p.global_position = stage.get_node("spawn1").global_position
 	add_child(p)
 	p = PLAYER_AI.instantiate()
 	p.name = "2"
+	p.player_name = "AI"
+	p.global_position = stage.get_node("spawn2").global_position
 	add_child(p)
+	state = STATE.GAME_SINGLE
 	
 func single_win(num):
 	if state != STATE.GAME_SINGLE and state != STATE.GAME_LOCAL:
@@ -839,7 +947,6 @@ func single_win(num):
 		print("freeze " + str(id))
 	game_ui.visible = true
 	if num == 1:
-		
 		var member_name = Steam.getPersonaName()
 		if state == STATE.GAMEWIN_LOCAL:
 			member_name = "Player 1"
@@ -891,18 +998,22 @@ func local_game_start():
 	is_local_game = true
 	is_single_game = false
 	camera_2d.position = Vector2.ZERO
-	state = STATE.GAME_LOCAL
 	var s = stages[1].instantiate()
 	add_child(s)
 	stage = s
 	var p
 	p = PLAYER_SINGLE.instantiate()
 	p.name = "1"
+	p.player_name = "Player 1"
 	p.is_host_player = true
+	p.global_position = stage.get_node("spawn1").global_position
 	add_child(p)
 	p = PLAYER_LOCAL_ALTER.instantiate()
 	p.name = "2"
+	p.player_name = "Player 2"
+	p.global_position = stage.get_node("spawn2").global_position
 	add_child(p)
+	state = STATE.GAME_LOCAL
 	
 
 func _on_button_back_pressed() -> void:
@@ -914,3 +1025,139 @@ func _on_button_back_pressed() -> void:
 	mainmenu.visible = true
 	
 	pass # Replace with function body.
+
+@onready var blasteffect: ColorRect = $CanvasLayer/BackBufferCopy_blast/blasteffect
+@rpc("any_peer", "call_local")
+func gen_blast(pos: Vector2, dir: Vector2, angle:=0.4 ):
+	
+	#if !is_effect_on:
+		#return
+	
+	var mat = blasteffect.material as ShaderMaterial
+	blasteffect.show()
+
+	# 1. 월드 좌표를 현재 화면상의 픽셀 위치로 변환 (카메라 Zoom/Offset 반영)
+	var canvas_transform = get_viewport().get_canvas_transform()
+	var screen_pixel_pos = canvas_transform * pos
+	
+	# 2. 현재 화면의 '논리적 해상도' 크기를 가져옴
+	# 프로젝트 설정에서 정한 1152x648 같은 크기입니다.
+	var screen_size = get_viewport().get_visible_rect().size
+	
+	# 3. 0.0 ~ 1.0 비율로 변환
+	var uv_center = Vector2(screen_pixel_pos.x / screen_size.x, screen_pixel_pos.y / screen_size.y)
+	
+	# [디버깅용] 만약 캐릭터가 화면 중앙에 있다면 0.5, 0.5 근처가 나와야 함
+	# print("Calculated UV:", uv_center)
+	mat.set_shader_parameter("aperture", angle)
+	mat.set_shader_parameter("center", uv_center)
+	
+	# 4. 방향(Direction) 보정
+	# 셰이더의 direction은 화면 좌표계 기준이므로 
+	# 카메라가 회전되어 있다면 그 각도만큼 dir도 돌려줘야 합니다.
+	mat.set_shader_parameter("direction", dir.normalized())
+	
+	# 4. 애니메이션 설정 (UV 기반이므로 blast 값 범위가 작아집니다)
+	var tween = create_tween()
+	mat.set_shader_parameter("force", 0.6) # 왜곡 강도
+	
+	# 인스펙터에서 size 값을 0.1 ~ 0.2 정도로 설정해두세요.
+	# blast는 화면 끝까지 퍼지도록 0.0에서 1.5까지 키웁니다.
+	tween.tween_property(mat, "shader_parameter/blast", 1.5, 1.5).from(0.0)
+	tween.parallel().tween_property(mat, "shader_parameter/force", 0.0, 0.5)
+	
+	# 5. 애니메이션 종료 후 숨기기
+	tween.finished.connect(func(): blasteffect.hide())
+
+
+func _on_window_resized():
+	# BackBufferCopy가 들어있는 레이어를 강제로 업데이트하거나 
+	# Viewport 모드를 다시 한번 확인해줍니다.
+	var bbc = $CanvasLayer/BackBufferCopy
+	bbc.copy_mode = BackBufferCopy.COPY_MODE_VIEWPORT
+	
+@onready var crackeffect: ColorRect = $CanvasLayer/BackBufferCopy_crack/crackeffect
+@rpc("any_peer", "call_local")
+func gen_crack(pos: Vector2):
+	var mat = crackeffect.material as ShaderMaterial
+	if not mat: return
+	
+	crackeffect.show()
+
+	var view_size = get_viewport_rect().size
+	var canvas_transform = get_viewport().get_canvas_transform()
+	var screen_pos = canvas_transform * pos
+	var uv_center = screen_pos / view_size
+
+	# 초기값 설정
+	mat.set_shader_parameter("seed", randf_range(0.0, 100.0))
+	mat.set_shader_parameter("center", uv_center)
+	mat.set_shader_parameter("force", 1.0)
+	mat.set_shader_parameter("blast", 0.0)
+	mat.set_shader_parameter("fading_radius", 0.0)
+
+	var tween = create_tween()
+	
+	# [1단계: 생성] 0.3초 동안 금이 화면 끝까지 시원하게 뻗어나갑니다.
+	# 5.0은 화면 밖까지 충분히 나가는 값입니다.
+	tween.tween_property(mat, "shader_parameter/blast", 5.0, 0.3)\
+		.from(0.0)\
+		.set_trans(Tween.TRANS_QUART)\
+		.set_ease(Tween.EASE_OUT)
+	
+	# [2단계: 서서히 사라짐] 생성된 지 0.1초 후부터 안쪽(중심)부터 지워지기 시작합니다.
+	# fading_radius가 blast를 뒤따라가면서 금을 지웁니다.
+	tween.parallel().tween_property(mat, "shader_parameter/fading_radius", 5.0, 0.3)\
+		.from(0.0)\
+		.set_delay(0.05)\
+		.set_trans(Tween.TRANS_SINE)\
+		.set_ease(Tween.EASE_IN_OUT)
+		
+	# [3단계: 투명도 조절] 사라지는 동안 전체적인 강도도 살짝 낮춰서 부드럽게 처리합니다.
+	tween.parallel().tween_property(mat, "shader_parameter/force", 0.0, 0.6)\
+		.from(1.0)\
+		.set_delay(0.2)
+
+	tween.finished.connect(func(): crackeffect.hide())
+	
+@onready var waveeffect: ColorRect = $CanvasLayer/BackBufferCopy_wave/waveeffect
+@rpc("any_peer", "call_local")
+func gen_wave(dir: Vector2):
+	# 전역 변수 waveeffect의 material을 참조합니다.
+	var mat = waveeffect.material as ShaderMaterial
+	if not mat: return
+	
+	# 1. 전달받은 방향 벡터를 셰이더에 적용 (정규화 포함)
+	mat.set_shader_parameter("direction", dir.normalized())
+	
+	# 2. 파동 파라미터 초기화
+	mat.set_shader_parameter("amplitude", 0.06) # 두께에 맞춰 강도도 살짝 높임
+	mat.set_shader_parameter("wave_phase", -0.2)
+	
+	# 3. Tween 애니메이션 실행
+	var tween = create_tween()
+	
+	# 1.0초 동안 화면 전체를 묵직하게 스캔합니다.
+	tween.tween_property(mat, "shader_parameter/wave_phase", 1.2, 1.0)\
+		.set_trans(Tween.TRANS_SINE)\
+		.set_ease(Tween.EASE_IN_OUT)
+	
+	# 4. 종료 후 왜곡 제거
+	tween.tween_property(mat, "shader_parameter/amplitude", 0.0, 0.1)
+	
+var is_camera_action = false
+var camera_action_target = 0
+@rpc("any_peer", "call_local")
+func camera_action(locked, target = 0, _zoom = Vector2(2,2)):
+	is_camera_action = locked
+	if locked:
+		camera_action_target = target
+	var tween = create_tween()
+	
+		# 1. 부드럽게 확대
+	tween.tween_property(camera_2d, "zoom", _zoom, 0.1).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	
+	#tween.finished.connect(func():
+		#var pwave = Vector2.LEFT if target == 1 else Vector2.RIGHT
+		#gen_wave.rpc(pwave)
+	#)

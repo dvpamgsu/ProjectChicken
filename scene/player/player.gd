@@ -1,6 +1,10 @@
 extends RigidBody2D
 
+var player_name = ""
+var id = 0
+
 @export var alive = true
+@export var corpse = false
 @export var is_host_player = false
 
 @onready var sprite_2d: Sprite2D = $Sprite2D
@@ -17,33 +21,41 @@ extends RigidBody2D
 
 @onready var jumpcharge: TextureProgressBar = $jumpcharge
 
-var mat
+var mat : ShaderMaterial
 var jump_timer = 0.0
 const jump_time_max = 1.0
 
 @export var hit_timer = 0.0
 
-var flip_dir = 1
+@export var flip_dir = 1
 
 @export var bounce = 0.1
 var spare_timer = 0.0
 # 스크립트 상단에 쿨다운 변수를 추가해 주세요.
 func _enter_tree() -> void:
 	set_multiplayer_authority(name.to_int())
-
-func _ready() -> void:
+	
+func basic_ready():
+	#physics_material_override = physics_material_override.duplicate()
 	main = get_node("/root/Main")
 	main.players[name.to_int()] = self
 	sprite_2d.material = sprite_2d.material.duplicate()
 	mat = sprite_2d.material as ShaderMaterial
 	
+	contact_monitor = true
+	max_contacts_reported = 5
+	
+func _ready() -> void:
+	
+	basic_ready()
+	
 	if is_multiplayer_authority():
 		if main.is_host:
-			position = main.stage.spawn_1.position
+			#position = main.stage.spawn_1.position
 			initial_pos = position
 			flip_dir = 1
 		else:
-			position = main.stage.spawn_2.position
+			#position = main.stage.spawn_2.position
 			initial_pos = position
 			flip_dir = -1
 	#print(is_multiplayer_authority())
@@ -69,10 +81,10 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 	if !is_multiplayer_authority():
 		return
 	
-	if !alive:
-		state.linear_velocity = Vector2.ZERO
-		state.angular_velocity = 0
+	if !alive and !corpse:
 		if $TimerDissolveDie.is_stopped():
+			state.linear_velocity = Vector2.ZERO
+			state.angular_velocity = 0
 			rotation = 0
 		return
 
@@ -163,9 +175,61 @@ func gen_jump_effect():
 	if !foot_ray_cast_2d.is_colliding():
 		return
 	var pos = foot_ray_cast_2d.get_collision_point() + Vector2(0,1)
+	var rot = 0
 	var e_code = "jump"
+	var _flip_h = false
+	if flip_dir == 1 and rotation < -PI/6.0:
+		_flip_h = true
+	if flip_dir == -1 and rotation < PI/6.0:
+		_flip_h = true
+	main.rpc_id(1, "gen_effect", e_code, pos, rot, _flip_h, 5)
+	
+@onready var jump_particle: CPUParticles2D = $JumpParticle
+func gen_air_jump_effect():
+	
+	var pos = $Area2DFloor.global_position
+	var rot = rotation
+	var e_code = "airjump"
 	var _flip_h = rotation <= 0.0
-	main.rpc_id(1, "gen_effect", e_code, pos, _flip_h, 5)
+	main.rpc_id(1, "gen_effect", e_code, pos, rot, _flip_h, 5)
+	
+	if is_multiplayer_authority():
+		gen_jump_particle.rpc()
+		
+func gen_hit1_effect():
+	
+	var rot = main.rng.randf_range(-PI,PI)
+	var e_code = "hit1"
+	#var _flip_h = rotation <= 0.0
+	main.rpc_id(1, "gen_effect", e_code, col_3.global_position, rot, true, 15)
+	
+func gen_hit2_effect(pos):
+	
+	var rot = main.rng.randf_range(-PI,PI)
+	var e_code = "hit2"
+	#var _flip_h = rotation <= 0.0
+	main.rpc_id(1, "gen_effect", e_code, pos, rot, true, 14)
+	
+@rpc("any_peer", "call_local", "reliable")
+func gen_jump_particle():
+	jump_particle.direction = Vector2.DOWN.rotated(rotation)
+	jump_particle.restart()
+	
+	
+const FEATHER = preload("uid://cdsi6nkkvir5s")
+@onready var dead_particle: CPUParticles2D = $DeadParticle
+@rpc("any_peer", "call_local", "reliable")
+func gen_dead_particle():
+	
+	dead_particle.restart()
+	
+	var f_num = main.rng.randi_range(20, 40)
+	for i in range(0, f_num):
+		var f = FEATHER.instantiate()
+		var fx = main.rng.randf_range(-8,8)
+		var fy = main.rng.randf_range(-8,8)
+		f.position = position + Vector2(fx, fy)
+		main.add_child(f)
 	
 var pre_is_touching_floor = false
 var air_timer = 1.0
@@ -174,14 +238,16 @@ func check_landing(state):
 	if itf:
 		if !pre_is_touching_floor and air_timer > 0.1:
 			var pos = last_contact_pos
+			var rot = 0
 			var e_code = "landing"
 			var _flip_h = rotation > 0.0
-			main.rpc_id(1, "gen_effect", e_code, pos, _flip_h, 5)
+			main.rpc_id(1, "gen_effect", e_code, pos, rot, _flip_h, 5)
 		air_timer = 0.0
 	else:
 		if air_timer < 2.0:
 			air_timer += state.step
 	pre_is_touching_floor = itf
+
 	
 var last_contact_pos := Vector2.ZERO
 func is_touching_floor(state: PhysicsDirectBodyState2D) -> bool:
@@ -247,15 +313,63 @@ func shock_f(delta):
 			shock = false
 			shock_timer = 0
 	
+
+var emitghost = false
+var ghostTimer = 0.0
+const ghostRate = 0.1
+func set_ghost_state(delta):
+	if !alive and !corpse:
+		return
+	if emitghost:
+		ghostTimer += delta
+		if ghostTimer > ghostRate:
+			ghostTimer = wrapf(ghostTimer, 0.0, ghostRate)
+			create_ghost.rpc()
+	
+@rpc("any_peer", "call_local")
+func create_ghost():
+	# 1. 새로운 스프라이트 노드 생성 및 현재 모습 복제
+	var ghost = Sprite2D.new()
+	
+	# 현재 캐릭터가 사용 중인 Sprite2D의 모든 정보를 그대로 가져옵니다.
+	# ($Sprite2D 부분은 실제 캐릭터의 스프라이트 노드 이름으로 수정하세요)
+	ghost.texture = $Sprite2D.texture
+	ghost.hframes = $Sprite2D.hframes
+	ghost.vframes = $Sprite2D.vframes
+	ghost.frame = $Sprite2D.frame
+	ghost.flip_h = $Sprite2D.flip_h  # ← 여기서 Flip이 완벽하게 해결됩니다.
+	
+	# 2. 위치 및 회전값 고정
+	ghost.global_transform = $Sprite2D.global_transform
+	
+	# 3. 시각 효과 (잔상 느낌 주기)
+	var f = main.rng.randf()
+	if f < 0.5:
+		ghost.modulate = Color(0.4, 0.8, 1.0, 0.6) # 약간 푸른빛이 도는 반투명
+	else:
+		ghost.modulate = Color(1.0, 0.4, 0.4, 0.6) # 약간 푸른빛이 도는 반투명
+		
+	ghost.z_index = z_index - 1              # 캐릭터보다 뒤에 표시
+	
+	# 4. 씬에 추가 (부모가 아닌 최상위 노드에 추가해야 캐릭터를 안 따라다님)
+	get_tree().current_scene.add_child(ghost)
+	
+	# 5. 트윈(Tween)으로 서서히 사라지게 하기
+	var ghost_tween = create_tween()
+	# 0.4초 동안 투명도를 0으로 만들고, 완료되면 노드를 삭제함
+	ghost_tween.tween_property(ghost, "modulate:a", 0.0, 0.4)
+	ghost_tween.finished.connect(func(): ghost.queue_free())
+	
+
 @export var lv := Vector2.ZERO
 var shock_timer = 0.0
+@export var particle_timer = 0.0
 func _physics_process(delta: float) -> void:
 	
 	find_alter()
 	check_flip()
 	#print(freeze)
 	#print(position)
-	sprite_2d.flip_h = sync_flip_h
 	
 	# [A] 공통 비주얼 업데이트 (권한 체크 위)
 	if main and main.stage and main.stage.has_node("lights"):
@@ -297,17 +411,45 @@ func _physics_process(delta: float) -> void:
 
 	# [B] 피격 효과 (권한 체크 위)
 	if hit_timer > 0.0:
-		mat.set_shader_parameter("hit_strength", 0.35 * hit_timer / 0.1)
+		mat.set_shader_parameter("hit_strength", 0.175*(1.0+cos(PI+TAU*wrapf(hit_timer,0.0,0.2)/0.2)))
+		physics_material_override.bounce = 1.0
 	else:
 		mat.set_shader_parameter("hit_strength", 0.0)
-		
+		physics_material_override.bounce = 0.0
+	
+	# 잔상 효과
+	set_ghost_state(delta)
+	
+	#if is_host_player:
+		#print(linear_velocity.length())
+	if particle_timer > 0.0:
+		if linear_velocity.length() < 100.0:
+			hit_particle.emitting = false
+		else:
+			hit_particle.emitting = true
+	else:
+		hit_particle.emitting = false
+	#print(hit_particle.emitting)
+			
+	#------------------------------------------------------------
 	if !is_multiplayer_authority():
 		return
+	
+	# 다시 원래대로 돌아오게 하고 싶다면
+	# tween.tween_property(mat, "shader_parameter/whiten_strength", 0.0, 0.2).set_delay(0.1)
 		
+	sprite_2d.flip_h = sync_flip_h
+	
 	if hit_timer > 0.0:
 		hit_timer -= delta
 	else:
 		hit_timer = 0.0
+		
+	
+	if particle_timer > 0.0:
+		particle_timer -= delta
+	else:
+		particle_timer = 0.0
 		
 	lv = linear_velocity
 	if !$TimerDissolveDie.is_stopped():
@@ -316,6 +458,8 @@ func _physics_process(delta: float) -> void:
 		dissolve_value = $TimerDissolveBirth.time_left/$TimerDissolveBirth.wait_time
 	if alive and $TimerDissolveBirth.is_stopped():
 		dissolve_value = 0.0
+	if !alive and corpse and position.y > main.cam_bl_pos.y:
+		start_rebirth()
 	
 		
 	if end:
@@ -323,15 +467,20 @@ func _physics_process(delta: float) -> void:
 		return
 		
 		
-	if !alive:
+	if !alive and !corpse:
 		alive_timer = 0.0
-		linear_velocity = Vector2.ZERO
-		angular_velocity = 0
+		if $TimerDissolveDie.is_stopped():
+			linear_velocity = Vector2.ZERO
+			angular_velocity = 0
 		jump_timer = 0.0
 		$jumpcharge.value = 0
+		jumpcharge.tint_under = Color(1,1,1,0)
 		return
-	else:
+	elif alive:
 		alive_timer += delta
+		mat.set_shader_parameter("whiten_strength", 0)
+	elif !alive:
+		return
 
 	shock_f(delta)
 		
@@ -367,6 +516,7 @@ func _physics_process(delta: float) -> void:
 	if (floor_cnt > 0 or jump_cnt > 0) and jump_result == 3:
 		var jump_dir = Vector2(cos(rotation-PI/2.0), sin(rotation-PI/2.0))
 		if floor_cnt <= 0:
+			gen_air_jump_effect()
 			#PhysicsServer2D.body_set_state(get_rid(), PhysicsServer2D.BODY_STATE_LINEAR_VELOCITY, Vector2.ZERO)
 			apply_impulse(jump_power*jump_dir*(jump_timer+0.5))
 		if floor_cnt > 0:
@@ -405,7 +555,6 @@ func _physics_process(delta: float) -> void:
 
 		
 func check_flip():
-	#print(name)
 	#for pk in main.players:
 		#var p2 = main.players[pk]
 		#if p2 == self:
@@ -451,13 +600,13 @@ func set_initial_pos():
 	else:
 		offsetX = 240
 	initial_pos.x = alter.position.x + offsetX
-	initial_pos.y = -1000
+	initial_pos.y = -5000
 	
 	var cnt = 0
 	var space_state = get_world_2d().direct_space_state
 	var flag = false
 	while true:
-		var query = PhysicsRayQueryParameters2D.create(initial_pos, initial_pos + Vector2(0, 4000))
+		var query = PhysicsRayQueryParameters2D.create(initial_pos, initial_pos + Vector2(0, 10000))
 		query.collision_mask = 1
 		var result = space_state.intersect_ray(query)
 		if result:
@@ -474,15 +623,15 @@ func set_initial_pos():
 	var sign = 0
 	if initial_pos.x < main.cam_bl_pos.x + 16:
 		initial_pos.x = main.cam_bl_pos.x + 240
-		initial_pos.y = -1000
+		initial_pos.y = -5000
 		sign = 1
 	if initial_pos.x > main.cam_tr_pos.x - 16:
 		initial_pos.x = main.cam_tr_pos.x - 240
-		initial_pos.y = -1000
+		initial_pos.y = -5000
 		sign = -1
 	cnt = 0
 	while sign!=0:
-		var query = PhysicsRayQueryParameters2D.create(initial_pos, initial_pos + Vector2(0, 4000))
+		var query = PhysicsRayQueryParameters2D.create(initial_pos, initial_pos + Vector2(0, 10000))
 		query.collision_mask = 1
 		var result = space_state.intersect_ray(query)
 		if result:
@@ -515,14 +664,13 @@ func dead():
 		return
 	if is_multiplayer_authority():
 		collision_layer = 4
-		collision_mask = 4
-		$TimerRebirth.start()
-		#set_deferred("freeze", true)
+		collision_mask = 1
 		alive = false
-		$TimerDissolveDie.start()
+		corpse = true
+		$TimerCorpse.start()
+		jumpcharge.value = 0
 		alive_timer = 0.0
-		linear_velocity = Vector2.ZERO
-		#set_initial_pos()
+		
 	
 var initial_pos = Vector2.ZERO	
 func initialize():
@@ -550,10 +698,32 @@ var forced = false
 func _on_body_entered(body: Node) -> void:
 	if body.is_in_group("player"):
 		forced = true
+	
+		var space_state = get_world_2d().direct_space_state
+		var query = PhysicsRayQueryParameters2D.create(global_position, body.global_position)
+		
+		# 자기 자신은 제외 (Area2D 등이 자기 자신과 부딪히는 것 방지)
+		query.exclude = [get_rid()]
+		query.collision_mask = 2
+		var result = space_state.intersect_ray(query)
+		
+		if result:
+			var hit_point = result.position
+			gen_hit2_effect(hit_point)
+		
+func start_rebirth():
+	linear_velocity = Vector2.ZERO
+	angular_velocity = 0
+	corpse = false
+	#set_ghost(false)
+	$TimerRebirth.start()
+	$TimerDissolveDie.start()
+	#gen_dead_particle.rpc()
 
 func _on_body_exited(body: Node) -> void:
 	if body.is_in_group("player"):
 		forced = false
+	
 
 
 var head_touch = []
@@ -576,7 +746,7 @@ func _on_area_2d_head_body_entered(body: Node2D) -> void:
 	
 	var result = space_state.intersect_ray(query)
 	
-	if result:
+	if result and alive and (!body.is_in_group("player") or body.alive):
 		# 3. 충돌한 면의 방향(Normal) 확인
 		# result.normal이 (0, -1)에 가깝다면 그것은 '바닥'의 윗면입니다.
 		if result.normal.dot(Vector2.UP) > 0.7: 
@@ -584,10 +754,15 @@ func _on_area_2d_head_body_entered(body: Node2D) -> void:
 			if hit_timer <= 0.0 and alive and hp > 1:
 				shock_timer = 0.0
 				shock = true
+			gen_hit1_effect()
 			hit()
 			
 var shock = false
-func hit():
+@onready var hit_particle: CPUParticles2D = $HitParticle
+@onready var timer_hit_ghost_emit: Timer = $TimerHitGhostEmit
+
+var pre_hit_by_player = false
+func hit(by_player = false, way = Vector2.ZERO):
 	if !is_multiplayer_authority():
 		return
 	if hit_timer > 0.0:
@@ -596,18 +771,26 @@ func hit():
 		return
 	hp -= 1
 	mat.set_shader_parameter("hit_strength", 0.35)
-	hit_timer = 0.1
+	set_ghost(true)
+		#main.gen_crack.rpc(col_3.global_position + way * 4.0, way)
+	hit_timer = 0.5
+	var ptype = 1 if is_host_player else 2
 	if hp <= 0:
 		hp = 3
+		#main.gen_crack.rpc(col_3.global_position)
+		if by_player:
+			main.request_hit_stop.rpc(true, ptype)
 		dead()
 	else:
-		## 물체 기준 오른쪽으로 2미터 지점 (Local)
-		#var local_pos = Vector2.UP * 20.0
-		#local_pos = local_pos.rotated(rotation)
-		## 로컬 방향을 현재 글로벌 회전값에 맞춰 변환 (오프셋만 필요하므로 basis 사용)
-		#
-		#apply_impulse(Vector2.UP * 400.0, local_pos)
-		pass
+		if by_player or (!timer_hit_ghost_emit.is_stopped() and pre_hit_by_player):
+			main.request_hit_stop.rpc(false)
+	timer_hit_ghost_emit.start()
+	if by_player:
+		main.gen_blast.rpc(col_3.global_position, way, 3.142)
+		#hit_particle.restart()
+		#hit_particle.emitting = true
+		particle_timer = 0.5
+	pre_hit_by_player = by_player
 
 func _on_timer_rebirth_timeout() -> void:
 	#print("rebirth")
@@ -645,4 +828,37 @@ func get_jump():
 func _on_area_2d_head_area_entered(area: Area2D) -> void:
 	if area.is_in_group("leg"):
 		if alive and area.alive:
-			hit()
+			var way = (global_position-area.global_position).normalized()
+			hit(true, way)
+			apply_impulse(way*500.0)
+			
+			gen_hit1_effect()
+			
+func set_ghost(is_on):
+	emitghost = is_on
+	pass
+
+
+func _on_timer_hit_ghost_emit_timeout() -> void:
+	set_ghost(false)
+
+
+func _on_timer_corpse_timeout() -> void:
+	flash_white()
+	
+func flash_white():
+	var tween = create_tween()
+	mat.set_shader_parameter("whiten_strength", 0.0)
+	# 0.2초 동안 서서히 하얀색으로 변함
+	tween.tween_property(mat, "shader_parameter/whiten_strength", 1.0, 0.5)
+	tween.tween_interval(0.5)
+	
+	if position.y < main.cam_bl_pos.y - 10:
+		# 3. 기다린 후 특정 함수를 실행합니다.
+		tween.tween_callback(explosion)
+	
+func explosion():
+	gen_dead_particle.rpc()
+	start_rebirth()
+	
+	

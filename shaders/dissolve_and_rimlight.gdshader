@@ -23,6 +23,9 @@ uniform float shadow_intensity : hint_range(0.0, 1.0) = 0.3;
 uniform vec4 hit_color : source_color = vec4(1.0, 0.0, 0.0, 1.0);
 uniform float hit_strength : hint_range(0.0, 1.0) = 0.0;
 
+// --- [4. 화이트 플래시 효과 (추가됨)] ---
+uniform float whiten_strength : hint_range(0.0, 1.0) = 0.0;
+
 // 림 마스크 계산 함수
 float get_rim_mask(sampler2D tex, vec2 uv, vec2 p_size, vec2 dir, float thick, float soft, float base_a) {
 	if (dot(dir, dir) < 0.01 || thick < 0.1) return 0.0;
@@ -30,7 +33,6 @@ float get_rim_mask(sampler2D tex, vec2 uv, vec2 p_size, vec2 dir, float thick, f
 	vec2 n_dir = normalize(dir);
 	vec2 offset = n_dir * p_size * thick;
 	
-	// .exe 호환성을 위해 UV 범위를 제한하며 샘플링
 	float s1 = texture(tex, clamp(uv - offset * 0.5, vec2(0.0), vec2(1.0))).a;
 	float s2 = texture(tex, clamp(uv - offset, vec2(0.0), vec2(1.0))).a;
 	
@@ -54,11 +56,8 @@ void fragment() {
 	float max_rim_mask = 0.0;
 
 	for (int i = 0; i < MAX_LIGHTS; i++) {
-		// light_count까지만 계산하고 탈출
 		if (i >= light_count) break;
-		
 		float m = get_rim_mask(TEXTURE, UV, TEXTURE_PIXEL_SIZE, light_directions[i], rim_thickness, rim_softness, base_color.a);
-		
 		total_light_rgb += light_colors[i].rgb * light_intensities[i] * m;
 		max_rim_mask = max(max_rim_mask, m);
 	}
@@ -66,8 +65,12 @@ void fragment() {
 	// D. 색상 합성
 	vec3 final_rgb = mix(shadow_rgb, total_light_rgb, clamp(max_rim_mask, 0.0, 1.0));
 	
-	// 피격 효과
+	// 피격 효과 (빨간색 등)
 	final_rgb = mix(final_rgb, hit_color.rgb, hit_strength * hit_color.a);
+	
+	// 화이트 플래시 효과 (하얀색으로 덮어씌우기)
+	// whiten_strength가 1.0이면 완전한 하얀색이 됩니다.
+	final_rgb = mix(final_rgb, vec3(1.0), whiten_strength);
 	
 	vec4 final_color = vec4(final_rgb, base_color.a);
 	

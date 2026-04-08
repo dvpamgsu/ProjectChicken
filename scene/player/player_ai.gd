@@ -6,15 +6,12 @@ func _enter_tree() -> void:
 	pass
 
 func _ready() -> void:
-	main = get_node("/root/Main")
-	main.players[name.to_int()] = self
-	sprite_2d.material = sprite_2d.material.duplicate()
-	mat = sprite_2d.material as ShaderMaterial
+	basic_ready()
 	
 	#sprite_2d.material = sprite_2d.material.duplicate()
 	jumpcharge.visible = false
 	
-	position = main.stage.spawn_2.position
+	#position = main.stage.spawn_2.position
 	initial_pos = position
 	flip_dir = -1
 	ai_target_position = position

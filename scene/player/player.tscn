@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://bh58c7wn1bdd1"]
+[gd_scene load_steps=28 format=3 uid="uid://bh58c7wn1bdd1"]
 
 [ext_resource type="Script" uid="uid://dpuvfwalotfcx" path="res://scene/player/player.gd" id="1_cm2cf"]
 [ext_resource type="Texture2D" uid="uid://do5vux4c2v0sp" path="res://texture/player/arrow.png" id="2_5lop3"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://c8opi2cft2wbu" path="res://texture/player/skin001.png" id="3_6smn3"]
 [ext_resource type="Script" uid="uid://bj114o7873h5e" path="res://scene/player/area_2df_leg.gd" id="5_ajqqa"]
 [ext_resource type="Script" uid="uid://da6hs0dbons26" path="res://scene/player/area_2d_floor.gd" id="6_rkmeh"]
+[ext_resource type="Texture2D" uid="uid://dv3bwyr0xjdyc" path="res://texture/player/dust.png" id="7_732fb"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_cm2cf"]
 friction = 0.0
@@ -32,8 +33,9 @@ shader_parameter/light_intensities = PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0)
 shader_parameter/rim_thickness = 5.0000002375
 shader_parameter/rim_softness = 0.800000038
 shader_parameter/shadow_intensity = 0.0
-shader_parameter/hit_color = Color(0.98274976, 6.08854e-06, 1.540184e-06, 1)
+shader_parameter/hit_color = Color(1, 0, 0, 1)
 shader_parameter/hit_strength = 0.0
+shader_parameter/whiten_strength = 0.0
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_cm2cf"]
 radius = 4.0
@@ -123,6 +125,58 @@ properties/20/replication_mode = 1
 properties/21/path = NodePath(".:hit_timer")
 properties/21/spawn = true
 properties/21/replication_mode = 1
+properties/22/path = NodePath("Sprite2D:flip_h")
+properties/22/spawn = true
+properties/22/replication_mode = 2
+properties/23/path = NodePath(".:flip_dir")
+properties/23/spawn = true
+properties/23/replication_mode = 2
+properties/24/path = NodePath(".:particle_timer")
+properties/24/spawn = true
+properties/24/replication_mode = 1
+properties/25/path = NodePath(".:corpse")
+properties/25/spawn = true
+properties/25/replication_mode = 2
+
+[sub_resource type="Curve" id="Curve_732fb"]
+_limits = [-360.0, 360.0, 0.0, 1.0]
+_data = [Vector2(0, 200), 0.0, 0.0, 0, 0, Vector2(1, -200), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Curve" id="Curve_hfhxk"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Gradient" id="Gradient_732fb"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0, 0.6196581)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="Curve" id="Curve_pisg7"]
+_limits = [-360.0, 360.0, -180.0, 180.0]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Curve" id="Curve_oypl4"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Gradient" id="Gradient_qjg4s"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0, 0.63247865)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="Curve" id="Curve_qjg4s"]
+_limits = [-360.0, 360.0, 0.0, 1.0]
+_data = [Vector2(0.002, 200), 0.0, 0.0, 0, 0, Vector2(0.99, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Curve" id="Curve_1wtbu"]
+_data = [Vector2(0, 0.8001061), 0.0, 0.0, 0, 0, Vector2(0.54347825, 0.79321325), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="Gradient" id="Gradient_p3aiu"]
+colors = PackedColorArray(1, 1, 1, 1, 0.68, 0.68, 0.68, 0)
 
 [node name="Player" type="RigidBody2D" groups=["player"]]
 z_index = 10
@@ -220,6 +274,74 @@ one_shot = true
 wait_time = 0.5
 one_shot = true
 
+[node name="HitParticle" type="CPUParticles2D" parent="."]
+emitting = false
+amount = 300
+texture = ExtResource("7_732fb")
+lifetime = 4.0
+emission_shape = 1
+emission_sphere_radius = 5.0
+spread = 180.0
+gravity = Vector2(0, 0)
+initial_velocity_max = 5.0
+angular_velocity_min = -1.0
+angular_velocity_max = 1.0
+angular_velocity_curve = SubResource("Curve_732fb")
+angle_min = -180.0
+angle_max = 180.0
+scale_amount_curve = SubResource("Curve_hfhxk")
+color_ramp = SubResource("Gradient_732fb")
+
+[node name="JumpParticle" type="CPUParticles2D" parent="."]
+position = Vector2(0, 34)
+emitting = false
+amount = 4
+texture = ExtResource("7_732fb")
+one_shot = true
+explosiveness = 1.0
+spread = 67.5
+gravity = Vector2(0, 0)
+initial_velocity_min = 45.0
+initial_velocity_max = 50.0
+angular_velocity_min = -1.0
+angular_velocity_max = 1.0
+angular_velocity_curve = SubResource("Curve_pisg7")
+linear_accel_min = -100.0
+linear_accel_max = -50.0
+scale_amount_curve = SubResource("Curve_oypl4")
+color_ramp = SubResource("Gradient_qjg4s")
+
+[node name="DeadParticle" type="CPUParticles2D" parent="."]
+z_index = 2
+emitting = false
+amount = 100
+texture = ExtResource("7_732fb")
+lifetime = 1.5
+one_shot = true
+explosiveness = 1.0
+lifetime_randomness = 0.44
+emission_shape = 1
+emission_sphere_radius = 40.0
+spread = 180.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 51.78
+initial_velocity_max = 106.8
+angular_velocity_min = -1.0
+angular_velocity_max = 1.0
+angular_velocity_curve = SubResource("Curve_qjg4s")
+linear_accel_min = -100.0
+linear_accel_max = -40.13
+scale_amount_curve = SubResource("Curve_1wtbu")
+color_ramp = SubResource("Gradient_p3aiu")
+
+[node name="TimerHitGhostEmit" type="Timer" parent="."]
+wait_time = 0.7
+one_shot = true
+
+[node name="TimerCorpse" type="Timer" parent="."]
+wait_time = 0.1
+one_shot = true
+
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]
 [connection signal="body_exited" from="." to="." method="_on_body_exited"]
 [connection signal="area_entered" from="col3/Area2DHead" to="." method="_on_area_2d_head_area_entered"]
@@ -229,3 +351,5 @@ one_shot = true
 [connection signal="body_exited" from="Area2DFloor" to="." method="_on_area_2d_floor_body_exited"]
 [connection signal="timeout" from="TimerRebirth" to="." method="_on_timer_rebirth_timeout"]
 [connection signal="timeout" from="TimerDissolveDie" to="." method="_on_timer_dissolve_die_timeout"]
+[connection signal="timeout" from="TimerHitGhostEmit" to="." method="_on_timer_hit_ghost_emit_timeout"]
+[connection signal="timeout" from="TimerCorpse" to="." method="_on_timer_corpse_timeout"]

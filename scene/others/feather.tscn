@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=3 uid="uid://cdsi6nkkvir5s"]
+
+[ext_resource type="Texture2D" uid="uid://dho64715mi3f5" path="res://texture/player/feathers.png" id="1_s3ipb"]
+[ext_resource type="Script" uid="uid://bxd2eejedsc84" path="res://scene/others/feather.gd" id="1_tgxbg"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_s3ipb"]
+size = Vector2(8.5, 9)
+
+[node name="feather" type="CharacterBody2D"]
+z_index = 13
+collision_layer = 32
+script = ExtResource("1_tgxbg")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_s3ipb")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-0.25, 0.5)
+shape = SubResource("RectangleShape2D_s3ipb")

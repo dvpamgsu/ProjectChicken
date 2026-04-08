@@ -1,7 +1,11 @@
-[gd_scene load_steps=9 format=3 uid="uid://dqdqa03uv7qbe"]
+[gd_scene load_steps=16 format=3 uid="uid://dqdqa03uv7qbe"]
 
 [ext_resource type="Script" uid="uid://7eiec3ticvn6" path="res://scene/stage/stage.gd" id="1_v4pcg"]
 [ext_resource type="Shader" uid="uid://q063ryg6carc" path="res://shaders/firebar.gdshader" id="2_pj41a"]
+[ext_resource type="Theme" uid="uid://dw7d5llgvpcda" path="res://theme/theme_bigui.tres" id="3_7efvv"]
+[ext_resource type="Shader" uid="uid://c5dwed2l2sd1r" path="res://shaders/firecircle.gdshader" id="4_pj41a"]
+[ext_resource type="Shader" uid="uid://8ujpgyn8y1pk" path="res://shaders/cropcircle.gdshader" id="5_d7w1h"]
+[ext_resource type="Texture2D" uid="uid://b6vvreu7uvvjy" path="res://texture/player/way_.png" id="6_gxjd3"]
 
 [sub_resource type="Environment" id="Environment_v4pcg"]
 background_mode = 3
@@ -50,6 +54,35 @@ shader_parameter/core_width_ratio = 0.39600001881
 shader_parameter/cut_off_point = 1.0
 shader_parameter/bluntness = 10.0
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_d7w1h"]
+shader = ExtResource("4_pj41a")
+shader_parameter/most_inner_color = Color(0.9999998, 0.9230851, 0.75372124, 1)
+shader_parameter/inner_color = Color(0.989212, 0.6298945, 0, 1)
+shader_parameter/mid_color = Color(1, 0.5, 0, 1)
+shader_parameter/outer_color = Color(0.8, 0.1, 0, 1)
+shader_parameter/core_radius = 0.2000000095
+shader_parameter/fire_length = 0.14000000665
+shader_parameter/fire_speed = 6.000000285
+shader_parameter/fire_detail = 12.0000005225
+shader_parameter/fire_width = 1.2
+shader_parameter/opacity_boost = 10.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_foayd"]
+shader = ExtResource("4_pj41a")
+shader_parameter/most_inner_color = Color(0.7968813, 0.9639867, 0.99999994, 1)
+shader_parameter/inner_color = Color(0, 0.80845505, 0.9208011, 1)
+shader_parameter/mid_color = Color(1.732707e-06, 0.73015255, 0.8972873, 1)
+shader_parameter/outer_color = Color(0, 0.47192532, 0.6380551, 1)
+shader_parameter/core_radius = 0.2000000095
+shader_parameter/fire_length = 0.14000000665
+shader_parameter/fire_speed = 6.000000285
+shader_parameter/fire_detail = 12.0000005225
+shader_parameter/fire_width = 1.2
+shader_parameter/opacity_boost = 10.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_gxjd3"]
+shader = ExtResource("5_d7w1h")
+
 [node name="stage" type="Node2D"]
 script = ExtResource("1_v4pcg")
 
@@ -92,15 +125,67 @@ material = SubResource("ShaderMaterial_wlpnx")
 offset_left = 64.0
 offset_top = 64.0
 offset_right = 576.0
-offset_bottom = 104.0
+offset_bottom = 128.0
 
 [node name="bar2" type="ColorRect" parent="CanvasLayer"]
 material = SubResource("ShaderMaterial_7efvv")
 offset_left = 1088.0
 offset_top = 64.0
 offset_right = 1600.0
-offset_bottom = 104.0
+offset_bottom = 128.0
 scale = Vector2(-1, 1)
+
+[node name="player1Label" type="Label" parent="CanvasLayer"]
+offset_left = 128.0
+offset_top = 112.0
+offset_right = 176.0
+offset_bottom = 144.0
+theme = ExtResource("3_7efvv")
+
+[node name="player2Label" type="Label" parent="CanvasLayer"]
+offset_left = 976.0
+offset_top = 112.0
+offset_right = 1024.0
+offset_bottom = 144.0
+theme = ExtResource("3_7efvv")
+horizontal_alignment = 2
+
+[node name="frame1" type="ColorRect" parent="CanvasLayer"]
+material = SubResource("ShaderMaterial_d7w1h")
+offset_top = 32.0
+offset_right = 128.0
+offset_bottom = 160.0
+
+[node name="frame2" type="ColorRect" parent="CanvasLayer"]
+material = SubResource("ShaderMaterial_foayd")
+offset_left = 1024.0
+offset_top = 32.0
+offset_right = 1152.0
+offset_bottom = 160.0
+
+[node name="profile1" type="TextureRect" parent="CanvasLayer"]
+z_index = 1
+material = SubResource("ShaderMaterial_gxjd3")
+offset_left = 40.0
+offset_top = 72.0
+offset_right = 88.0
+offset_bottom = 120.0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="profile2" type="TextureRect" parent="CanvasLayer"]
+z_index = 1
+material = SubResource("ShaderMaterial_gxjd3")
+offset_left = 1064.0
+offset_top = 72.0
+offset_right = 1112.0
+offset_bottom = 120.0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="way_chicken" type="Sprite2D" parent="CanvasLayer"]
+position = Vector2(576, 44)
+texture = ExtResource("6_gxjd3")
 
 [node name="lights" type="Node2D" parent="."]
 
