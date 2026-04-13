@@ -84,6 +84,17 @@ func toggle_fullscreen():
 		# 전체화면(또는 최대화 등)일 경우 다시 창 모드로 전환
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 		
+func _input(event):
+	if event.is_action_pressed("debug4"): # Tab 키
+		# 1. 힌트 설정 변경
+		var tree = get_tree()
+		tree.debug_collisions_hint = !tree.debug_collisions_hint
+		
+		# 2. (중요) 변경된 설정을 적용하기 위해 씬을 다시 로드하거나 
+		# CanvasItem의 업데이트를 유도해야 할 수 있습니다.
+		# 단순 토글이 안 된다면 아래 처럼 현재 씬을 재시작해 보세요.
+		tree.reload_current_scene()
+		
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		if event.is_pressed():
@@ -265,6 +276,9 @@ func _process(delta: float) -> void:
 		
 	if Input.is_action_just_pressed("debug3"):
 		is_effect_on = !is_effect_on
+	
+		
+	$CanvasLayer/BackBufferCopy_vhs/vhseffect.visible = is_effect_on
 			
 func _physics_process(delta: float) -> void:
 	if state != STATE.GAME and state != STATE.GAME_SINGLE and state != STATE.GAME_LOCAL:
@@ -354,23 +368,47 @@ func _physics_process(delta: float) -> void:
 					
 					cam_target.position.x = pos_center.x
 					
+					var dominant = 0
 					if p1.alive and p2.alive:
 						if p1.position.x > p2.position.x:
 							if p1.alive_timer > p2.alive_timer+0.5:
 								cam_target.position.x = p1.position.x - width/6
 							elif p1.alive_timer+0.5 < p2.alive_timer:
 								cam_target.position.x = p2.position.x + width/6
-						#blasteffect.visible = false
+						if p1.alive_timer > p2.alive_timer+0.5:
+							dominant = 1
+						elif p1.alive_timer + 0.5 < p2.alive_timer:
+							dominant = -1
 					else:
-						pass
-						#blasteffect.visible = true
+						if p1.alive and !p2.alive:
+							dominant = 1
+						elif !p1.alive and p2.alive:
+							dominant = -1
 					
 					var space_state = get_world_2d().direct_space_state
-					var query = PhysicsRayQueryParameters2D.create(Vector2(camera_2d.position.x, -1000), Vector2(camera_2d.position.x, 4000))
-					query.collision_mask = 1
-					var result = space_state.intersect_ray(query)
-					if result:
-						cam_target.position.y = result.position.y - 64
+					if dominant == 0:
+						var query = PhysicsRayQueryParameters2D.create(Vector2(camera_2d.position.x, -1000), Vector2(camera_2d.position.x, 4000))
+						query.collision_mask = 1
+						var result = space_state.intersect_ray(query)
+						if result:
+							cam_target.position.y = result.position.y - 64
+					else:
+						var cx = camera_2d.position.x-width/2.0
+						var min_y = camera_2d.position.y
+						var max_y = camera_2d.position.y
+						while true:
+							var query = PhysicsRayQueryParameters2D.create(Vector2(cx, -1000), Vector2(cx, 4000))
+							query.collision_mask = 1
+							var result = space_state.intersect_ray(query)
+							if result:
+								if min_y > result.position.y:
+									min_y = result.position.y
+								if max_y < result.position.y:
+									max_y = result.position.y
+							cx += 4
+							if cx > camera_2d.position.x + width/2:
+								break
+						cam_target.position.y = (max_y-64+min_y+64)/2.0
 					
 					cam_target.position.x = clamp(cam_target.position.x, cam_bl_pos.x + width/2, cam_tr_pos.x - width/2)
 					cam_target.position.y = clamp(cam_target.position.y, cam_tr_pos.y + height/2, cam_bl_pos.y - height/2)

@@ -7,8 +7,9 @@
 size = Vector2(8.5, 9)
 
 [node name="feather" type="CharacterBody2D"]
-z_index = 13
+z_index = 18
 collision_layer = 32
+collision_mask = 0
 script = ExtResource("1_tgxbg")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]

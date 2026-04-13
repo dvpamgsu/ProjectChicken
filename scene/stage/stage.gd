@@ -10,15 +10,20 @@ extends Node2D
 @onready var lights: Node2D = $lights
 @export var shadow = 0.0
 
-@onready var player_1_label: Label = $CanvasLayer/player1Label
-@onready var player_2_label: Label = $CanvasLayer/player2Label
-@onready var profile_1: TextureRect = $CanvasLayer/profile1
-@onready var profile_2: TextureRect = $CanvasLayer/profile2
-@onready var frame_1: ColorRect = $CanvasLayer/frame1
-@onready var frame_2: ColorRect = $CanvasLayer/frame2
+@onready var player_1_label: Label = $ui/player1Label
+@onready var player_2_label: Label = $ui/player2Label
+@onready var profile_1: TextureRect = $ui/profile1
+@onready var profile_2: TextureRect = $ui/profile2
+@onready var frame_1: ColorRect = $ui/frame1
+@onready var frame_2: ColorRect = $ui/frame2
+@onready var alivetimer_1: TextureProgressBar = $ui/alivetimer1
+@onready var alivetimer_2: TextureProgressBar = $ui/alivetimer2
 
-@onready var way_chicken: Sprite2D = $CanvasLayer/way_chicken
 
+@onready var way_chicken: Sprite2D = $ui/way_chicken
+
+const MIKU = preload("uid://b1piejy83552g")
+const TETO = preload("uid://dwnbqw3txwioa")
 
 var p1
 var p2
@@ -47,8 +52,8 @@ func _on_area_2dp_2_body_entered(body: Node2D) -> void:
 var target_progress_value = 50.0
 var progress_value = 50.0
 var progress_timer = 0.0
-@onready var bar_1: ColorRect = $CanvasLayer/bar1
-@onready var bar_2: ColorRect = $CanvasLayer/bar2
+@onready var bar_1: ColorRect = $ui/bar1
+@onready var bar_2: ColorRect = $ui/bar2
 
 func _ready():
 	way_chicken.scale.x = 0
@@ -106,8 +111,39 @@ func ui_update(delta):
 		
 	if p1.id != 0 and !profile_1.texture:
 		profile_1.texture = main.get_steam_avatar(p1.id)
+		alivetimer_1.texture = profile_1.texture
+	elif p1.id == 0 and !profile_1.texture:
+		profile_1.texture = MIKU
+		alivetimer_1.texture_progress = profile_1.texture
 	if p2.id != 0 and !profile_2.texture:
 		profile_2.texture = main.get_steam_avatar(p2.id)
+		alivetimer_2.texture = profile_2.texture
+	elif p2.id == 0 and !profile_2.texture:
+		profile_2.texture = TETO
+		alivetimer_2.texture_progress = profile_2.texture
+		
+	if profile_1.texture:
+		#if p1.corpse:
+			#var timer : Timer = p1.timer_corpse
+			#alivetimer_1.value = 100.0
+			#alivetimer_1.tint_progress.a = 0.5*(1.0-timer.time_left/timer.wait_time)
+		if !p1.alive:
+			var timer : Timer = p1.timer_rebirth
+			alivetimer_1.value = (timer.time_left/timer.wait_time)*100.0
+		else:
+			#alivetimer_1.tint_progress.a = 0
+			alivetimer_1.value = 0
+	if profile_2.texture:
+		#if p2.corpse:
+			#var timer : Timer = p1.timer_corpse
+			#alivetimer_2.value = 100.0
+			#alivetimer_2.tint_progress.a = 0.5*(1.0-timer.time_left/timer.wait_time)
+		if !p2.alive:
+			var timer : Timer = p2.timer_rebirth
+			alivetimer_2.value = (timer.time_left/timer.wait_time)*100.0
+		else:
+			#alivetimer_2.tint_progress.a = 0
+			alivetimer_2.value = 0
 		
 	mat1 = frame_1.material as ShaderMaterial
 	mat1.set_shader_parameter("fire_length", progress_value/100.0*0.14)

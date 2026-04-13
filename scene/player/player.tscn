@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=3 uid="uid://bh58c7wn1bdd1"]
+[gd_scene load_steps=29 format=3 uid="uid://bh58c7wn1bdd1"]
 
 [ext_resource type="Script" uid="uid://dpuvfwalotfcx" path="res://scene/player/player.gd" id="1_cm2cf"]
 [ext_resource type="Texture2D" uid="uid://do5vux4c2v0sp" path="res://texture/player/arrow.png" id="2_5lop3"]
@@ -171,6 +171,11 @@ _limits = [-360.0, 360.0, 0.0, 1.0]
 _data = [Vector2(0.002, 200), 0.0, 0.0, 0, 0, Vector2(0.99, 0), 0.0, 0.0, 0, 0]
 point_count = 2
 
+[sub_resource type="Curve" id="Curve_p3aiu"]
+_limits = [0.0, 100.0, 0.0, 1.0]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.26010102, 100), 0.0, 0.0, 0, 0, Vector2(1, 100), 0.0, 0.0, 0, 0]
+point_count = 3
+
 [sub_resource type="Curve" id="Curve_1wtbu"]
 _data = [Vector2(0, 0.8001061), 0.0, 0.0, 0, 0, Vector2(0.54347825, 0.79321325), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
 point_count = 3
@@ -179,7 +184,7 @@ point_count = 3
 colors = PackedColorArray(1, 1, 1, 1, 0.68, 0.68, 0.68, 0)
 
 [node name="Player" type="RigidBody2D" groups=["player"]]
-z_index = 10
+z_index = 15
 collision_layer = 2
 collision_mask = 3
 physics_material_override = SubResource("PhysicsMaterial_cm2cf")
@@ -314,23 +319,24 @@ color_ramp = SubResource("Gradient_qjg4s")
 [node name="DeadParticle" type="CPUParticles2D" parent="."]
 z_index = 2
 emitting = false
-amount = 100
+amount = 60
 texture = ExtResource("7_732fb")
 lifetime = 1.5
 one_shot = true
 explosiveness = 1.0
 lifetime_randomness = 0.44
 emission_shape = 1
-emission_sphere_radius = 40.0
+emission_sphere_radius = 20.0
 spread = 180.0
 gravity = Vector2(0, 0)
-initial_velocity_min = 51.78
-initial_velocity_max = 106.8
+initial_velocity_min = 500.0
+initial_velocity_max = 600.0
 angular_velocity_min = -1.0
 angular_velocity_max = 1.0
 angular_velocity_curve = SubResource("Curve_qjg4s")
-linear_accel_min = -100.0
-linear_accel_max = -40.13
+damping_min = 400.0
+damping_max = 400.0
+damping_curve = SubResource("Curve_p3aiu")
 scale_amount_curve = SubResource("Curve_1wtbu")
 color_ramp = SubResource("Gradient_p3aiu")
 
@@ -339,7 +345,7 @@ wait_time = 0.7
 one_shot = true
 
 [node name="TimerCorpse" type="Timer" parent="."]
-wait_time = 0.1
+wait_time = 0.5
 one_shot = true
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]

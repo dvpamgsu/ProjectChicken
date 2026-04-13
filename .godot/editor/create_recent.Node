@@ -1,3 +1,7 @@
+TextureProgressBar
+ProgressBar
+Node2D
+CanvasLayer
 Timer
 CollisionShape2D
 Sprite2D
@@ -9,6 +13,3 @@ ColorRect
 GPUParticles2D
 TextureRect
 Label
-Button
-MultiplayerSynchronizer
-RayCast2D

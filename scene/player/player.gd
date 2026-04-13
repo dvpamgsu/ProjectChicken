@@ -87,6 +87,11 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 			state.angular_velocity = 0
 			rotation = 0
 		return
+	#if alive and alive_timer < 0.2:
+		#state.linear_velocity.x = 0
+		#state.angular_velocity = 0
+		#rotation = 0
+		
 
 	# 2. 쿨다운 진행 (0.05~0.1초 정도의 아주 짧은 무적 시간)
 	if hit_cooldown > 0:
@@ -201,14 +206,14 @@ func gen_hit1_effect():
 	var rot = main.rng.randf_range(-PI,PI)
 	var e_code = "hit1"
 	#var _flip_h = rotation <= 0.0
-	main.rpc_id(1, "gen_effect", e_code, col_3.global_position, rot, true, 15)
+	main.rpc_id(1, "gen_effect", e_code, col_3.global_position, rot, true, 20)
 	
 func gen_hit2_effect(pos):
 	
 	var rot = main.rng.randf_range(-PI,PI)
 	var e_code = "hit2"
 	#var _flip_h = rotation <= 0.0
-	main.rpc_id(1, "gen_effect", e_code, pos, rot, true, 14)
+	main.rpc_id(1, "gen_effect", e_code, pos, rot, true, 19)
 	
 @rpc("any_peer", "call_local", "reliable")
 func gen_jump_particle():
@@ -218,7 +223,6 @@ func gen_jump_particle():
 	
 const FEATHER = preload("uid://cdsi6nkkvir5s")
 @onready var dead_particle: CPUParticles2D = $DeadParticle
-@rpc("any_peer", "call_local", "reliable")
 func gen_dead_particle():
 	
 	dead_particle.restart()
@@ -588,6 +592,7 @@ func set_flip(dir):
 func set_initial_pos():
 	if !is_multiplayer_authority():
 		return
+	set_flip(1 if is_host_player else -1)
 	#var alter
 	#for pk in main.players:
 		#var p = main.players[pk]
@@ -595,7 +600,7 @@ func set_initial_pos():
 			#continue
 		#alter = p
 	var offsetX = 0
-	if main.is_host or is_host_player:
+	if is_host_player:
 		offsetX = -240
 	else:
 		offsetX = 240
@@ -667,7 +672,8 @@ func dead():
 		collision_mask = 1
 		alive = false
 		corpse = true
-		$TimerCorpse.start()
+		#$TimerCorpse.start()
+		flash_white.rpc()
 		jumpcharge.value = 0
 		alive_timer = 0.0
 		
@@ -714,9 +720,9 @@ func _on_body_entered(body: Node) -> void:
 func start_rebirth():
 	linear_velocity = Vector2.ZERO
 	angular_velocity = 0
-	corpse = false
 	#set_ghost(false)
 	$TimerRebirth.start()
+	corpse = false
 	$TimerDissolveDie.start()
 	#gen_dead_particle.rpc()
 
@@ -792,14 +798,16 @@ func hit(by_player = false, way = Vector2.ZERO):
 		particle_timer = 0.5
 	pre_hit_by_player = by_player
 
+@onready var timer_corpse: Timer = $TimerCorpse
+@onready var timer_rebirth: Timer = $TimerRebirth
 func _on_timer_rebirth_timeout() -> void:
 	#print("rebirth")
 	if is_multiplayer_authority():
 		initialize()
-		shock = false
-		alive = true
 		collision_layer = 2
 		collision_mask = 3
+		shock = false
+		alive = true
 		hp = 3
 		$TimerDissolveBirth.start()
 		#freeze = false # 다시 움직일 수 있도록 해제
@@ -844,21 +852,24 @@ func _on_timer_hit_ghost_emit_timeout() -> void:
 
 
 func _on_timer_corpse_timeout() -> void:
-	flash_white()
+	pass
 	
+
+@rpc("any_peer", "call_local", "reliable")
 func flash_white():
+	timer_corpse.start()
 	var tween = create_tween()
 	mat.set_shader_parameter("whiten_strength", 0.0)
 	# 0.2초 동안 서서히 하얀색으로 변함
 	tween.tween_property(mat, "shader_parameter/whiten_strength", 1.0, 0.5)
-	tween.tween_interval(0.5)
+	tween.tween_interval(0.0)
 	
 	if position.y < main.cam_bl_pos.y - 10:
 		# 3. 기다린 후 특정 함수를 실행합니다.
 		tween.tween_callback(explosion)
 	
 func explosion():
-	gen_dead_particle.rpc()
+	gen_dead_particle()
 	start_rebirth()
 	
 	
