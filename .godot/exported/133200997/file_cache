@@ -1,6 +1,6 @@
-res://scene/main.tscn::cc9e5a03c8e83db26cdf82a9df99991b::1775709932::res://.godot/exported/133200997/export-fa9c8ff5b16a5ec23280afa6577b07ee-main.scn
+res://scene/main.tscn::a446675f60f4ca1e58dfcb99c63b95d4::1776246154::res://.godot/exported/133200997/export-fa9c8ff5b16a5ec23280afa6577b07ee-main.scn
 res://scene/player.tscn::8f19d2533d14312cd9adcb15ef63cf1c::1772623146::res://.godot/exported/133200997/export-34afcb3bda2393b8f6a0cd71512aeb81-player.scn
-res://scene/player/player.tscn::3049b4a99ed072a002e50131190c76ee::1776059142::res://.godot/exported/133200997/export-3e038ebae82c2bbbd20a0c261d1078da-player.scn
+res://scene/player/player.tscn::c353456faa4218e84385a588e0986f8e::1776247076::res://.godot/exported/133200997/export-3e038ebae82c2bbbd20a0c261d1078da-player.scn
 res://samples/softbody2d/attach-to-character-controller/attach.tscn::1981d9d0fb62367a146fe0e616e98e6f::1772627226::res://.godot/exported/133200997/export-85c8cc1f2a1438288bf8b33d0380456e-attach.scn
 res://samples/softbody2d/car-demo/car.tscn::b1d3d2877fdf76e21517927a24d992d1::1772627226::res://.godot/exported/133200997/export-ba6652c9b952fdbb016c46a28897f015-car.scn
 res://samples/softbody2d/create-a-softbody/create.tscn::a3d3e628a954f06d1395c0417922a233::1772627226::res://.godot/exported/133200997/export-92bf1d9cc423ab48c5b88cdcaf350213-create.scn
@@ -11,11 +11,11 @@ res://samples/softbody2d/softbody2d_phys_slippery.tres::7bb2e1643bd69078026fcbba
 res://samples/softbody2d/tutorial.tscn::05aa7e8c779604de1a28bb30f563ac7d::1772627226::res://.godot/exported/133200997/export-2628788171ecb435ff9cbf0eee333ed9-tutorial.scn
 res://scene/pm/pm_ground.tres::9499e3c50291fd76d98bb9498b96f0d1::1774483521::res://.godot/exported/133200997/export-0c4b4d5a2e6082f226e33406166d227a-pm_ground.res
 res://scene/stage/stage_test.tscn::2eab899c0086ba3f8993fd3cad679a73::1774863105::res://.godot/exported/133200997/export-4b7a17813a2c92aa00ae5facfdc2ea3a-stage_test.scn
-res://scene/stage/stage.tscn::402193599bbba030d5a3bc3484c8aa13::1776058819::res://.godot/exported/133200997/export-0de06b99a795985a40adfae85b131389-stage.scn
-res://scene/player/player_single.tscn::1c6b167db154b6f0ad20aa48dccbf675::1775130362::res://.godot/exported/133200997/export-0615eb83cc26edda66f0855488dd8457-player_single.scn
-res://scene/player/player_ai.tscn::a64745121c739306c82bba2a11b17717::1775481109::res://.godot/exported/133200997/export-75f3bc87ffb0c80a79e30b56e9f9b5a1-player_ai.scn
-res://scene/player/player_local_alter.tscn::9390c114243c8d68f46f1370111a491e::1775129893::res://.godot/exported/133200997/export-8ee90ce77a0c5287640bc1a2221f4570-player_local_alter.scn
-res://scene/stage/stage001.tscn::494e779f6a46085f208387c5c5a016d6::1775555399::res://.godot/exported/133200997/export-c90eab279546ab99b2ad250438eb7b3a-stage001.scn
+res://scene/stage/stage.tscn::c75071fabda6e5951af3711db7d76689::1776247717::res://.godot/exported/133200997/export-0de06b99a795985a40adfae85b131389-stage.scn
+res://scene/player/player_single.tscn::525d66a89288ac5845ac25675aa0135c::1776073710::res://.godot/exported/133200997/export-0615eb83cc26edda66f0855488dd8457-player_single.scn
+res://scene/player/player_ai.tscn::4a39d9c6ba854f80c51ee1f0c3e91508::1776073726::res://.godot/exported/133200997/export-75f3bc87ffb0c80a79e30b56e9f9b5a1-player_ai.scn
+res://scene/player/player_local_alter.tscn::9390c114243c8d68f46f1370111a491e::1776073738::res://.godot/exported/133200997/export-8ee90ce77a0c5287640bc1a2221f4570-player_local_alter.scn
+res://scene/stage/stage001.tscn::6807aca3df9fa83e9f41fb586e2ca1d7::1776159654::res://.godot/exported/133200997/export-c90eab279546ab99b2ad250438eb7b3a-stage001.scn
 res://resources/fnl.tres::c1b1f2e856f734c1c558cc22197f0f76::1775111699::res://.godot/exported/133200997/export-a1bff71231cb5624269b4edc88713c63-fnl.res
 res://resources/noise.tres::220dff53aea8c34fefe3550da3d9b05c::1775111699::res://.godot/exported/133200997/export-61a2c2ac57c92aad0c6927c2de6062bd-noise.res
 res://scene/light.tscn::1eb1b32707acbcf170890b712ca43981::1775124748::res://.godot/exported/133200997/export-c84f2ed1f5e99280771ae53ecdcb9a7c-light.scn
@@ -27,3 +27,8 @@ res://scene/effect/simple_effect_air_jump.tscn::7d58717e6d579ca9fb77f3a371b815b8
 res://scene/effect/simple_effect_hit_2.tscn::61da11356d8eed923e3e0f93cf4145b2::1775471898::res://.godot/exported/133200997/export-735455efcaa3434b15a0f71d01dc7c01-simple_effect_hit_2.scn
 res://scene/effect/simple_effect_hit_1.tscn::e55d5341f57f5e9701cacbc1fc81cd3a::1775471694::res://.godot/exported/133200997/export-f148e202f4eb474519849daa65ab512e-simple_effect_hit_1.scn
 res://scene/others/feather.tscn::72352bf4cdc9d4e7d0e8328ed0528c2e::1776056315::res://.godot/exported/133200997/export-2970b921da62bd3c1fe4c91857cdb0c7-feather.scn
+res://scene/others/cloud.tscn::a9e8cfb34ed986de2da1916bac49656c::1776145775::res://.godot/exported/133200997/export-0e90edd2d4eca7a61c08ca5e98dae6e4-cloud.scn
+res://scene/others/bird.tscn::961159482b6de2fcdb2a23d5da538a15::1776155888::res://.godot/exported/133200997/export-1b3e4bd40c760502c0e668a48463a807-bird.scn
+res://scene/others/birds.tscn::203e209ad4867d7cd39d86f1a7162ebf::1776157469::res://.godot/exported/133200997/export-e256c13a7f63433dc56778e0bf7468ec-birds.scn
+res://scene/others/bird_2.tscn::4340bd68c28133583714d11524f82f9d::1776160353::res://.godot/exported/133200997/export-7f841632918fd8c6d369552e3d713950-bird_2.scn
+res://scene/select.tscn::c3942323c10af3b528fc9bd9d1100273::1776246445::res://.godot/exported/133200997/export-73616b1bdd921c85041d3d5347d8f547-select.scn

@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://cr7wv4h5j6efm"]
+[gd_scene load_steps=26 format=3 uid="uid://cr7wv4h5j6efm"]
 
 [ext_resource type="Script" uid="uid://d28h4b1ulmne7" path="res://scene/main.gd" id="1_itxqv"]
 [ext_resource type="PackedScene" uid="uid://djnt8fbxvb051" path="res://scene/stage/stage_test.tscn" id="2_v0l8b"]
@@ -7,11 +7,15 @@
 [ext_resource type="PackedScene" uid="uid://dbsx3dipfeqda" path="res://scene/effect/simple_effect_landing.tscn" id="5_0ha60"]
 [ext_resource type="PackedScene" uid="uid://d3p6cvj65jyjb" path="res://scene/effect/simple_effect_air_jump.tscn" id="6_4j5ol"]
 [ext_resource type="PackedScene" uid="uid://c2ks8rvs536o4" path="res://scene/effect/simple_effect_hit_1.tscn" id="7_b5f6u"]
-[ext_resource type="Shader" uid="uid://34gyp4r03b4t" path="res://shaders/blast.gdshader" id="7_p1hux"]
-[ext_resource type="Shader" uid="uid://ctbfwrigx12vx" path="res://shaders/crack.gdshader" id="8_of57s"]
+[ext_resource type="Shader" uid="uid://34gyp4r03b4t" path="res://shaders/effect/blast.gdshader" id="7_p1hux"]
+[ext_resource type="Shader" uid="uid://ctbfwrigx12vx" path="res://shaders/effect/crack.gdshader" id="8_of57s"]
 [ext_resource type="PackedScene" uid="uid://ogqrso2b1tut" path="res://scene/effect/simple_effect_hit_2.tscn" id="8_tqoya"]
-[ext_resource type="Shader" uid="uid://dcpgu6k362oxo" path="res://shaders/wave.gdshader" id="11_k65ib"]
-[ext_resource type="Shader" uid="uid://dq3p85hjcqmcq" path="res://shaders/vhs.gdshader" id="12_wscrc"]
+[ext_resource type="Shader" uid="uid://dcpgu6k362oxo" path="res://shaders/effect/wave.gdshader" id="11_k65ib"]
+[ext_resource type="Shader" uid="uid://kx41wcw5uddh" path="res://shaders/effect/zaworld.gdshader" id="12_v2gmf"]
+[ext_resource type="Shader" uid="uid://dq3p85hjcqmcq" path="res://shaders/postprocess/vhs.gdshader" id="12_wscrc"]
+[ext_resource type="Shader" uid="uid://c5psfkvdys1qh" path="res://shaders/postprocess/retro.gdshader" id="13_mswub"]
+[ext_resource type="Shader" uid="uid://bj58jevpex137" path="res://shaders/postprocess/cinema.gdshader" id="14_hybxs"]
+[ext_resource type="PackedScene" uid="uid://jnxlfytv5jlj" path="res://scene/select.tscn" id="16_jcbur"]
 
 [sub_resource type="Theme" id="Theme_v0l8b"]
 default_font_size = 48
@@ -48,6 +52,51 @@ shader_parameter/direction = Vector2(1, 0)
 shader_parameter/amplitude = 0.04
 shader_parameter/wave_phase = -0.1
 shader_parameter/wave_width = 0.1
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_jcbur"]
+shader = ExtResource("12_v2gmf")
+shader_parameter/progress = 0.0
+shader_parameter/strength = 0.08
+shader_parameter/center = Vector2(0.5, 0.5)
+shader_parameter/max_radius = 1.5
+shader_parameter/aberration = 0.425
+shader_parameter/width = 0.04
+shader_parameter/feather = 0.135
+shader_parameter/border_width = 0.01
+shader_parameter/border_color = Color(0, 0, 0, 1)
+shader_parameter/rect_size = Vector2(1152, 648)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_v2gmf"]
+shader = ExtResource("14_hybxs")
+shader_parameter/ratio_preset = 0
+shader_parameter/frame_visible = true
+shader_parameter/frame_color = Color(0, 0, 0, 1)
+shader_parameter/top_bar = 0.0
+shader_parameter/bottom_bar = 0.0
+shader_parameter/left_bar = 0.0
+shader_parameter/right_bar = 0.0
+shader_parameter/vignette_on = true
+shader_parameter/adaptive_vignette = true
+shader_parameter/vignette_intensity = 0.5
+shader_parameter/vignette_opacity = 0.5
+shader_parameter/vignette_color = Color(0.17015183, 0.07542092, 0.015203174, 1)
+shader_parameter/vignette_center = Vector2(0.5, 0.5)
+shader_parameter/dynamic_on = false
+shader_parameter/gate_weave_style = 0
+shader_parameter/gate_weave_speed = 15.0
+shader_parameter/gate_weave_amount = 0.002
+shader_parameter/film_fps = 24.0
+shader_parameter/pulse_intensity = 0.22
+shader_parameter/pulse_rate = 0.5
+shader_parameter/projector_flicker_intensity = 0.08
+shader_parameter/projector_flicker_rate = 1.0
+shader_parameter/handheld_shake_speed = 1.0
+shader_parameter/handheld_shake_amount = 0.005
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_hybxs"]
+shader = ExtResource("13_mswub")
+shader_parameter/pixelation = 0.010000000475
+shader_parameter/opacity = 1.0
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_mswub"]
 shader = ExtResource("12_wscrc")
@@ -97,6 +146,7 @@ spawn_path = NodePath("..")
 layer = 4
 
 [node name="mainmenu" type="Node2D" parent="CanvasLayer"]
+visible = false
 z_index = 10
 
 [node name="host_button" type="Button" parent="CanvasLayer/mainmenu"]
@@ -237,7 +287,6 @@ offset_bottom = 303.0
 text = "reset pos"
 
 [node name="lobby" type="Node2D" parent="CanvasLayer"]
-visible = false
 z_index = 10
 
 [node name="Label_player1" type="Label" parent="CanvasLayer/lobby"]
@@ -247,9 +296,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = 448.0
-offset_top = 256.0
+offset_top = 276.0
 offset_right = 510.0
-offset_bottom = 279.0
+offset_bottom = 299.0
 grow_horizontal = 2
 grow_vertical = 2
 text = "player 1"
@@ -261,9 +310,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = 448.0
-offset_top = 320.0
+offset_top = 340.0
 offset_right = 510.0
-offset_bottom = 343.0
+offset_bottom = 363.0
 grow_horizontal = 2
 grow_vertical = 2
 text = "player 2"
@@ -302,6 +351,14 @@ offset_bottom = 377.0
 grow_horizontal = 2
 grow_vertical = 2
 expand_mode = 1
+
+[node name="select" parent="CanvasLayer/lobby" instance=ExtResource("16_jcbur")]
+z_index = 2
+position = Vector2(332, 268)
+
+[node name="select2" parent="CanvasLayer/lobby" instance=ExtResource("16_jcbur")]
+z_index = 1
+position = Vector2(332, 332)
 
 [node name="friend_lobbies" type="Node2D" parent="CanvasLayer"]
 visible = false
@@ -350,23 +407,29 @@ visible = false
 z_index = 10
 
 [node name="single_start_button" type="Button" parent="CanvasLayer/lobby_single"]
-offset_left = 545.0
-offset_top = 307.0
-offset_right = 609.0
-offset_bottom = 344.0
+offset_left = 608.0
+offset_top = 300.0
+offset_right = 672.0
+offset_bottom = 340.0
 text = "start"
+
+[node name="select" parent="CanvasLayer/lobby_single" instance=ExtResource("16_jcbur")]
+position = Vector2(492, 299)
 
 [node name="lobby_local" type="Node2D" parent="CanvasLayer"]
 visible = false
 z_index = 10
 
 [node name="local_start_button" type="Button" parent="CanvasLayer/lobby_local"]
-offset_left = 545.0
-offset_top = 307.0
-offset_right = 608.0
-offset_bottom = 342.0
+offset_left = 608.0
+offset_top = 300.0
+offset_right = 671.0
+offset_bottom = 340.0
 text = "start
 "
+
+[node name="select" parent="CanvasLayer/lobby_local" instance=ExtResource("16_jcbur")]
+position = Vector2(492, 300)
 
 [node name="ButtonBack" type="Button" parent="CanvasLayer"]
 z_index = 10
@@ -421,11 +484,59 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
+[node name="BackBufferCopy_zaworld" type="BackBufferCopy" parent="CanvasLayer"]
+process_mode = 3
+z_index = 1
+copy_mode = 2
+
+[node name="zaworldeffect" type="ColorRect" parent="CanvasLayer/BackBufferCopy_zaworld"]
+material = SubResource("ShaderMaterial_jcbur")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 952.0
+offset_bottom = 448.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="BackBufferCopy_cinema" type="BackBufferCopy" parent="CanvasLayer"]
+z_index = 15
+copy_mode = 2
+
+[node name="pp_cinema" type="ColorRect" parent="CanvasLayer/BackBufferCopy_cinema"]
+visible = false
+material = SubResource("ShaderMaterial_v2gmf")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 952.0
+offset_bottom = 448.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="BackBufferCopy_retro" type="BackBufferCopy" parent="CanvasLayer"]
+z_index = 15
+copy_mode = 2
+
+[node name="pp_retro" type="ColorRect" parent="CanvasLayer/BackBufferCopy_retro"]
+visible = false
+material = SubResource("ShaderMaterial_hybxs")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 952.0
+offset_bottom = 448.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
 [node name="BackBufferCopy_vhs" type="BackBufferCopy" parent="CanvasLayer"]
 z_index = 15
 copy_mode = 2
 
-[node name="vhseffect" type="ColorRect" parent="CanvasLayer/BackBufferCopy_vhs"]
+[node name="pp_vhs" type="ColorRect" parent="CanvasLayer/BackBufferCopy_vhs"]
 visible = false
 material = SubResource("ShaderMaterial_mswub")
 anchors_preset = 15
@@ -473,6 +584,8 @@ one_shot = true
 [connection signal="pressed" from="CanvasLayer/debug/Button_jump" to="." method="_on_button_jump_pressed"]
 [connection signal="pressed" from="CanvasLayer/debug/Button_reset" to="." method="_on_button_reset_pressed"]
 [connection signal="pressed" from="CanvasLayer/lobby/Button_ready" to="." method="_on_button_ready_pressed"]
+[connection signal="changed" from="CanvasLayer/lobby/select" to="." method="_on_select_changed"]
+[connection signal="changed" from="CanvasLayer/lobby/select2" to="." method="_on_select_2_changed"]
 [connection signal="pressed" from="CanvasLayer/friend_lobbies/Button_refresh" to="." method="_on_button_refresh_pressed"]
 [connection signal="pressed" from="CanvasLayer/lobby_single/single_start_button" to="." method="_on_single_start_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/lobby_local/local_start_button" to="." method="_on_local_start_button_pressed"]

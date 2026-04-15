@@ -35,15 +35,33 @@ var spare_timer = 0.0
 func _enter_tree() -> void:
 	set_multiplayer_authority(name.to_int())
 	
+	
+var char_code = 1
 func basic_ready():
 	#physics_material_override = physics_material_override.duplicate()
 	main = get_node("/root/Main")
 	main.players[name.to_int()] = self
 	sprite_2d.material = sprite_2d.material.duplicate()
 	mat = sprite_2d.material as ShaderMaterial
+	#mat.set_shader_parameter("rim_thickness", 0.1)
+	mat.set_shader_parameter("sprite_size", sprite_2d.get_rect().size)
 	
 	contact_monitor = true
 	max_contacts_reported = 5
+	max_dist = pow(pow(main.width,2.0)+pow(main.height,2.0), 0.5)
+	
+	if is_host_player:
+		char_code = main.p1_code
+	else:
+		char_code = main.p2_code
+		
+	var name_code = ""
+	if char_code < 10:
+		name_code = "00"+str(char_code)
+	else:
+		name_code = "0"+str(char_code)
+	name_code += ".png"
+	sprite_2d.texture = load("res://texture/player/skin"+name_code)
 	
 func _ready() -> void:
 	
@@ -62,7 +80,6 @@ func _ready() -> void:
 	if !is_multiplayer_authority():
 		freeze = true
 		jumpcharge.visible = false
-		sprite_2d.texture = load("res://texture/player/skin002.png")
 	if name.to_int() != 1:
 		flip_dir = -1
 	
@@ -368,6 +385,7 @@ func create_ghost():
 @export var lv := Vector2.ZERO
 var shock_timer = 0.0
 @export var particle_timer = 0.0
+var max_dist
 func _physics_process(delta: float) -> void:
 	
 	find_alter()
@@ -380,36 +398,42 @@ func _physics_process(delta: float) -> void:
 		var lights = main.stage.lights.get_children()
 		
 		# .exe 호환성을 위해 PackedArray를 미리 생성
-		var lds = PackedVector2Array()
 		var lcs = PackedColorArray()
 		var lis = PackedFloat32Array()
-		
+		var loffsets = PackedVector2Array()
+
 		# 반드시 8개를 꽉 채워서 보냅니다 (빌드 환경에서는 가변 배열이 위험함)
 		for i in range(8):
 			if i < lights.size():
 				var l = lights[i]
-				var dist = global_position.distance_to(l.global_position)
-				var ld = (global_position - l.global_position).normalized()
+				var dist = sprite_2d.global_position.distance_to(l.global_position)
+				var local_pos:Vector2 = l.global_position - sprite_2d.global_position
 				
-				ld = ld.rotated(-rotation)
-				if flip_dir < 0:
-					ld.x *= -1.0
+				local_pos = local_pos.rotated(-rotation)
+				if sprite_2d.flip_h:
+					local_pos = local_pos.reflect(Vector2.UP)
 					
-				lds.append(ld)
+				#if is_host_player:
+					#print(local_pos)
+				loffsets.append(local_pos)
+
 				lcs.append(l.light_color)
 				var intensity = l.intensity if l.is_fixed else l.intensity / max(dist, 1.0)
 				lis.append(intensity)
+
 			else:
 				# 빈 슬롯은 0이 아닌 안전한 기본값으로 채움
-				lds.append(Vector2.ZERO)
+				loffsets.append(Vector2.ZERO)
 				lcs.append(Color(0,0,0,0))
 				lis.append(0.0)
+
 		
 		# 매 프레임 set_shader_parameter 호출
 		mat.set_shader_parameter("light_count", min(lights.size(), 8))
-		mat.set_shader_parameter("light_directions", lds)
+		mat.set_shader_parameter("light_offsets", loffsets)
 		mat.set_shader_parameter("light_colors", lcs)
 		mat.set_shader_parameter("light_intensities", lis)
+
 		mat.set_shader_parameter("dissolve_amount", dissolve_value)
 		mat.set_shader_parameter("shadow_intensity", main.stage.shadow)
 
@@ -434,6 +458,10 @@ func _physics_process(delta: float) -> void:
 	else:
 		hit_particle.emitting = false
 	#print(hit_particle.emitting)
+	
+	if alive:
+		mat.set_shader_parameter("whiten_strength", 0)
+	
 			
 	#------------------------------------------------------------
 	if !is_multiplayer_authority():
@@ -721,7 +749,8 @@ func start_rebirth():
 	linear_velocity = Vector2.ZERO
 	angular_velocity = 0
 	#set_ghost(false)
-	$TimerRebirth.start()
+	timer_rebirth_start.rpc()
+	
 	corpse = false
 	$TimerDissolveDie.start()
 	#gen_dead_particle.rpc()
@@ -797,6 +826,11 @@ func hit(by_player = false, way = Vector2.ZERO):
 		#hit_particle.emitting = true
 		particle_timer = 0.5
 	pre_hit_by_player = by_player
+
+
+@rpc("any_peer", "call_local", "reliable")
+func timer_rebirth_start():
+	$TimerRebirth.start()
 
 @onready var timer_corpse: Timer = $TimerCorpse
 @onready var timer_rebirth: Timer = $TimerRebirth

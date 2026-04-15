@@ -1,17 +1,20 @@
-[gd_scene load_steps=20 format=3 uid="uid://dqdqa03uv7qbe"]
+[gd_scene load_steps=26 format=3 uid="uid://dqdqa03uv7qbe"]
 
 [ext_resource type="Script" uid="uid://7eiec3ticvn6" path="res://scene/stage/stage.gd" id="1_v4pcg"]
 [ext_resource type="Script" uid="uid://dr4q8w4sa78sx" path="res://scene/stage/ui.gd" id="2_foayd"]
 [ext_resource type="Shader" uid="uid://q063ryg6carc" path="res://shaders/firebar.gdshader" id="2_pj41a"]
+[ext_resource type="Script" uid="uid://3wsd3c0oy33k" path="res://scene/stage/background_movement.gd" id="2_tamef"]
 [ext_resource type="Theme" uid="uid://dw7d5llgvpcda" path="res://theme/theme_bigui.tres" id="3_7efvv"]
 [ext_resource type="Shader" uid="uid://c5dwed2l2sd1r" path="res://shaders/firecircle.gdshader" id="4_pj41a"]
 [ext_resource type="Shader" uid="uid://8ujpgyn8y1pk" path="res://shaders/cropcircle.gdshader" id="5_d7w1h"]
 [ext_resource type="Texture2D" uid="uid://b6vvreu7uvvjy" path="res://texture/player/way_.png" id="6_gxjd3"]
 [ext_resource type="Shader" uid="uid://dc6osjf3ccive" path="res://shaders/circle.gdshader" id="8_r5rt7"]
+[ext_resource type="Texture2D" uid="uid://bc6jsbc41al33" path="res://texture/bridget.png" id="9_4n35m"]
 
 [sub_resource type="Environment" id="Environment_v4pcg"]
 background_mode = 3
 glow_enabled = true
+glow_bloom = 0.1
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_v4pcg"]
 size = Vector2(52, 108)
@@ -84,12 +87,28 @@ shader_parameter/opacity_boost = 10.0
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_gxjd3"]
 shader = ExtResource("5_d7w1h")
+shader_parameter/border_width = 0.1
+shader_parameter/border_color = Color(0, 0, 0, 1)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_r5rt7"]
 shader = ExtResource("8_r5rt7")
 
+[sub_resource type="Gradient" id="Gradient_tamef"]
+offsets = PackedFloat32Array(0)
+colors = PackedColorArray(0, 0, 0, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_2rnjc"]
+gradient = SubResource("Gradient_tamef")
+
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_4n35m"]
 shader = ExtResource("8_r5rt7")
+
+[sub_resource type="Gradient" id="Gradient_dd3yr"]
+offsets = PackedFloat32Array(0)
+colors = PackedColorArray(0, 0, 0, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_ngctk"]
+gradient = SubResource("Gradient_dd3yr")
 
 [node name="stage" type="Node2D"]
 script = ExtResource("1_v4pcg")
@@ -106,9 +125,25 @@ environment = SubResource("Environment_v4pcg")
 [node name="spawn2" type="Node2D" parent="."]
 
 [node name="sprite_stage" type="Sprite2D" parent="."]
-z_index = 7
+z_index = 5
 
 [node name="background" type="Sprite2D" parent="."]
+
+[node name="background_farEX" type="Sprite2D" parent="."]
+z_index = 2
+script = ExtResource("2_tamef")
+
+[node name="background_far" type="Sprite2D" parent="."]
+z_index = 3
+script = ExtResource("2_tamef")
+
+[node name="background_near" type="Node2D" parent="."]
+z_index = 4
+script = ExtResource("2_tamef")
+
+[node name="background_nearEX" type="Node2D" parent="."]
+z_index = 25
+script = ExtResource("2_tamef")
 
 [node name="collision" type="Node2D" parent="."]
 
@@ -176,22 +211,23 @@ offset_bottom = 160.0
 [node name="profile1" type="TextureRect" parent="ui"]
 z_index = 1
 material = SubResource("ShaderMaterial_gxjd3")
-offset_left = 40.0
-offset_top = 72.0
-offset_right = 88.0
-offset_bottom = 120.0
+offset_left = 36.0
+offset_top = 68.0
+offset_right = 92.0
+offset_bottom = 124.0
 expand_mode = 1
 stretch_mode = 5
 
 [node name="profile2" type="TextureRect" parent="ui"]
 z_index = 1
 material = SubResource("ShaderMaterial_gxjd3")
-offset_left = 1064.0
-offset_top = 72.0
-offset_right = 1112.0
-offset_bottom = 120.0
+offset_left = 1060.0
+offset_top = 68.0
+offset_right = 1116.0
+offset_bottom = 124.0
 expand_mode = 1
 stretch_mode = 5
+flip_h = true
 
 [node name="way_chicken" type="Sprite2D" parent="ui"]
 position = Vector2(576, 44)
@@ -208,22 +244,64 @@ mouse_filter = 2
 step = 0.1
 fill_mode = 5
 nine_patch_stretch = true
+texture_progress = SubResource("GradientTexture1D_2rnjc")
 tint_progress = Color(0, 0, 0, 0.50980395)
 
 [node name="alivetimer2" type="TextureProgressBar" parent="ui"]
 z_index = 2
 material = SubResource("ShaderMaterial_4n35m")
-offset_left = 1064.0
-offset_top = 72.0
-offset_right = 1112.0
-offset_bottom = 120.0
+offset_left = 1060.0
+offset_top = 68.0
+offset_right = 1116.0
+offset_bottom = 124.0
 mouse_filter = 2
 step = 0.1
 fill_mode = 5
 nine_patch_stretch = true
+texture_progress = SubResource("GradientTexture1D_ngctk")
 tint_progress = Color(0, 0, 0, 0.50980395)
 
 [node name="lights" type="Node2D" parent="."]
 
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+layer = 10
+
+[node name="menu" type="ColorRect" parent="CanvasLayer"]
+process_mode = 3
+offset_left = 384.0
+offset_top = 176.0
+offset_right = 768.0
+offset_bottom = 560.0
+color = Color(0.12, 0.12, 0.12, 0.54509807)
+
+[node name="ButtonResume" type="Button" parent="CanvasLayer/menu"]
+z_index = 1
+layout_mode = 0
+offset_left = 128.0
+offset_top = 224.0
+offset_right = 256.0
+offset_bottom = 272.0
+text = "Resume"
+
+[node name="ButtonExit" type="Button" parent="CanvasLayer/menu"]
+z_index = 1
+layout_mode = 0
+offset_left = 128.0
+offset_top = 304.0
+offset_right = 256.0
+offset_bottom = 352.0
+text = "EXIT"
+
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/menu"]
+layout_mode = 0
+offset_left = 96.0
+offset_top = 16.0
+offset_right = 288.0
+offset_bottom = 192.0
+texture = ExtResource("9_4n35m")
+expand_mode = 1
+
 [connection signal="body_entered" from="Area2DP1" to="." method="_on_area_2dp_1_body_entered"]
 [connection signal="body_entered" from="Area2DP2" to="." method="_on_area_2dp_2_body_entered"]
+[connection signal="pressed" from="CanvasLayer/menu/ButtonResume" to="." method="_on_button_resume_pressed"]
+[connection signal="pressed" from="CanvasLayer/menu/ButtonExit" to="." method="_on_button_exit_pressed"]

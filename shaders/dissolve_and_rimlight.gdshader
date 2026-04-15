@@ -1,86 +1,94 @@
 shader_type canvas_item;
 
-// --- [1. Dissolve 및 기본 파라미터] ---
-uniform sampler2D noise_tex : repeat_enable;
+// --- [1. 기본 효과 유니폼] ---
+uniform sampler2D noise_tex : repeat_enable, hint_default_black;
 uniform float dissolve_amount : hint_range(0.0, 1.0) = 0.0;
 uniform vec4 edge_color : source_color = vec4(1.0, 0.5, 0.1, 1.0);
 uniform float edge_thickness : hint_range(0.0, 0.2) = 0.05;
 uniform float edge_intensity : hint_range(1.0, 10.0) = 3.0;
-uniform float noise_scale : hint_range(0.1, 10.0) = 1.0;
+uniform float noise_scale : hint_range(0.01, 2.0) = 0.5; 
 
-// --- [2. 다중 광원 배열] ---
-const int MAX_LIGHTS = 8;
-uniform int light_count : hint_range(0, 8) = 0;
-uniform vec2 light_directions[8];
-uniform vec4 light_colors[8] : source_color;
+uniform float whiten_strength : hint_range(0.0, 1.0) = 0.0;
+// [추가] 히트 효과 (빨간색)
+uniform float hit_strength : hint_range(0.0, 1.0) = 0.0;
+uniform float shadow_intensity : hint_range(0.0, 1.0) = 0.2;
+
+// --- [2. 데이터 유니폼] ---
+uniform vec2 sprite_size;      // 애니메이션 프레임의 실제 픽셀 크기
+uniform int light_count = 0;
+uniform vec2 light_offsets[8]; // 중심점 기준 광원 상대 좌표 (Pixels)
+uniform vec4 light_colors[8];
 uniform float light_intensities[8];
 
-uniform float rim_thickness : hint_range(0.0, 20.0) = 5.0;
+// --- [3. 림라이트 설정] ---
+uniform float rim_thickness_base : hint_range(0.0, 10.0) = 2.0;
+uniform float rim_expand_width : hint_range(0.0, 20.0) = 5.0;
 uniform float rim_softness : hint_range(0.0, 1.0) = 0.5;
-uniform float shadow_intensity : hint_range(0.0, 1.0) = 0.3;
-
-// --- [3. 피격 이펙트] ---
-uniform vec4 hit_color : source_color = vec4(1.0, 0.0, 0.0, 1.0);
-uniform float hit_strength : hint_range(0.0, 1.0) = 0.0;
-
-// --- [4. 화이트 플래시 효과 (추가됨)] ---
-uniform float whiten_strength : hint_range(0.0, 1.0) = 0.0;
-
-// 림 마스크 계산 함수
-float get_rim_mask(sampler2D tex, vec2 uv, vec2 p_size, vec2 dir, float thick, float soft, float base_a) {
-	if (dot(dir, dir) < 0.01 || thick < 0.1) return 0.0;
-
-	vec2 n_dir = normalize(dir);
-	vec2 offset = n_dir * p_size * thick;
-	
-	float s1 = texture(tex, clamp(uv - offset * 0.5, vec2(0.0), vec2(1.0))).a;
-	float s2 = texture(tex, clamp(uv - offset, vec2(0.0), vec2(1.0))).a;
-	
-	float combined_a = (s1 + s2) * 0.5;
-	float diff = max(base_a - combined_a, 0.0);
-	return smoothstep(0.0, soft + 0.1, diff);
-}
+uniform float bloom_intensity : hint_range(0.0, 10.0) = 2.0;
 
 void fragment() {
-	// A. 좌표 계산
-	vec2 aspect = vec2(1.0 / TEXTURE_PIXEL_SIZE.x, 1.0 / TEXTURE_PIXEL_SIZE.y);
-	float m_side = max(aspect.x, aspect.y);
-	vec2 n_uv = UV * (aspect / m_side) * noise_scale;
-
-	// B. 기본 색상 및 그림자
 	vec4 base_color = texture(TEXTURE, UV);
-	vec3 shadow_rgb = base_color.rgb * (1.0 - shadow_intensity);
 	
-	// C. 다중 광원 루프 연산
-	vec3 total_light_rgb = vec3(0.0);
-	float max_rim_mask = 0.0;
-
-	for (int i = 0; i < MAX_LIGHTS; i++) {
-		if (i >= light_count) break;
-		float m = get_rim_mask(TEXTURE, UV, TEXTURE_PIXEL_SIZE, light_directions[i], rim_thickness, rim_softness, base_color.a);
-		total_light_rgb += light_colors[i].rgb * light_intensities[i] * m;
-		max_rim_mask = max(max_rim_mask, m);
+	// --- [A. 디졸브 로직] ---
+	if (dissolve_amount > 0.0) {
+		vec2 fixed_uv = (UV * sprite_size) * noise_scale * 0.01;
+		float n_val = texture(noise_tex, fixed_uv).r;
+		if (n_val < dissolve_amount) {
+			discard;
+		} else if (n_val < dissolve_amount + edge_thickness) {
+			base_color.rgb = mix(base_color.rgb, edge_color.rgb * edge_intensity, edge_color.a);
+		}
 	}
 
-	// D. 색상 합성
-	vec3 final_rgb = mix(shadow_rgb, total_light_rgb, clamp(max_rim_mask, 0.0, 1.0));
+	vec3 final_rgb = base_color.rgb * (1.0 - shadow_intensity);
+	vec3 rim_accum = vec3(0.0);
+
+	// --- [B. 픽셀별 다중 샘플링 림라이트] ---
+	if (base_color.a > 0.0001) {
+		vec2 pixel_pos_from_center = (UV - vec2(0.5)) * sprite_size;
+
+		for (int i = 0; i < 8; i++) {
+			if (i >= light_count) break;
+
+			vec2 pixel_to_light = light_offsets[i] - pixel_pos_from_center;
+			float dist_to_light = length(pixel_to_light);
+			vec2 dir = normalize(pixel_to_light);
+
+			float max_thickness = rim_thickness_base + (dist_to_light * 0.02);
+			max_thickness = min(max_thickness, rim_thickness_base + rim_expand_width);
+
+			float rim_soft_accum = 0.0;
+			const int SAMPLES = 4; 
+			
+			for (int j = 1; j <= SAMPLES; j++) {
+				float current_step = float(j) / float(SAMPLES);
+				float check_dist = current_step * max_thickness;
+				
+				vec2 sample_pos = UV + (dir * TEXTURE_PIXEL_SIZE * check_dist);
+				float alpha_sample = texture(TEXTURE, sample_pos).a;
+				
+				float mask_val = clamp(base_color.a - alpha_sample, 0.0, 1.0);
+				rim_soft_accum += mask_val * (1.1 - current_step);
+			}
+			
+			float rim_mask = (rim_soft_accum / float(SAMPLES));
+			rim_mask = smoothstep(0.0, rim_softness, rim_mask);
+
+			float attenuation = light_intensities[i] / max(dist_to_light * 0.005, 1.0);
+			rim_accum += light_colors[i].rgb * attenuation * rim_mask;
+		}
+	}
+
+	// --- [C. 최종 합성 및 색상 효과] ---
+	final_rgb += rim_accum * bloom_intensity;
 	
-	// 피격 효과 (빨간색 등)
-	final_rgb = mix(final_rgb, hit_color.rgb, hit_strength * hit_color.a);
+	// 1. 히트 효과 (빨간색으로 변함)
+	// 빨간색의 정도를 조절할 수 있습니다. 여기서는 (1, 0, 0) 완전한 빨강을 썼습니다.
+	vec3 hit_color = vec3(1.0, 0.0, 0.0);
+	final_rgb = mix(final_rgb, hit_color, hit_strength);
 	
-	// 화이트 플래시 효과 (하얀색으로 덮어씌우기)
-	// whiten_strength가 1.0이면 완전한 하얀색이 됩니다.
+	// 2. 화이트 피격 효과 (히트 효과보다 나중에 적용되어 최종적으로 흰색이 됨)
 	final_rgb = mix(final_rgb, vec3(1.0), whiten_strength);
 	
-	vec4 final_color = vec4(final_rgb, base_color.a);
-	
-	// E. 디졸브 처리
-	float n_val = texture(noise_tex, n_uv).r;
-	if (n_val < dissolve_amount) {
-		final_color.a = 0.0;
-	} else if (dissolve_amount > 0.0 && n_val < dissolve_amount + edge_thickness) {
-		final_color.rgb = mix(final_color.rgb, edge_color.rgb * edge_intensity, edge_color.a);
-	}
-	
-	COLOR = final_color;
+	COLOR = vec4(final_rgb, base_color.a);
 }

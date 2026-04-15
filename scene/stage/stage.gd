@@ -54,19 +54,68 @@ var progress_value = 50.0
 var progress_timer = 0.0
 @onready var bar_1: ColorRect = $ui/bar1
 @onready var bar_2: ColorRect = $ui/bar2
+var background_offset := Vector2.ZERO
+
+@export var has_cloud = true
+const CLOUD = preload("uid://y6r85jeua0is")
+@export var cloud_modulate := Color.WHITE
+
+
+@onready var background: Sprite2D = $background
 
 func _ready():
+	menu.visible = false
 	way_chicken.scale.x = 0
+	background_offset = $background.position
+	
+	var clouds_x = []
+	if has_cloud:
+		for i in 3:
+			var c = CLOUD.instantiate()
+			var x = 0
+			while true:
+				var flag = false
+				for cx in clouds_x:
+					if abs(cx - x) < 200:
+						flag = true
+				if !flag:
+					break
+				x = main.rng.randf_range(-main.width/2, main.width/2)
+			clouds_x.append(x)
+			c.position.x = x
+			c.position.y = main.rng.randf_range(-main.height/8*3, -main.height/8)
+			c.modulate = cloud_modulate
+			background.add_child(c)
+	
+func _stage_process(delta):
+	pass
+	
+var cloud_timer = 0.0
+var cloud_time = 60.0
+func _physics_process(delta: float) -> void:
+	$background.position = main.camera_2d.global_position + background_offset
 
-func _process(delta: float) -> void:
-	$background.position = main.camera_2d.global_position
-
+	cloud_timer += delta
+	if cloud_timer > cloud_time:
+		var c = CLOUD.instantiate()
+		c.position.x = -main.width/2 - 192
+		c.position.y = main.rng.randf_range(-main.height/8*3, -main.height/8)
+		c.modulate = cloud_modulate
+		background.add_child(c)
+		cloud_timer = 0.0
 	
 	for l in lights.get_children():
 		if l.is_fixed:
 			l.global_position = main.camera_2d.global_position + l.offset
+			
+	if main.state != main.STATE.GAME and main.state != main.STATE.GAMEWIN and Input.is_action_just_pressed("esc"):
+		get_tree().paused = true
+		menu.visible = true
+		main.gen_zaworld.rpc(true)
 		
 	ui_update(delta)
+	
+	_stage_process(delta)
 
 var target_way = 0
 var cur_w = 0
@@ -109,18 +158,13 @@ func ui_update(delta):
 	if player_2_label.text == "":
 		player_2_label.text = p2.player_name
 		
-	if p1.id != 0 and !profile_1.texture:
-		profile_1.texture = main.get_steam_avatar(p1.id)
-		alivetimer_1.texture = profile_1.texture
-	elif p1.id == 0 and !profile_1.texture:
-		profile_1.texture = MIKU
-		alivetimer_1.texture_progress = profile_1.texture
-	if p2.id != 0 and !profile_2.texture:
-		profile_2.texture = main.get_steam_avatar(p2.id)
-		alivetimer_2.texture = profile_2.texture
-	elif p2.id == 0 and !profile_2.texture:
-		profile_2.texture = TETO
-		alivetimer_2.texture_progress = profile_2.texture
+	if !profile_1.texture:
+		profile_1.texture = load("res://texture/player/chicken_profile" + str(main.p1_code) + ".png")
+		print(main.p1_code)
+		#alivetimer_1.texture_progress = profile_1.texture
+	if !profile_2.texture:
+		profile_2.texture = load("res://texture/player/chicken_profile" + str(main.p2_code) + ".png")
+		#alivetimer_2.texture_progress = profile_2.texture
 		
 	if profile_1.texture:
 		#if p1.corpse:
@@ -174,3 +218,13 @@ func ui_update(delta):
 func get_relative_value(x):
 	return clamp(100.0*(x-cam_bl.global_position.x)/(cam_tr.global_position.x - cam_bl.global_position.x), 0, 100)
 	
+@onready var menu: ColorRect = $CanvasLayer/menu	
+func _on_button_resume_pressed() -> void:
+	get_tree().paused = false
+	main.gen_zaworld.rpc(false)
+	menu.visible = false
+
+func _on_button_exit_pressed() -> void:
+	get_tree().paused = false
+	main.gen_zaworld.rpc(false)
+	main.to_title()

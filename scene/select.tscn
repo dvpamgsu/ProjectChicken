@@ -1,0 +1,34 @@
+[gd_scene load_steps=6 format=3 uid="uid://jnxlfytv5jlj"]
+
+[ext_resource type="Texture2D" uid="uid://bvr37o4gs35dg" path="res://texture/player/chicken_profile1.png" id="1_2t17c"]
+[ext_resource type="Script" uid="uid://d1vnd6y5gee5c" path="res://scene/select.gd" id="1_eunbn"]
+[ext_resource type="Script" uid="uid://ce1q1ef287opd" path="res://scene/v_box_container.gd" id="1_qg0qg"]
+[ext_resource type="Texture2D" uid="uid://5j5palnjntd7" path="res://texture/player/profile frame.png" id="2_qg0qg"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_eunbn"]
+texture = ExtResource("2_qg0qg")
+
+[node name="select" type="Node2D"]
+script = ExtResource("1_eunbn")
+
+[node name="CharacterSelector" type="VBoxContainer" parent="."]
+offset_right = 40.0
+offset_bottom = 128.0
+script = ExtResource("1_qg0qg")
+
+[node name="CurrentProfile" type="Button" parent="CharacterSelector"]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+focus_mode = 0
+theme_override_styles/normal = SubResource("StyleBoxTexture_eunbn")
+icon = ExtResource("1_2t17c")
+icon_alignment = 1
+
+[node name="CharacterList" type="ScrollContainer" parent="CharacterSelector"]
+layout_mode = 2
+vertical_scroll_mode = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CharacterSelector/CharacterList"]
+layout_mode = 2
+
+[connection signal="pressed" from="CharacterSelector/CurrentProfile" to="CharacterSelector" method="_on_current_profile_pressed"]

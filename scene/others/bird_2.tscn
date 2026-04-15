@@ -1,0 +1,48 @@
+[gd_scene load_steps=6 format=4 uid="uid://djtleyejpnr2j"]
+
+[ext_resource type="Texture2D" uid="uid://ca2itobtn3hm7" path="res://texture/stage/bird2.png" id="1_f42kn"]
+[ext_resource type="Shader" uid="uid://5hthfdgao58a" path="res://shaders/dissolve_and_rimlight.gdshader" id="1_wmwe1"]
+[ext_resource type="Script" uid="uid://j1dtx0v0fbp2" path="res://scene/others/bird_2.gd" id="2_c0osw"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_sddbx"]
+shader = ExtResource("1_wmwe1")
+shader_parameter/dissolve_amount = 0.0
+shader_parameter/edge_color = Color(1, 0.5, 0.1, 1)
+shader_parameter/edge_thickness = 0.05
+shader_parameter/edge_intensity = 3.0
+shader_parameter/noise_scale = 0.5
+shader_parameter/whiten_strength = 0.0
+shader_parameter/shadow_intensity = 0.2
+shader_parameter/sprite_size = Vector2(0, 0)
+shader_parameter/light_count = 0
+shader_parameter/light_offsets = PackedVector2Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+shader_parameter/light_colors = PackedVector4Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+shader_parameter/light_intensities = PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0)
+shader_parameter/rim_thickness_base = 1.0000000475
+shader_parameter/rim_expand_width = 20.0
+shader_parameter/rim_softness = 0.5
+shader_parameter/bloom_intensity = 1.0000000475
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_c0osw"]
+radius = 52.0
+
+[node name="bird2" type="Sprite2D"]
+z_index = 5
+material = SubResource("ShaderMaterial_sddbx")
+texture = ExtResource("1_f42kn")
+hframes = 3
+script = ExtResource("2_c0osw")
+
+[node name="RayCast2D" type="RayCast2D" parent="."]
+position = Vector2(0, 12)
+target_position = Vector2(0, 4)
+
+[node name="Area2D" type="Area2D" parent="."]
+position = Vector2(0, 8)
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("CircleShape2D_c0osw")
+
+[connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]

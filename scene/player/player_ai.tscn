@@ -1,34 +1,7 @@
-[gd_scene load_steps=8 format=3 uid="uid://c26cids0j3463"]
+[gd_scene load_steps=4 format=3 uid="uid://c26cids0j3463"]
 
 [ext_resource type="PackedScene" uid="uid://bh58c7wn1bdd1" path="res://scene/player/player.tscn" id="1_xfw8x"]
 [ext_resource type="Script" uid="uid://feminn4f5tvi" path="res://scene/player/player_ai.gd" id="2_lqv4w"]
-[ext_resource type="Shader" uid="uid://5hthfdgao58a" path="res://shaders/dissolve_and_rimlight.gdshader" id="3_5ws1u"]
-
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_6smn3"]
-frequency = 0.02
-
-[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_rkmeh"]
-noise = SubResource("FastNoiseLite_6smn3")
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_lqv4w"]
-resource_local_to_scene = true
-shader = ExtResource("3_5ws1u")
-shader_parameter/noise_tex = SubResource("NoiseTexture2D_rkmeh")
-shader_parameter/dissolve_amount = 0.0
-shader_parameter/edge_color = Color(1, 0.5, 0.1, 1)
-shader_parameter/edge_thickness = 0.05
-shader_parameter/edge_intensity = 3.0
-shader_parameter/noise_scale = 1.0
-shader_parameter/light_count = 0
-shader_parameter/light_directions = PackedVector2Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-shader_parameter/light_colors = PackedColorArray(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-shader_parameter/light_intensities = PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0)
-shader_parameter/rim_thickness = 5.0000002375
-shader_parameter/rim_softness = 0.800000038
-shader_parameter/shadow_intensity = 0.0
-shader_parameter/hit_color = Color(1, 0, 0, 1)
-shader_parameter/hit_strength = 0.0
-shader_parameter/whiten_strength = 0.0
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_5ws1u"]
 radius = 8.0
@@ -37,9 +10,6 @@ height = 40.0
 [node name="Player_AI" instance=ExtResource("1_xfw8x")]
 collision_mask = 19
 script = ExtResource("2_lqv4w")
-
-[node name="Sprite2D" parent="." index="2"]
-material = SubResource("ShaderMaterial_lqv4w")
 
 [node name="Polygon2D" type="Polygon2D" parent="." index="9"]
 visible = false

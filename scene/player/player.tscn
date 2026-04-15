@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3 uid="uid://bh58c7wn1bdd1"]
+[gd_scene load_steps=29 format=4 uid="uid://bh58c7wn1bdd1"]
 
 [ext_resource type="Script" uid="uid://dpuvfwalotfcx" path="res://scene/player/player.gd" id="1_cm2cf"]
 [ext_resource type="Texture2D" uid="uid://do5vux4c2v0sp" path="res://texture/player/arrow.png" id="2_5lop3"]
@@ -26,16 +26,18 @@ shader_parameter/edge_color = Color(1, 0.5, 0.1, 1)
 shader_parameter/edge_thickness = 0.05
 shader_parameter/edge_intensity = 3.0
 shader_parameter/noise_scale = 1.0
-shader_parameter/light_count = 0
-shader_parameter/light_directions = PackedVector2Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-shader_parameter/light_colors = PackedColorArray(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-shader_parameter/light_intensities = PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0)
-shader_parameter/rim_thickness = 5.0000002375
-shader_parameter/rim_softness = 0.800000038
-shader_parameter/shadow_intensity = 0.0
-shader_parameter/hit_color = Color(1, 0, 0, 1)
-shader_parameter/hit_strength = 0.0
 shader_parameter/whiten_strength = 0.0
+shader_parameter/hit_strength = 0.0
+shader_parameter/shadow_intensity = 0.0
+shader_parameter/sprite_size = Vector2(0, 0)
+shader_parameter/light_count = 0
+shader_parameter/light_offsets = PackedVector2Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+shader_parameter/light_colors = PackedVector4Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+shader_parameter/light_intensities = PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0)
+shader_parameter/rim_thickness_base = 1.0000000475
+shader_parameter/rim_expand_width = 20.0
+shader_parameter/rim_softness = 0.50000002375
+shader_parameter/bloom_intensity = 1.0000000475
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_cm2cf"]
 radius = 4.0

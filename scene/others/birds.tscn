@@ -1,0 +1,27 @@
+[gd_scene load_steps=3 format=3 uid="uid://wpuqe470i1c6"]
+
+[ext_resource type="Script" uid="uid://rsd27dw213iv" path="res://scene/others/birds.gd" id="1_qgk1i"]
+[ext_resource type="PackedScene" uid="uid://cw5lo17urh2jt" path="res://scene/others/bird.tscn" id="2_1w0aq"]
+
+[node name="birds" type="Node2D"]
+script = ExtResource("1_qgk1i")
+
+[node name="bird" parent="." instance=ExtResource("2_1w0aq")]
+modulate = Color(0.34124362, 0.26135066, 0.22165981, 1)
+position = Vector2(-16, -8)
+
+[node name="bird2" parent="." instance=ExtResource("2_1w0aq")]
+modulate = Color(0.49192363, 0.3665848, 0.33868605, 1)
+position = Vector2(12, -4)
+
+[node name="bird3" parent="." instance=ExtResource("2_1w0aq")]
+modulate = Color(0.24628001, 0.17132631, 0.13670775, 1)
+position = Vector2(0, -4)
+
+[node name="bird4" parent="." instance=ExtResource("2_1w0aq")]
+modulate = Color(0.6045623, 0.5019004, 0.4869569, 1)
+position = Vector2(8, -8)
+
+[node name="bird5" parent="." instance=ExtResource("2_1w0aq")]
+modulate = Color(0.14983758, 0.10182417, 0.09053015, 1)
+position = Vector2(16, 0)

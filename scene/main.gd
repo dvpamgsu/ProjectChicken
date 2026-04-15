@@ -55,7 +55,17 @@ var is_joining : bool = false
 @onready var lobby_local: Node2D = $CanvasLayer/lobby_local
 
 
+@onready var pp_vhs: ColorRect = $CanvasLayer/BackBufferCopy_vhs/pp_vhs
+@onready var pp_retro: ColorRect = $CanvasLayer/BackBufferCopy_retro/pp_retro
+@onready var pp_cinema: ColorRect = $CanvasLayer/BackBufferCopy_cinema/pp_cinema
+
+@export var character_num = 2
+
 @export var stages = []
+
+
+var p1_code
+var p2_code
 
 var width = 1152/2
 var height = 648/2
@@ -147,6 +157,10 @@ func _ready() -> void:
 	
 	$Camera2D/boundary1.position.x = -width/2.0
 	$Camera2D/boundary2.position.x = width/2.0
+	
+	pp_vhs.visible = false
+	pp_retro.visible = false
+	pp_cinema.visible = false
 
 func _on_peer_connected(id: int) -> void:
 	# 새로운 유저가 접속하면 서버가 그 유저에게 Steam ID를 물어봄
@@ -255,6 +269,7 @@ func request_hit_stop(by_player = false, ptype = 0):
 	)
 	
 
+
 var is_effect_on = false
 func _process(delta: float) -> void:
 	
@@ -274,12 +289,16 @@ func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("fullscreen"):
 		toggle_fullscreen()
 		
-	if Input.is_action_just_pressed("debug3"):
-		is_effect_on = !is_effect_on
-	
-		
-	$CanvasLayer/BackBufferCopy_vhs/vhseffect.visible = is_effect_on
+	if Input.is_action_just_pressed("pp1"):
+		pp_vhs.visible = !pp_vhs.visible
+	if Input.is_action_just_pressed("pp2"):
+		pp_retro.visible = !pp_retro.visible
+	if Input.is_action_just_pressed("pp3"):
+		pp_cinema.visible = !pp_cinema.visible
 			
+@onready var select: Node2D = $CanvasLayer/lobby/select
+@onready var select_2: Node2D = $CanvasLayer/lobby/select2
+
 func _physics_process(delta: float) -> void:
 	if state != STATE.GAME and state != STATE.GAME_SINGLE and state != STATE.GAME_LOCAL:
 		cam_target.position = Vector2.ZERO
@@ -292,6 +311,10 @@ func _physics_process(delta: float) -> void:
 		STATE.MAIN:
 			pass
 		STATE.LOBBY:
+			
+			
+			
+			
 			pass
 		STATE.GAME, STATE.GAME_SINGLE, STATE.GAME_LOCAL:
 			
@@ -408,7 +431,7 @@ func _physics_process(delta: float) -> void:
 							cx += 4
 							if cx > camera_2d.position.x + width/2:
 								break
-						cam_target.position.y = (max_y-64+min_y+64)/2.0
+						cam_target.position.y = (max_y-64+min_y+64)/2.0 - 20
 					
 					cam_target.position.x = clamp(cam_target.position.x, cam_bl_pos.x + width/2, cam_tr_pos.x - width/2)
 					cam_target.position.y = clamp(cam_target.position.y, cam_tr_pos.y + height/2, cam_bl_pos.y - height/2)
@@ -461,6 +484,7 @@ func _on_lobby_chat_update(l_id: int, changed_id: int, making_change_id: int, ch
 				_bomb_lobby()
 		
 		# 3. 로비 UI 갱신 (아직 방이 유지되는 경우)
+	if chat_state == 1:
 		if state == STATE.LOBBY:
 			update_lobby_members_ui()
 			
@@ -473,6 +497,7 @@ func update_lobby_members_ui() -> void:
 	
 	# 2. 로비 인원 수 확인
 	var member_count = Steam.getNumLobbyMembers(lobby_id)
+	print(member_count)
 	
 	var ready_count = 0
 	
@@ -480,7 +505,7 @@ func update_lobby_members_ui() -> void:
 		# 3. 멤버 ID 및 닉네임 가져오기
 		var member_steam_id = Steam.getLobbyMemberByIndex(lobby_id, i)
 		var member_name = Steam.getFriendPersonaName(member_steam_id)
-		
+		print(member_name)
 		# 4. 해당 멤버의 "ready" 데이터 읽기
 		var ready_status = Steam.getLobbyMemberData(lobby_id, member_steam_id, "ready")
 		
@@ -492,11 +517,34 @@ func update_lobby_members_ui() -> void:
 			ready_count += 1
 		else:
 			label_players[i].modulate = Color.RED
+			
+		var char_code = Steam.getLobbyMemberData(lobby_id, member_steam_id, "char_code").to_int()
+		if char_code < 1:
+			char_code = 1
+		
+		if i==0:
+			p1_code = char_code
+			select.set_icon(char_code)
+		else:
+			p2_code = char_code
+			select_2.set_icon(char_code)
+			
+			
 		
 	for i in range(member_count, 2):
 		label_players[i].text = ""
 		texture_players[i].texture = null
 		
+	if member_count < 2:
+		select_2.visible = false
+	else:
+		select_2.visible = true
+		if is_host:
+			select.enable_selector()
+			select_2.disable_selector()
+		else:
+			select.disable_selector()
+			select_2.enable_selector()
 	
 	if ready_count == 2 and player_ids.size() == 2:
 		start_game.rpc()
@@ -518,6 +566,8 @@ func start_game() -> void:
 		for id in player_ids:
 			spawn_player(id)
 	state = STATE.GAME
+	
+	
 	
 
 func _bomb_lobby() -> void:
@@ -934,8 +984,15 @@ func _on_single_start_button_pressed() -> void:
 const PLAYER_SINGLE = preload("uid://cwqqe8ake83qo")
 const PLAYER_AI = preload("uid://c26cids0j3463")
 
+@onready var select_single: Node2D = $CanvasLayer/lobby_single/select
+
+
 var is_single_game = false
 func single_game_start():
+	
+	p1_code = select_single.character_selector.current_profile_code
+	print(p1_code)
+	p2_code = rng.randi_range(1, character_num)
 	
 	is_single_game = true
 	is_local_game = false
@@ -958,6 +1015,30 @@ func single_game_start():
 	p.global_position = stage.get_node("spawn2").global_position
 	add_child(p)
 	state = STATE.GAME_SINGLE
+	
+func to_title():
+	state = STATE.MAIN
+	if stage:
+		stage.queue_free()
+		stage = null
+	for pk in players:
+		var p = players[pk]
+		if p:
+			p.queue_free()
+		#var p_steam_id = peer.get_steam_id_for_peer_id(p.name.to_int())
+		Steam.setLobbyMemberData(lobby_id, "ready", "0")
+		
+		
+	players.clear()
+	#player_ids.clear() # ID 리스트도 초기화 필수
+	mainmenu.visible = true
+	lobby.visible = false
+	lobby_single.visible = false
+	lobby_local.visible = false
+	friend_lobbies.visible = false
+	game_ui.visible = false
+	lobby.visible = false
+
 	
 func single_win(num):
 	if state != STATE.GAME_SINGLE and state != STATE.GAME_LOCAL:
@@ -1031,7 +1112,12 @@ func _on_local_start_button_pressed() -> void:
 	
 const PLAYER_LOCAL_ALTER = preload("uid://bnw6ygsrlbhmt")	
 var is_local_game = false
+@onready var select_local: Node2D = $CanvasLayer/lobby_local/select
+
 func local_game_start():
+	
+	p1_code = select_local.character_selector.current_profile_code
+	p2_code = rng.randi_range(1, character_num)
 	
 	is_local_game = true
 	is_single_game = false
@@ -1055,6 +1141,8 @@ func local_game_start():
 	
 
 func _on_button_back_pressed() -> void:
+	if state == STATE.LOBBY:
+		_bomb_lobby()
 	lobby.visible = false
 	lobby_single.visible = false
 	lobby_local.visible = false
@@ -1183,6 +1271,27 @@ func gen_wave(dir: Vector2):
 	# 4. 종료 후 왜곡 제거
 	tween.tween_property(mat, "shader_parameter/amplitude", 0.0, 0.1)
 	
+	
+@onready var zaworldeffect: ColorRect = $CanvasLayer/BackBufferCopy_zaworld/zaworldeffect
+@rpc("any_peer", "call_local")
+func gen_zaworld(invert = true):
+	# 전역 변수 waveeffect의 material을 참조합니다.
+	var mat = zaworldeffect.material as ShaderMaterial
+	if not mat: return
+	
+	# 3. Tween 애니메이션 실행
+	var tween = create_tween()
+	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	
+	# 1.0초 동안 화면 전체를 묵직하게 스캔합니다.
+	if invert:
+		mat.set_shader_parameter("progress", 0.0)
+		tween.tween_property(mat, "shader_parameter/progress", 0.5, 0.5)
+	else:
+		mat.set_shader_parameter("progress", 0.5)
+		tween.tween_property(mat, "shader_parameter/progress", 1.0, 0.5)
+		
+	
 var is_camera_action = false
 var camera_action_target = 0
 @rpc("any_peer", "call_local")
@@ -1199,3 +1308,13 @@ func camera_action(locked, target = 0, _zoom = Vector2(2,2)):
 		#var pwave = Vector2.LEFT if target == 1 else Vector2.RIGHT
 		#gen_wave.rpc(pwave)
 	#)
+
+
+func _on_select_changed() -> void:
+	Steam.setLobbyMemberData(lobby_id, "char_code", str(select.character_selector.current_profile_code))
+	update_lobby_members_ui()
+
+
+func _on_select_2_changed() -> void:
+	Steam.setLobbyMemberData(lobby_id, "char_code", str(select_2.character_selector.current_profile_code))
+	update_lobby_members_ui()

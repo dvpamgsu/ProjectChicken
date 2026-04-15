@@ -17,7 +17,7 @@ func _ready() -> void:
 	ai_target_position = position
 	first_touch = false
 	
-	sprite_2d.texture = load("res://texture/player/skin002.png")
+	
 	
 var is_jump = false
 var pre_jump = false
