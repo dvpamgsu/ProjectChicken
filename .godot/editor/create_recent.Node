@@ -1,3 +1,4 @@
+Sprite2D
 Button
 VBoxContainer
 ScrollContainer
@@ -7,7 +8,6 @@ GridContainer
 CollisionShape2D
 Area2D
 RayCast2D
-Sprite2D
 Parallax2D
 Node2D
 ColorRect

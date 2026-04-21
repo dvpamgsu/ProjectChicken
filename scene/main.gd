@@ -67,8 +67,8 @@ var is_joining : bool = false
 var p1_code
 var p2_code
 
-var width = 1152/2
-var height = 648/2
+var width = 1152.0
+var height = 648.0
 
 var stage
 
@@ -1113,11 +1113,12 @@ func _on_local_start_button_pressed() -> void:
 const PLAYER_LOCAL_ALTER = preload("uid://bnw6ygsrlbhmt")	
 var is_local_game = false
 @onready var select_local: Node2D = $CanvasLayer/lobby_local/select
+@onready var select_local_2: Node2D = $CanvasLayer/lobby_local/select2
 
 func local_game_start():
 	
 	p1_code = select_local.character_selector.current_profile_code
-	p2_code = rng.randi_range(1, character_num)
+	p2_code = select_local_2.character_selector.current_profile_code
 	
 	is_local_game = true
 	is_single_game = false
@@ -1154,7 +1155,7 @@ func _on_button_back_pressed() -> void:
 
 @onready var blasteffect: ColorRect = $CanvasLayer/BackBufferCopy_blast/blasteffect
 @rpc("any_peer", "call_local")
-func gen_blast(pos: Vector2, dir: Vector2, angle:=0.4 ):
+func gen_blast(pos: Vector2, dir: Vector2):
 	
 	#if !is_effect_on:
 		#return
@@ -1175,7 +1176,7 @@ func gen_blast(pos: Vector2, dir: Vector2, angle:=0.4 ):
 	
 	# [디버깅용] 만약 캐릭터가 화면 중앙에 있다면 0.5, 0.5 근처가 나와야 함
 	# print("Calculated UV:", uv_center)
-	mat.set_shader_parameter("aperture", angle)
+	#mat.set_shader_parameter("aperture", angle)
 	mat.set_shader_parameter("center", uv_center)
 	
 	# 4. 방향(Direction) 보정
@@ -1295,7 +1296,7 @@ func gen_zaworld(invert = true):
 var is_camera_action = false
 var camera_action_target = 0
 @rpc("any_peer", "call_local")
-func camera_action(locked, target = 0, _zoom = Vector2(2,2)):
+func camera_action(locked, target = 0, _zoom = Vector2(1.6,1.6)):
 	is_camera_action = locked
 	if locked:
 		camera_action_target = target

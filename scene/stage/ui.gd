@@ -13,5 +13,5 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	scale.x = 1.0/cam.zoom.x
 	scale.y = 1.0/cam.zoom.y
-	position = cam.position - Vector2(main.width/cam.zoom.x,main.height/cam.zoom.y)
+	position = cam.position - Vector2(main.width/2.0,main.height/2.0)
 	

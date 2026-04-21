@@ -40,8 +40,6 @@ shader_parameter/center = Vector2(0, 0)
 shader_parameter/force = 0.0
 shader_parameter/size = 0.2
 shader_parameter/blast = 0.0
-shader_parameter/direction = Vector2(0, 0)
-shader_parameter/aperture = 0.400000019
 shader_parameter/red_offset = 1.0000000475
 shader_parameter/green_offset = 1.0000000475
 shader_parameter/blue_offset = 1.0000000475
@@ -129,6 +127,7 @@ b = Vector2(0, 320)
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_itxqv")
+character_num = 3
 stages = [ExtResource("2_v0l8b"), ExtResource("3_wp4xf")]
 effect_package = {
 "airjump": ExtResource("6_4j5ol"),
@@ -287,6 +286,7 @@ offset_bottom = 303.0
 text = "reset pos"
 
 [node name="lobby" type="Node2D" parent="CanvasLayer"]
+visible = false
 z_index = 10
 
 [node name="Label_player1" type="Label" parent="CanvasLayer/lobby"]
@@ -417,19 +417,30 @@ text = "start"
 position = Vector2(492, 299)
 
 [node name="lobby_local" type="Node2D" parent="CanvasLayer"]
-visible = false
 z_index = 10
 
 [node name="local_start_button" type="Button" parent="CanvasLayer/lobby_local"]
-offset_left = 608.0
-offset_top = 300.0
-offset_right = 671.0
-offset_bottom = 340.0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 544.0
+offset_top = 304.0
+offset_right = 607.0
+offset_bottom = 344.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 text = "start
 "
 
 [node name="select" parent="CanvasLayer/lobby_local" instance=ExtResource("16_jcbur")]
-position = Vector2(492, 300)
+position = Vector2(440, 304)
+
+[node name="select2" parent="CanvasLayer/lobby_local" instance=ExtResource("16_jcbur")]
+position = Vector2(672, 304)
 
 [node name="ButtonBack" type="Button" parent="CanvasLayer"]
 z_index = 10
@@ -441,6 +452,7 @@ text = "Back
 "
 
 [node name="BackBufferCopy_crack" type="BackBufferCopy" parent="CanvasLayer"]
+visible = false
 copy_mode = 2
 
 [node name="crackeffect" type="ColorRect" parent="CanvasLayer/BackBufferCopy_crack"]
@@ -549,17 +561,17 @@ grow_vertical = 2
 mouse_filter = 2
 
 [node name="Camera2D" type="Camera2D" parent="."]
-zoom = Vector2(2, 2)
+zoom = Vector2(1.6, 1.6)
 position_smoothing_speed = 3.0
 
 [node name="boundary1" type="StaticBody2D" parent="Camera2D"]
-position = Vector2(-288, 0)
+position = Vector2(-360, 0)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Camera2D/boundary1"]
 shape = SubResource("SegmentShape2D_wp4xf")
 
 [node name="boundary2" type="StaticBody2D" parent="Camera2D"]
-position = Vector2(288, 0)
+position = Vector2(360, 0)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Camera2D/boundary2"]
 shape = SubResource("SegmentShape2D_wp4xf")

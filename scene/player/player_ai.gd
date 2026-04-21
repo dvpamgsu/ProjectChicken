@@ -38,6 +38,12 @@ var fool_timer = 0.0
 func ai_process(delta: float):
 	
 	if !alive:
+		is_jump = false
+		is_left = false
+		is_right = false
+		pre_jump = false
+		pre_left = false
+		pre_right = false
 		return
 	
 	#if fool_timer < 1.0:

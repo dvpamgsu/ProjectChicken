@@ -1,4 +1,4 @@
-[gd_scene load_steps=42 format=3 uid="uid://dt2gtnj2wolrf"]
+[gd_scene load_steps=43 format=3 uid="uid://dt2gtnj2wolrf"]
 
 [ext_resource type="PackedScene" uid="uid://dqdqa03uv7qbe" path="res://scene/stage/stage.tscn" id="1_1l11k"]
 [ext_resource type="Texture2D" uid="uid://d1g5mgrm7wdcn" path="res://texture/stage/stage001/stage1_.png" id="2_3dm8t"]
@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://b7skpfesp5o2t" path="res://texture/stage/stage001/backm.png" id="4_vxm7k"]
 [ext_resource type="Texture2D" uid="uid://bstnqjxir0no" path="res://texture/stage/stage001/Skyline.png" id="5_2cilj"]
 [ext_resource type="PackedScene" uid="uid://vnso7nmt3aw" path="res://scene/light.tscn" id="5_at007"]
+[ext_resource type="Script" uid="uid://doc5vdf65ps7f" path="res://scene/stage/skew.gd" id="5_oc5dm"]
 [ext_resource type="Shader" uid="uid://clt0lkwj4qxfj" path="res://shaders/blur.gdshader" id="7_8nkmo"]
 [ext_resource type="PackedScene" uid="uid://wpuqe470i1c6" path="res://scene/others/birds.tscn" id="7_26mvy"]
 
@@ -144,18 +145,23 @@ texture = ExtResource("2_3dm8t")
 [node name="Sprite2D" type="Sprite2D" parent="sprite_stage" index="0"]
 z_index = -1
 texture_repeat = 2
-position = Vector2(4, 80)
+position = Vector2(4, 128)
 texture = ExtResource("3_2cilj")
+offset = Vector2(0, -48)
 region_enabled = true
 region_rect = Rect2(0, 0, 960, 96)
+script = ExtResource("5_oc5dm")
 
 [node name="Sprite2D2" type="Sprite2D" parent="sprite_stage" index="1"]
 z_index = -1
 texture_repeat = 2
-position = Vector2(-4, 80)
+position = Vector2(-4, 128)
 texture = ExtResource("3_2cilj")
+offset = Vector2(0, -48)
 region_enabled = true
 region_rect = Rect2(0, 0, 960, 96)
+script = ExtResource("5_oc5dm")
+timer_offset = 0.5
 
 [node name="background" parent="." index="6"]
 position = Vector2(0, -24)
@@ -177,28 +183,36 @@ factor = 0.01
 position = Vector2(0, -61.333336)
 scale = Vector2(0.5, 0.5)
 
-[node name="background_near" parent="." index="9"]
+[node name="Sprite2D" type="Sprite2D" parent="background_middle" index="0"]
+
+[node name="background_near" parent="." index="10"]
 factor = 0.8
 
 [node name="Sprite2D" type="Sprite2D" parent="background_near" index="0"]
 z_index = -1
 texture_repeat = 2
-position = Vector2(4, 68)
+position = Vector2(4, 118.399994)
 scale = Vector2(0.9, 0.9)
 texture = ExtResource("3_2cilj")
+offset = Vector2(0, -48)
 region_enabled = true
 region_rect = Rect2(0, 0, 8400, 96)
+script = ExtResource("5_oc5dm")
+timer_offset = 4.0
 
 [node name="Sprite2D2" type="Sprite2D" parent="background_near" index="1"]
 z_index = -1
 texture_repeat = 2
-position = Vector2(-4, 68)
+position = Vector2(-4, 118.399994)
 scale = Vector2(0.9, 0.9)
 texture = ExtResource("3_2cilj")
+offset = Vector2(0, -48)
 region_enabled = true
 region_rect = Rect2(0, 0, 8400, 96)
+script = ExtResource("5_oc5dm")
+timer_offset = 4.5
 
-[node name="background_nearEX" parent="." index="10"]
+[node name="background_nearEX" parent="." index="11"]
 factor = 1.5
 has_bound = true
 boundary_max_y = 1000
@@ -208,22 +222,28 @@ modulate = Color(0.38, 0.27740002, 0.27740002, 1)
 z_index = -1
 texture_repeat = 2
 material = SubResource("ShaderMaterial_2cilj")
-position = Vector2(36, 164)
+position = Vector2(36, 368)
 scale = Vector2(4, 4)
 texture = ExtResource("3_2cilj")
+offset = Vector2(0, -48)
 region_enabled = true
 region_rect = Rect2(0, 0, 8400, 96)
+script = ExtResource("5_oc5dm")
+timer_offset = 8.0
 
 [node name="Sprite2D2" type="Sprite2D" parent="background_nearEX" index="1"]
 modulate = Color(0.38, 0.27740002, 0.27740002, 1)
 z_index = -1
 texture_repeat = 2
 material = SubResource("ShaderMaterial_26mvy")
-position = Vector2(-12, 164)
+position = Vector2(-12, 368)
 scale = Vector2(4, 4)
 texture = ExtResource("3_2cilj")
+offset = Vector2(0, -48)
 region_enabled = true
 region_rect = Rect2(0, 0, 8400, 96)
+script = ExtResource("5_oc5dm")
+timer_offset = 8.5
 
 [node name="StaticBody2D" type="StaticBody2D" parent="collision" index="0"]
 physics_material_override = ExtResource("4_8dltt")
@@ -480,14 +500,14 @@ shape = SubResource("RectangleShape2D_tghsh")
 position = Vector2(-2683, -33)
 shape = SubResource("RectangleShape2D_alhdj")
 
-[node name="Area2DP1" parent="." index="12"]
+[node name="Area2DP1" parent="." index="13"]
 position = Vector2(2992, -118)
 
 [node name="CollisionShape2D" parent="Area2DP1" index="0"]
 position = Vector2(-12, 2)
 shape = SubResource("RectangleShape2D_vxm7k")
 
-[node name="Area2DP2" parent="." index="13"]
+[node name="Area2DP2" parent="." index="14"]
 position = Vector2(-2992, -132)
 
 [node name="CollisionShape2D" parent="Area2DP2" index="0"]

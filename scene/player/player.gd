@@ -104,10 +104,10 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 			state.angular_velocity = 0
 			rotation = 0
 		return
-	#if alive and alive_timer < 0.2:
-		#state.linear_velocity.x = 0
-		#state.angular_velocity = 0
-		#rotation = 0
+	if alive and alive_timer < 0.1:
+		state.linear_velocity.x = 0
+		state.angular_velocity = 0
+		rotation = 0
 		
 
 	# 2. 쿨다운 진행 (0.05~0.1초 정도의 아주 짧은 무적 시간)
@@ -735,15 +735,19 @@ func _on_body_entered(body: Node) -> void:
 	
 		var space_state = get_world_2d().direct_space_state
 		var query = PhysicsRayQueryParameters2D.create(global_position, body.global_position)
-		
+		var query2 = PhysicsRayQueryParameters2D.create(body.global_position, global_position)
 		# 자기 자신은 제외 (Area2D 등이 자기 자신과 부딪히는 것 방지)
 		query.exclude = [get_rid()]
 		query.collision_mask = 2
 		var result = space_state.intersect_ray(query)
+		query2.exclude = [body.get_rid()]
+		query2.collision_mask = 2
+		var result2 = space_state.intersect_ray(query2)
 		
-		if result:
+		if result and result2:
 			var hit_point = result.position
-			gen_hit2_effect(hit_point)
+			var hit_point2 = result2.position
+			gen_hit2_effect((hit_point+hit_point2)/2.0)
 		
 func start_rebirth():
 	linear_velocity = Vector2.ZERO
@@ -800,6 +804,8 @@ var pre_hit_by_player = false
 func hit(by_player = false, way = Vector2.ZERO):
 	if !is_multiplayer_authority():
 		return
+	if alive_timer < 0.1:
+		return
 	if hit_timer > 0.0:
 		return
 	if !alive:
@@ -821,7 +827,7 @@ func hit(by_player = false, way = Vector2.ZERO):
 			main.request_hit_stop.rpc(false)
 	timer_hit_ghost_emit.start()
 	if by_player:
-		main.gen_blast.rpc(col_3.global_position, way, 3.142)
+		main.gen_blast.rpc(col_3.global_position, way)
 		#hit_particle.restart()
 		#hit_particle.emitting = true
 		particle_timer = 0.5

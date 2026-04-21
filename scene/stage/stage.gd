@@ -10,6 +10,7 @@ extends Node2D
 @onready var lights: Node2D = $lights
 @export var shadow = 0.0
 
+@onready var ui: Node2D = $ui
 @onready var player_1_label: Label = $ui/player1Label
 @onready var player_2_label: Label = $ui/player2Label
 @onready var profile_1: TextureRect = $ui/profile1
@@ -121,6 +122,8 @@ var target_way = 0
 var cur_w = 0
 var way_angle := 0.0
 func ui_update(delta):
+	
+	
 	
 	if !p1 or !p2:
 		for pk in main.players:
