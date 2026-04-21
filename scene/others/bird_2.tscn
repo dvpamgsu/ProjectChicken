@@ -12,6 +12,7 @@ shader_parameter/edge_thickness = 0.05
 shader_parameter/edge_intensity = 3.0
 shader_parameter/noise_scale = 0.5
 shader_parameter/whiten_strength = 0.0
+shader_parameter/hit_strength = 0.0
 shader_parameter/shadow_intensity = 0.2
 shader_parameter/sprite_size = Vector2(0, 0)
 shader_parameter/light_count = 0
@@ -27,7 +28,7 @@ shader_parameter/bloom_intensity = 1.0000000475
 radius = 52.0
 
 [node name="bird2" type="Sprite2D"]
-z_index = 5
+z_index = 6
 material = SubResource("ShaderMaterial_sddbx")
 texture = ExtResource("1_f42kn")
 hframes = 3

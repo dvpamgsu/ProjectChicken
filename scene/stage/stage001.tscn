@@ -1,4 +1,4 @@
-[gd_scene load_steps=43 format=3 uid="uid://dt2gtnj2wolrf"]
+[gd_scene load_steps=59 format=3 uid="uid://dt2gtnj2wolrf"]
 
 [ext_resource type="PackedScene" uid="uid://dqdqa03uv7qbe" path="res://scene/stage/stage.tscn" id="1_1l11k"]
 [ext_resource type="Texture2D" uid="uid://d1g5mgrm7wdcn" path="res://texture/stage/stage001/stage1_.png" id="2_3dm8t"]
@@ -12,21 +12,57 @@
 [ext_resource type="Script" uid="uid://doc5vdf65ps7f" path="res://scene/stage/skew.gd" id="5_oc5dm"]
 [ext_resource type="Shader" uid="uid://clt0lkwj4qxfj" path="res://shaders/blur.gdshader" id="7_8nkmo"]
 [ext_resource type="PackedScene" uid="uid://wpuqe470i1c6" path="res://scene/others/birds.tscn" id="7_26mvy"]
+[ext_resource type="Texture2D" uid="uid://bay7gx1xsp3pr" path="res://texture/stage/stage001/st01_back2.png" id="10_p763n"]
+[ext_resource type="Texture2D" uid="uid://ckl7l1suqyou" path="res://texture/stage/stage001/st01_henhouse_01.png" id="11_alhdj"]
+[ext_resource type="Shader" uid="uid://dfjtfp43n3lkn" path="res://shaders/hsv.gdshader" id="11_ux388"]
+[ext_resource type="Texture2D" uid="uid://b2vl67o3hwrdx" path="res://texture/stage/stage001/st01_henhouse_02.png" id="12_2ufda"]
+[ext_resource type="Texture2D" uid="uid://dwqabtq3qekca" path="res://texture/stage/stage001/st01_henhouse_03.png" id="13_s3djy"]
+[ext_resource type="Texture2D" uid="uid://u2famfdcjmvd" path="res://texture/stage/stage001/st01_house_01.png" id="14_tghsh"]
+[ext_resource type="Texture2D" uid="uid://bvw8vptoeiqvy" path="res://texture/stage/stage001/st01_house_02.png" id="15_a6i2t"]
+[ext_resource type="Texture2D" uid="uid://dkljmdbqnyx0x" path="res://texture/stage/stage001/st01_house_03.png" id="16_02icq"]
+[ext_resource type="Texture2D" uid="uid://c4qxq0ggqkvlf" path="res://texture/stage/stage001/st01_house_04.png" id="17_pxudg"]
+[ext_resource type="Texture2D" uid="uid://dqm7aktiicpjj" path="res://texture/stage/stage001/st01_silo_01.png" id="18_c0wkv"]
+[ext_resource type="Texture2D" uid="uid://ekhh2ibeyj8j" path="res://texture/stage/stage001/st01_silo_02.png" id="19_8rq8p"]
+[ext_resource type="Texture2D" uid="uid://dag45ragbg6gu" path="res://texture/stage/stage001/st01_tower.png" id="20_cakgq"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_alhdj"]
+shader = ExtResource("11_ux388")
+shader_parameter/hue_shift = 0.0
+shader_parameter/saturation_scale = 1.0
+shader_parameter/value_scale = 1.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_2ufda"]
+shader = ExtResource("11_ux388")
+shader_parameter/hue_shift = 0.0
+shader_parameter/saturation_scale = 1.3650000648375
+shader_parameter/value_scale = 0.8250000391875
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_s3djy"]
+shader = ExtResource("11_ux388")
+shader_parameter/hue_shift = -0.024999953687499965
+shader_parameter/saturation_scale = 1.0850000515375
+shader_parameter/value_scale = 0.69600003306
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_tghsh"]
+shader = ExtResource("11_ux388")
+shader_parameter/hue_shift = -0.03499995416250001
+shader_parameter/saturation_scale = 1.0650000505875
+shader_parameter/value_scale = 0.462000021945
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_2cilj"]
 shader = ExtResource("7_8nkmo")
 shader_parameter/blur_radius = 0.50000002375
 shader_parameter/alpha_persistence = 0.70000003325
-shader_parameter/brightness = 0.2000000095
-shader_parameter/saturation = 1.6000000760000002
+shader_parameter/brightness = 0.1490000070775
+shader_parameter/saturation = 2.0
 shader_parameter/top_softness = 0.05
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_26mvy"]
 shader = ExtResource("7_8nkmo")
 shader_parameter/blur_radius = 0.50000002375
 shader_parameter/alpha_persistence = 0.70000003325
-shader_parameter/brightness = 0.2000000095
-shader_parameter/saturation = 1.6000000760000002
+shader_parameter/brightness = 0.190000009025
+shader_parameter/saturation = 2.0
 shader_parameter/top_softness = 0.05
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1l11k"]
@@ -143,6 +179,7 @@ position = Vector2(213, 35)
 texture = ExtResource("2_3dm8t")
 
 [node name="Sprite2D" type="Sprite2D" parent="sprite_stage" index="0"]
+modulate = Color(0.665073, 0.397567, 0.37778434, 1)
 z_index = -1
 texture_repeat = 2
 position = Vector2(4, 128)
@@ -153,6 +190,7 @@ region_rect = Rect2(0, 0, 960, 96)
 script = ExtResource("5_oc5dm")
 
 [node name="Sprite2D2" type="Sprite2D" parent="sprite_stage" index="1"]
+modulate = Color(0.5151594, 0.2911889, 0.27358118, 1)
 z_index = -1
 texture_repeat = 2
 position = Vector2(-4, 128)
@@ -165,6 +203,7 @@ timer_offset = 0.5
 
 [node name="background" parent="." index="6"]
 position = Vector2(0, -24)
+scale = Vector2(1.1851852, 1.2045455)
 texture = ExtResource("3_3dm8t")
 
 [node name="background_farEX" parent="." index="7"]
@@ -174,6 +213,7 @@ texture = ExtResource("4_vxm7k")
 factor = 0.0
 
 [node name="background_far" parent="." index="8"]
+modulate = Color(0.93, 0.93, 0.93, 1)
 position = Vector2(0, 32)
 scale = Vector2(1.5, 1.5)
 texture = ExtResource("5_2cilj")
@@ -183,9 +223,404 @@ factor = 0.01
 position = Vector2(0, -61.333336)
 scale = Vector2(0.5, 0.5)
 
-[node name="Sprite2D" type="Sprite2D" parent="background_middle" index="0"]
+[node name="background_middle" parent="." index="9"]
+modulate = Color(0.5394644, 0.45498776, 0.451181, 1)
+position = Vector2(0, -2)
+factor = 0.2
 
-[node name="background_near" parent="." index="10"]
+[node name="Sprite2D" type="Sprite2D" parent="background_middle" index="0"]
+position = Vector2(0, 112)
+texture = ExtResource("10_p763n")
+region_enabled = true
+region_rect = Rect2(0, 0, 1800, 112)
+
+[node name="Sprite2D6" type="Sprite2D" parent="background_middle" index="1"]
+texture_repeat = 2
+material = SubResource("ShaderMaterial_alhdj")
+position = Vector2(-0.66656494, 67.2)
+scale = Vector2(0.20000002, 0.20000002)
+texture = ExtResource("3_2cilj")
+offset = Vector2(0, -48)
+region_enabled = true
+region_rect = Rect2(0, 0, 8400, 96)
+script = ExtResource("5_oc5dm")
+timer_offset = 4.0
+
+[node name="Sprite2D7" type="Sprite2D" parent="background_middle" index="2"]
+texture_repeat = 2
+material = SubResource("ShaderMaterial_alhdj")
+position = Vector2(-5.999939, 67.2)
+scale = Vector2(0.20000002, 0.20000002)
+texture = ExtResource("3_2cilj")
+offset = Vector2(0, -48)
+region_enabled = true
+region_rect = Rect2(0, 0, 8400, 96)
+script = ExtResource("5_oc5dm")
+timer_offset = 4.5
+
+[node name="St01Tower" type="Sprite2D" parent="background_middle" index="3"]
+position = Vector2(-80, 32)
+texture = ExtResource("20_cakgq")
+
+[node name="St01House04" type="Sprite2D" parent="background_middle" index="4"]
+position = Vector2(-404, 46)
+texture = ExtResource("16_02icq")
+
+[node name="St01Henhouse17" type="Sprite2D" parent="background_middle/St01House04" index="0"]
+position = Vector2(58, 0)
+texture = ExtResource("12_2ufda")
+flip_h = true
+
+[node name="St01Silo06" type="Sprite2D" parent="background_middle/St01House04" index="1"]
+position = Vector2(-34, -14)
+texture = ExtResource("18_c0wkv")
+
+[node name="St01Henhouse04" type="Sprite2D" parent="background_middle" index="5"]
+position = Vector2(-114, 48)
+texture = ExtResource("11_alhdj")
+flip_h = true
+
+[node name="St01Henhouse10" type="Sprite2D" parent="background_middle/St01Henhouse04" index="0"]
+position = Vector2(-28, 0)
+texture = ExtResource("11_alhdj")
+flip_h = true
+
+[node name="St01Henhouse11" type="Sprite2D" parent="background_middle/St01Henhouse04" index="1"]
+position = Vector2(-56, 0)
+texture = ExtResource("11_alhdj")
+flip_h = true
+
+[node name="St01Silo02" type="Sprite2D" parent="background_middle/St01Henhouse04" index="2"]
+position = Vector2(-92, -8)
+texture = ExtResource("19_8rq8p")
+flip_h = true
+
+[node name="St01Silo03" type="Sprite2D" parent="background_middle/St01Henhouse04" index="3"]
+position = Vector2(-80, -8)
+texture = ExtResource("19_8rq8p")
+flip_h = true
+
+[node name="St01Henhouse05" type="Sprite2D" parent="background_middle" index="6"]
+position = Vector2(548, 54)
+texture = ExtResource("11_alhdj")
+flip_h = true
+
+[node name="St01Silo04" type="Sprite2D" parent="background_middle/St01Henhouse05" index="0"]
+position = Vector2(-80, -8)
+texture = ExtResource("19_8rq8p")
+flip_h = true
+
+[node name="St01Silo01" type="Sprite2D" parent="background_middle/St01Henhouse05/St01Silo04" index="0"]
+position = Vector2(42, -10)
+texture = ExtResource("18_c0wkv")
+flip_h = true
+
+[node name="St01Silo05" type="Sprite2D" parent="background_middle/St01Henhouse05" index="1"]
+position = Vector2(-66, -16)
+texture = ExtResource("19_8rq8p")
+flip_h = true
+
+[node name="St01Henhouse10" type="Sprite2D" parent="background_middle/St01Henhouse05" index="2"]
+position = Vector2(-28, 0)
+texture = ExtResource("11_alhdj")
+flip_h = true
+
+[node name="St01Henhouse03" type="Sprite2D" parent="background_middle/St01Henhouse05" index="3"]
+position = Vector2(-58, 0)
+texture = ExtResource("12_2ufda")
+flip_h = true
+
+[node name="St01Henhouse04" type="Sprite2D" parent="background_middle/St01Henhouse05" index="4"]
+position = Vector2(-58, 0)
+texture = ExtResource("12_2ufda")
+flip_h = true
+
+[node name="St01Silo02" type="Sprite2D" parent="background_middle" index="7"]
+position = Vector2(-550, 42)
+texture = ExtResource("19_8rq8p")
+
+[node name="St01Silo02" type="Sprite2D" parent="background_middle/St01Silo02" index="0"]
+position = Vector2(14, 0)
+texture = ExtResource("19_8rq8p")
+
+[node name="St01Henhouse14" type="Sprite2D" parent="background_middle/St01Silo02" index="1"]
+position = Vector2(26, 8)
+texture = ExtResource("11_alhdj")
+
+[node name="St01Henhouse15" type="Sprite2D" parent="background_middle/St01Silo02" index="2"]
+position = Vector2(54, 8)
+texture = ExtResource("11_alhdj")
+
+[node name="St01House07" type="Sprite2D" parent="background_middle/St01Silo02" index="3"]
+position = Vector2(-36, 8)
+texture = ExtResource("17_pxudg")
+
+[node name="St01House05" type="Sprite2D" parent="background_middle" index="8"]
+position = Vector2(-246, 50)
+texture = ExtResource("16_02icq")
+flip_h = true
+
+[node name="St01Henhouse13" type="Sprite2D" parent="background_middle" index="9"]
+position = Vector2(86, 50)
+texture = ExtResource("13_s3djy")
+
+[node name="St01Henhouse12" type="Sprite2D" parent="background_middle/St01Henhouse13" index="0"]
+position = Vector2(26, 0)
+texture = ExtResource("13_s3djy")
+
+[node name="St01Silo01" type="Sprite2D" parent="background_middle/St01Henhouse13" index="1"]
+position = Vector2(64, -16)
+texture = ExtResource("18_c0wkv")
+
+[node name="St01Henhouse02" type="Sprite2D" parent="background_middle" index="10"]
+position = Vector2(180, 52)
+texture = ExtResource("12_2ufda")
+
+[node name="St01Tower2" type="Sprite2D" parent="background_middle" index="11"]
+position = Vector2(-720, 32)
+texture = ExtResource("20_cakgq")
+
+[node name="St01Henhouse20" type="Sprite2D" parent="background_middle" index="12"]
+position = Vector2(-750, 48)
+texture = ExtResource("13_s3djy")
+flip_h = true
+
+[node name="St01Silo08" type="Sprite2D" parent="background_middle/St01Henhouse20" index="0"]
+position = Vector2(-80, -8)
+texture = ExtResource("19_8rq8p")
+
+[node name="St01Henhouse05" type="Sprite2D" parent="background_middle/St01Henhouse20" index="1"]
+position = Vector2(-26, 0)
+texture = ExtResource("13_s3djy")
+flip_h = true
+
+[node name="St01Henhouse09" type="Sprite2D" parent="background_middle/St01Henhouse20" index="2"]
+position = Vector2(-54, 0)
+texture = ExtResource("12_2ufda")
+flip_h = true
+
+[node name="St01Silo09" type="Sprite2D" parent="background_middle/St01Henhouse20" index="3"]
+position = Vector2(-96, -16)
+texture = ExtResource("18_c0wkv")
+
+[node name="St01Silo05" type="Sprite2D" parent="background_middle" index="13"]
+position = Vector2(752, 32)
+texture = ExtResource("18_c0wkv")
+
+[node name="St01Silo04" type="Sprite2D" parent="background_middle/St01Silo05" index="0"]
+position = Vector2(26, 0)
+texture = ExtResource("18_c0wkv")
+
+[node name="St01Henhouse08" type="Sprite2D" parent="background_middle/St01Silo05" index="1"]
+position = Vector2(-58, 16)
+texture = ExtResource("13_s3djy")
+
+[node name="St01Henhouse07" type="Sprite2D" parent="background_middle/St01Silo05" index="2"]
+position = Vector2(-28, 16)
+texture = ExtResource("13_s3djy")
+
+[node name="St01Henhouse06" type="Sprite2D" parent="background_middle/St01Silo05" index="3"]
+position = Vector2(2, 16)
+texture = ExtResource("13_s3djy")
+
+[node name="St01Tower2" type="Sprite2D" parent="background_middle/St01Silo05" index="4"]
+position = Vector2(48, 0)
+texture = ExtResource("20_cakgq")
+
+[node name="St01House08" type="Sprite2D" parent="background_middle" index="14"]
+position = Vector2(382, 52)
+texture = ExtResource("16_02icq")
+
+[node name="St01House07" type="Sprite2D" parent="background_middle/St01House08" index="0"]
+position = Vector2(-52, 0)
+texture = ExtResource("17_pxudg")
+
+[node name="St01House06" type="Sprite2D" parent="background_middle/St01House08" index="1"]
+position = Vector2(-100, 0)
+texture = ExtResource("17_pxudg")
+
+[node name="Sprite2D4" type="Sprite2D" parent="background_middle" index="15"]
+texture_repeat = 2
+material = SubResource("ShaderMaterial_2ufda")
+position = Vector2(0, 76.8)
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("3_2cilj")
+offset = Vector2(0, -48)
+region_enabled = true
+region_rect = Rect2(0, 0, 8400, 96)
+script = ExtResource("5_oc5dm")
+timer_offset = 4.0
+
+[node name="Sprite2D5" type="Sprite2D" parent="background_middle" index="16"]
+texture_repeat = 2
+material = SubResource("ShaderMaterial_2ufda")
+position = Vector2(-1.999939, 80)
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("3_2cilj")
+offset = Vector2(0, -48)
+region_enabled = true
+region_rect = Rect2(0, 0, 8400, 96)
+script = ExtResource("5_oc5dm")
+timer_offset = 4.5
+
+[node name="background_middle2" parent="." index="10"]
+modulate = Color(0.41374218, 0.27957952, 0.3400187, 1)
+position = Vector2(0, -42.000004)
+scale = Vector2(1.5, 1.5)
+factor = 0.25
+
+[node name="Sprite2D4" type="Sprite2D" parent="background_middle2" index="0"]
+texture_repeat = 2
+material = SubResource("ShaderMaterial_s3djy")
+position = Vector2(4.053116e-05, 94.4)
+scale = Vector2(0.4, 0.4)
+texture = ExtResource("3_2cilj")
+offset = Vector2(0, -48)
+region_enabled = true
+region_rect = Rect2(0, 0, 8400, 96)
+script = ExtResource("5_oc5dm")
+timer_offset = 4.0
+
+[node name="Sprite2D5" type="Sprite2D" parent="background_middle2" index="1"]
+texture_repeat = 2
+material = SubResource("ShaderMaterial_s3djy")
+position = Vector2(-5.3333335, 94.4)
+scale = Vector2(0.4, 0.4)
+texture = ExtResource("3_2cilj")
+offset = Vector2(0, -48)
+region_enabled = true
+region_rect = Rect2(0, 0, 8400, 96)
+script = ExtResource("5_oc5dm")
+timer_offset = 4.5
+
+[node name="St01House01" type="Sprite2D" parent="background_middle2" index="2"]
+position = Vector2(238, 56)
+texture = ExtResource("14_tghsh")
+flip_h = true
+
+[node name="St01House02" type="Sprite2D" parent="background_middle2" index="3"]
+position = Vector2(387, 57)
+texture = ExtResource("15_a6i2t")
+
+[node name="St01House06" type="Sprite2D" parent="background_middle2/St01House02" index="0"]
+position = Vector2(68, 8)
+texture = ExtResource("17_pxudg")
+flip_h = true
+
+[node name="St01House07" type="Sprite2D" parent="background_middle2/St01House02" index="1"]
+position = Vector2(118, 8)
+texture = ExtResource("17_pxudg")
+flip_h = true
+
+[node name="St01House07" type="Sprite2D" parent="background_middle2" index="4"]
+position = Vector2(-500, 64)
+texture = ExtResource("17_pxudg")
+flip_h = true
+
+[node name="St01House08" type="Sprite2D" parent="background_middle2" index="5"]
+position = Vector2(-452, 64)
+texture = ExtResource("17_pxudg")
+flip_h = true
+
+[node name="St01House09" type="Sprite2D" parent="background_middle2" index="6"]
+position = Vector2(149.33333, 65.33333)
+texture = ExtResource("17_pxudg")
+flip_h = true
+
+[node name="St01House03" type="Sprite2D" parent="background_middle2" index="7"]
+position = Vector2(-388, 56)
+texture = ExtResource("15_a6i2t")
+
+[node name="St01Henhouse13" type="Sprite2D" parent="background_middle2" index="8"]
+position = Vector2(-188, 64)
+texture = ExtResource("13_s3djy")
+flip_h = true
+
+[node name="St01Silo01" type="Sprite2D" parent="background_middle2/St01Henhouse13" index="0"]
+position = Vector2(-60.235287, -15.999998)
+scale = Vector2(0.99999994, 1)
+texture = ExtResource("18_c0wkv")
+flip_h = true
+
+[node name="St01Henhouse02" type="Sprite2D" parent="background_middle2/St01Henhouse13" index="1"]
+position = Vector2(-29.090904, 1.7881393e-06)
+scale = Vector2(1.0000002, 1)
+texture = ExtResource("12_2ufda")
+flip_h = true
+
+[node name="St01House04" type="Sprite2D" parent="background_middle2" index="9"]
+position = Vector2(-637.3334, 62.66667)
+texture = ExtResource("17_pxudg")
+
+[node name="St01Henhouse10" type="Sprite2D" parent="background_middle2/St01House04" index="0"]
+position = Vector2(-31.999918, -3.8146973e-06)
+texture = ExtResource("11_alhdj")
+flip_h = true
+
+[node name="St01Henhouse11" type="Sprite2D" parent="background_middle2/St01House04" index="1"]
+position = Vector2(-59.999977, -3.8146973e-06)
+texture = ExtResource("11_alhdj")
+flip_h = true
+
+[node name="St01Silo02" type="Sprite2D" parent="background_middle2/St01House04" index="2"]
+position = Vector2(-95.99998, -8.000004)
+texture = ExtResource("19_8rq8p")
+flip_h = true
+
+[node name="St01Silo03" type="Sprite2D" parent="background_middle2/St01House04" index="3"]
+position = Vector2(-83.99998, -8.000004)
+texture = ExtResource("19_8rq8p")
+flip_h = true
+
+[node name="St01Henhouse20" type="Sprite2D" parent="background_middle2" index="10"]
+position = Vector2(745.3334, 65.333336)
+texture = ExtResource("13_s3djy")
+flip_h = true
+
+[node name="St01Silo08" type="Sprite2D" parent="background_middle2/St01Henhouse20" index="0"]
+position = Vector2(-80, -8)
+texture = ExtResource("19_8rq8p")
+
+[node name="St01Henhouse05" type="Sprite2D" parent="background_middle2/St01Henhouse20" index="1"]
+position = Vector2(-26, 0)
+texture = ExtResource("13_s3djy")
+flip_h = true
+
+[node name="St01Henhouse09" type="Sprite2D" parent="background_middle2/St01Henhouse20" index="2"]
+position = Vector2(-54, 0)
+texture = ExtResource("12_2ufda")
+flip_h = true
+
+[node name="St01Silo09" type="Sprite2D" parent="background_middle2/St01Henhouse20" index="3"]
+position = Vector2(-96, -16)
+texture = ExtResource("18_c0wkv")
+
+[node name="Sprite2D2" type="Sprite2D" parent="background_middle2" index="11"]
+texture_repeat = 2
+material = SubResource("ShaderMaterial_tghsh")
+position = Vector2(5.333369, 106.66667)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("3_2cilj")
+offset = Vector2(0, -48)
+region_enabled = true
+region_rect = Rect2(0, 0, 8400, 96)
+script = ExtResource("5_oc5dm")
+timer_offset = 4.0
+
+[node name="Sprite2D3" type="Sprite2D" parent="background_middle2" index="12"]
+texture_repeat = 2
+material = SubResource("ShaderMaterial_tghsh")
+position = Vector2(-5.1259995e-06, 106.66667)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("3_2cilj")
+offset = Vector2(0, -48)
+region_enabled = true
+region_rect = Rect2(0, 0, 8400, 96)
+script = ExtResource("5_oc5dm")
+timer_offset = 4.5
+
+[node name="background_near" parent="." index="11"]
+modulate = Color(0.81, 0.602235, 0.5913, 1)
 factor = 0.8
 
 [node name="Sprite2D" type="Sprite2D" parent="background_near" index="0"]
@@ -212,13 +647,13 @@ region_rect = Rect2(0, 0, 8400, 96)
 script = ExtResource("5_oc5dm")
 timer_offset = 4.5
 
-[node name="background_nearEX" parent="." index="11"]
+[node name="background_nearEX" parent="." index="12"]
 factor = 1.5
 has_bound = true
 boundary_max_y = 1000
 
 [node name="Sprite2D" type="Sprite2D" parent="background_nearEX" index="0"]
-modulate = Color(0.38, 0.27740002, 0.27740002, 1)
+modulate = Color(0.5896231, 0.3107838, 0.31285343, 1)
 z_index = -1
 texture_repeat = 2
 material = SubResource("ShaderMaterial_2cilj")
@@ -232,7 +667,7 @@ script = ExtResource("5_oc5dm")
 timer_offset = 8.0
 
 [node name="Sprite2D2" type="Sprite2D" parent="background_nearEX" index="1"]
-modulate = Color(0.38, 0.27740002, 0.27740002, 1)
+modulate = Color(0.5896231, 0.3107838, 0.31285343, 1)
 z_index = -1
 texture_repeat = 2
 material = SubResource("ShaderMaterial_26mvy")
@@ -500,14 +935,14 @@ shape = SubResource("RectangleShape2D_tghsh")
 position = Vector2(-2683, -33)
 shape = SubResource("RectangleShape2D_alhdj")
 
-[node name="Area2DP1" parent="." index="13"]
+[node name="Area2DP1" parent="." index="14"]
 position = Vector2(2992, -118)
 
 [node name="CollisionShape2D" parent="Area2DP1" index="0"]
 position = Vector2(-12, 2)
 shape = SubResource("RectangleShape2D_vxm7k")
 
-[node name="Area2DP2" parent="." index="14"]
+[node name="Area2DP2" parent="." index="15"]
 position = Vector2(-2992, -132)
 
 [node name="CollisionShape2D" parent="Area2DP2" index="0"]
