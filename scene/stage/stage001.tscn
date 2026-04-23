@@ -40,22 +40,32 @@ seamless = true
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_02icq"]
 resource_local_to_scene = true
 shader = ExtResource("6_2ufda")
+shader_parameter/noise_tex = SubResource("NoiseTexture2D_a6i2t")
 shader_parameter/water_color = Color(0.7853498, 0.6717852, 0.42317688, 1)
 shader_parameter/reflection_strength = 0.5
 shader_parameter/water_line_y = 0.50000002375
-shader_parameter/noise_tex = SubResource("NoiseTexture2D_a6i2t")
 shader_parameter/distortion_strength = 0.02
 shader_parameter/wave_speed = 0.05
+shader_parameter/reflection_v_compression = 2.0
+shader_parameter/sparkle_color = Color(1, 1, 1, 1)
+shader_parameter/sparkle_intensity = 3.0
+shader_parameter/sparkle_size = 0.05
+shader_parameter/sparkle_stretch = 15.0
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_a6i2t"]
 resource_local_to_scene = true
 shader = ExtResource("6_2ufda")
+shader_parameter/noise_tex = SubResource("NoiseTexture2D_a6i2t")
 shader_parameter/water_color = Color(0.7853498, 0.6717852, 0.42317688, 1)
 shader_parameter/reflection_strength = 0.5
 shader_parameter/water_line_y = 0.50000002375
-shader_parameter/noise_tex = SubResource("NoiseTexture2D_a6i2t")
 shader_parameter/distortion_strength = 0.02
 shader_parameter/wave_speed = 0.05
+shader_parameter/reflection_v_compression = 2.0
+shader_parameter/sparkle_color = Color(1, 1, 1, 1)
+shader_parameter/sparkle_intensity = 3.0
+shader_parameter/sparkle_size = 0.05
+shader_parameter/sparkle_stretch = 15.0
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_alhdj"]
 shader = ExtResource("11_ux388")
