@@ -307,6 +307,9 @@ func _physics_process(delta: float) -> void:
 			if e:
 				effects.erase(e)
 				e.queue_free()
+		for s in get_children():
+			if s is Sprite2D:
+				s.queue_free()
 	match state:
 		STATE.MAIN:
 			pass
@@ -1124,6 +1127,7 @@ func local_game_start():
 	is_single_game = false
 	camera_2d.position = Vector2.ZERO
 	var s = stages[1].instantiate()
+	
 	add_child(s)
 	stage = s
 	var p

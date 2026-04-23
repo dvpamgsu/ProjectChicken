@@ -220,6 +220,8 @@ func gen_air_jump_effect():
 		
 func gen_hit1_effect():
 	
+	if alive_timer < 0.1:
+		return
 	var rot = main.rng.randf_range(-PI,PI)
 	var e_code = "hit1"
 	#var _flip_h = rotation <= 0.0
@@ -227,6 +229,8 @@ func gen_hit1_effect():
 	
 func gen_hit2_effect(pos):
 	
+	if alive_timer < 0.1:
+		return
 	var rot = main.rng.randf_range(-PI,PI)
 	var e_code = "hit2"
 	#var _flip_h = rotation <= 0.0

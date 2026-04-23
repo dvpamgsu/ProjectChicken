@@ -125,9 +125,10 @@ environment = SubResource("Environment_v4pcg")
 [node name="spawn2" type="Node2D" parent="."]
 
 [node name="sprite_stage" type="Sprite2D" parent="."]
-z_index = 7
+z_index = 15
 
 [node name="background" type="Sprite2D" parent="."]
+visibility_layer = 3
 
 [node name="background_farEX" type="Sprite2D" parent="."]
 z_index = 2
