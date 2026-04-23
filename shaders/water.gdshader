@@ -19,13 +19,13 @@ void fragment() {
     // 수평선 기준 반사 좌표 계산
     float distance_from_surface = SCREEN_UV.y - water_line_y;
     vec2 reflect_uv = vec2(SCREEN_UV.x + distortion, water_line_y - distance_from_surface);
-
+	reflect_uv = clamp(reflect_uv, vec2(0.0), vec2(1.0));
     // [핵심] 소스 선택 로직
     vec4 reflection_col;
 
     // 전체 화면 사용 (SCREEN_TEXTURE)
     reflection_col = texture(SCREEN_TEXTURE, reflect_uv);
-
+	
 
     // 최종 색상 혼합 (불투명 버전)
     vec3 final_rgb = mix(water_color.rgb, reflection_col.rgb, reflection_strength);

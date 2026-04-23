@@ -292,8 +292,12 @@ region_rect = Rect2(0, 0, 1600, 96)
 script = ExtResource("5_oc5dm")
 timer_offset = 0.5
 
-[node name="Water7" type="ColorRect" parent="." index="12"]
+[node name="BackBufferCopy" type="BackBufferCopy" parent="." index="12"]
 z_index = 17
+copy_mode = 2
+
+[node name="Water7" type="ColorRect" parent="." index="13"]
+z_index = 18
 material = SubResource("ShaderMaterial_a6i2t")
 anchors_preset = 8
 anchor_left = 0.5
@@ -309,18 +313,18 @@ grow_vertical = 2
 script = ExtResource("7_s3djy")
 _y = 125.0
 
-[node name="background" parent="." index="13"]
+[node name="background" parent="." index="14"]
 position = Vector2(0, -24)
 scale = Vector2(1.1851852, 1.2045455)
 texture = ExtResource("3_3dm8t")
 
-[node name="background_farEX" parent="." index="14"]
+[node name="background_farEX" parent="." index="15"]
 position = Vector2(0, -4)
 scale = Vector2(1.5, 1.5)
 texture = ExtResource("4_vxm7k")
 factor = 0.0
 
-[node name="background_far" parent="." index="15"]
+[node name="background_far" parent="." index="16"]
 modulate = Color(0.93, 0.93, 0.93, 1)
 position = Vector2(0, 32)
 scale = Vector2(1.5, 1.5)
@@ -331,7 +335,7 @@ factor = 0.01
 position = Vector2(0, -61.333336)
 scale = Vector2(0.5, 0.5)
 
-[node name="background_middle" parent="." index="16"]
+[node name="background_middle" parent="." index="17"]
 modulate = Color(0.5394644, 0.45498776, 0.451181, 1)
 position = Vector2(0, -2)
 factor = 0.2
@@ -571,7 +575,7 @@ region_rect = Rect2(0, 0, 8400, 96)
 script = ExtResource("5_oc5dm")
 timer_offset = 4.5
 
-[node name="background_middle2" parent="." index="17"]
+[node name="background_middle2" parent="." index="18"]
 modulate = Color(0.41374218, 0.27957952, 0.3400187, 1)
 position = Vector2(0, -42.000004)
 scale = Vector2(1.5, 1.5)
@@ -727,7 +731,7 @@ region_rect = Rect2(0, 0, 8400, 96)
 script = ExtResource("5_oc5dm")
 timer_offset = 4.5
 
-[node name="background_near" parent="." index="18"]
+[node name="background_near" parent="." index="19"]
 modulate = Color(0.81, 0.602235, 0.5913, 1)
 factor = 0.8
 
@@ -755,7 +759,7 @@ region_rect = Rect2(0, 0, 8400, 96)
 script = ExtResource("5_oc5dm")
 timer_offset = 4.5
 
-[node name="background_nearEX" parent="." index="19"]
+[node name="background_nearEX" parent="." index="20"]
 factor = 1.5
 has_bound = true
 boundary_max_y = 1000
@@ -788,7 +792,7 @@ region_rect = Rect2(0, 0, 8400, 96)
 script = ExtResource("5_oc5dm")
 timer_offset = 8.5
 
-[node name="collision" parent="." index="20"]
+[node name="collision" parent="." index="21"]
 visible = false
 z_index = 50
 
@@ -967,21 +971,22 @@ shape = SubResource("RectangleShape2D_tghsh")
 position = Vector2(-2683, -33)
 shape = SubResource("RectangleShape2D_alhdj")
 
-[node name="Area2DP1" parent="." index="21"]
+[node name="Area2DP1" parent="." index="22"]
 position = Vector2(2992, -118)
 
 [node name="CollisionShape2D" parent="Area2DP1" index="0"]
 position = Vector2(-12, 2)
 shape = SubResource("RectangleShape2D_vxm7k")
 
-[node name="Area2DP2" parent="." index="22"]
+[node name="Area2DP2" parent="." index="23"]
 position = Vector2(-2992, -132)
 
 [node name="CollisionShape2D" parent="Area2DP2" index="0"]
 position = Vector2(12, 16)
 shape = SubResource("RectangleShape2D_2cilj")
 
-[node name="ui" parent="." index="23"]
+[node name="ui" parent="." index="24"]
+visible = false
 z_index = 15
 
 [node name="light" parent="lights" index="0" instance=ExtResource("5_at007")]

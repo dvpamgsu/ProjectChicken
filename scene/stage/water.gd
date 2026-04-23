@@ -12,3 +12,4 @@ func _physics_process(delta: float) -> void:
 	y /= main.height
 	y = clamp(y, 0.0, 1.0)
 	mat.set_shader_parameter("water_line_y", y)
+	

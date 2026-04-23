@@ -16,3 +16,4 @@ res://shaders/postprocess/retro.gdshader
 res://shaders/postprocess/cinema.gdshader
 res://shaders/dissolve.gdshader
 res://shaders/flip.gdshader
+res://scene/stage/water.gd
