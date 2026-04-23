@@ -1,4 +1,4 @@
-[gd_scene load_steps=56 format=3 uid="uid://dt2gtnj2wolrf"]
+[gd_scene load_steps=57 format=3 uid="uid://dt2gtnj2wolrf"]
 
 [ext_resource type="PackedScene" uid="uid://dqdqa03uv7qbe" path="res://scene/stage/stage.tscn" id="1_1l11k"]
 [ext_resource type="Script" uid="uid://b1kw4gqvdvr8w" path="res://scene/stage/stage_001.gd" id="2_xk278"]
@@ -26,6 +26,7 @@
 [ext_resource type="Texture2D" uid="uid://dqm7aktiicpjj" path="res://texture/stage/stage001/st01_silo_01.png" id="18_c0wkv"]
 [ext_resource type="Texture2D" uid="uid://ekhh2ibeyj8j" path="res://texture/stage/stage001/st01_silo_02.png" id="19_8rq8p"]
 [ext_resource type="Texture2D" uid="uid://dag45ragbg6gu" path="res://texture/stage/stage001/st01_tower.png" id="20_cakgq"]
+[ext_resource type="Texture2D" uid="uid://c2ehmjoyokego" path="res://texture/stage/stage001/st1_JAN_D.png" id="24_tghsh"]
 
 [sub_resource type="Gradient" id="Gradient_s3djy"]
 
@@ -304,10 +305,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -3013.0
-offset_top = 126.0
-offset_right = 3010.0
-offset_bottom = 205.03937
+offset_left = -3012.0
+offset_top = 136.0
+offset_right = 3011.0
+offset_bottom = 215.03937
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("7_s3djy")
@@ -758,6 +759,14 @@ region_enabled = true
 region_rect = Rect2(0, 0, 8400, 96)
 script = ExtResource("5_oc5dm")
 timer_offset = 4.5
+
+[node name="St1JanD" type="Sprite2D" parent="background_near" index="2"]
+modulate = Color(0.52, 0.47042665, 0.46279997, 1)
+texture_repeat = 2
+position = Vector2(0, 108)
+texture = ExtResource("24_tghsh")
+region_enabled = true
+region_rect = Rect2(0, 0, 8384, 32)
 
 [node name="background_nearEX" parent="." index="20"]
 factor = 1.5
