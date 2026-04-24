@@ -412,13 +412,7 @@ func _physics_process(delta: float) -> void:
 							dominant = -1
 					
 					var space_state = get_world_2d().direct_space_state
-					if dominant == 0:
-						var query = PhysicsRayQueryParameters2D.create(Vector2(camera_2d.position.x, -1000), Vector2(camera_2d.position.x, 4000))
-						query.collision_mask = 1
-						var result = space_state.intersect_ray(query)
-						if result:
-							cam_target.position.y = result.position.y - 64
-					else:
+					if true:
 						var cx = camera_2d.position.x-width/2.0
 						var min_y = camera_2d.position.y
 						var max_y = camera_2d.position.y
