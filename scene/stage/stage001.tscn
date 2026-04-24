@@ -1,4 +1,4 @@
-[gd_scene load_steps=57 format=3 uid="uid://dt2gtnj2wolrf"]
+[gd_scene load_steps=60 format=3 uid="uid://dt2gtnj2wolrf"]
 
 [ext_resource type="PackedScene" uid="uid://dqdqa03uv7qbe" path="res://scene/stage/stage.tscn" id="1_1l11k"]
 [ext_resource type="Script" uid="uid://b1kw4gqvdvr8w" path="res://scene/stage/stage_001.gd" id="2_xk278"]
@@ -41,31 +41,31 @@ seamless = true
 resource_local_to_scene = true
 shader = ExtResource("6_2ufda")
 shader_parameter/noise_tex = SubResource("NoiseTexture2D_a6i2t")
-shader_parameter/water_color = Color(0.7853498, 0.6717852, 0.42317688, 1)
+shader_parameter/water_color = Color(0.59999883, 0.37858823, 0.5280082, 1)
 shader_parameter/reflection_strength = 0.5
-shader_parameter/water_line_y = 0.50000002375
+shader_parameter/water_line_y = 0.5
 shader_parameter/distortion_strength = 0.02
 shader_parameter/wave_speed = 0.05
 shader_parameter/reflection_v_compression = 2.0
-shader_parameter/sparkle_color = Color(1, 1, 1, 1)
+shader_parameter/sparkle_color = Color(0.9327863, 0.6517004, 3.85046e-07, 1)
 shader_parameter/sparkle_intensity = 3.0
-shader_parameter/sparkle_size = 0.05
-shader_parameter/sparkle_stretch = 15.0
+shader_parameter/sparkle_size = 0.400000019
+shader_parameter/sparkle_stretch = 3.000000095
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_a6i2t"]
 resource_local_to_scene = true
 shader = ExtResource("6_2ufda")
 shader_parameter/noise_tex = SubResource("NoiseTexture2D_a6i2t")
-shader_parameter/water_color = Color(0.7853498, 0.6717852, 0.42317688, 1)
+shader_parameter/water_color = Color(0.6, 0.38039216, 0.5294118, 1)
 shader_parameter/reflection_strength = 0.5
-shader_parameter/water_line_y = 0.50000002375
+shader_parameter/water_line_y = 0.250000011875
 shader_parameter/distortion_strength = 0.02
 shader_parameter/wave_speed = 0.05
 shader_parameter/reflection_v_compression = 2.0
-shader_parameter/sparkle_color = Color(1, 1, 1, 1)
+shader_parameter/sparkle_color = Color(0.93333334, 0.6509804, 0, 1)
 shader_parameter/sparkle_intensity = 3.0
-shader_parameter/sparkle_size = 0.05
-shader_parameter/sparkle_stretch = 15.0
+shader_parameter/sparkle_size = 0.400000019
+shader_parameter/sparkle_stretch = 3.000000095
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_alhdj"]
 shader = ExtResource("11_ux388")
@@ -90,6 +90,33 @@ shader = ExtResource("11_ux388")
 shader_parameter/hue_shift = -0.03499995416250001
 shader_parameter/saturation_scale = 1.0650000505875
 shader_parameter/value_scale = 0.462000021945
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_c0wkv"]
+shader = ExtResource("11_ux388")
+shader_parameter/hue_shift = 0.0
+shader_parameter/saturation_scale = 1.2930000614175001
+shader_parameter/value_scale = 0.910000043225
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_8rq8p"]
+shader = ExtResource("11_ux388")
+shader_parameter/hue_shift = -0.010999953022500009
+shader_parameter/saturation_scale = 1.13600005396
+shader_parameter/value_scale = 0.91600004351
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_pxudg"]
+resource_local_to_scene = true
+shader = ExtResource("6_2ufda")
+shader_parameter/noise_tex = SubResource("NoiseTexture2D_a6i2t")
+shader_parameter/water_color = Color(0.6, 0.38039216, 0.5294118, 1)
+shader_parameter/reflection_strength = 0.5
+shader_parameter/water_line_y = 0.50000002375
+shader_parameter/distortion_strength = 0.02
+shader_parameter/wave_speed = 0.05
+shader_parameter/reflection_v_compression = 2.0
+shader_parameter/sparkle_color = Color(0.93333334, 0.6509804, 0, 1)
+shader_parameter/sparkle_intensity = 3.0
+shader_parameter/sparkle_size = 0.400000019
+shader_parameter/sparkle_stretch = 3.000000095
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_2cilj"]
 shader = ExtResource("7_8nkmo")
@@ -182,6 +209,7 @@ position = Vector2(-213, 33)
 position = Vector2(213, 35)
 
 [node name="Water" type="ColorRect" parent="." index="5"]
+visible = false
 z_index = 15
 material = SubResource("ShaderMaterial_02icq")
 anchors_preset = 8
@@ -189,15 +217,17 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = 894.0
-offset_top = 96.0
-offset_right = 1456.0
-offset_bottom = 176.0
+offset_left = 888.0
+offset_top = 80.0
+offset_right = 1464.0
+offset_bottom = 160.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("7_s3djy")
+_y = 80.0
 
 [node name="Water2" type="ColorRect" parent="." index="6"]
+visible = false
 z_index = 15
 material = SubResource("ShaderMaterial_02icq")
 anchors_preset = 8
@@ -205,15 +235,17 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = 2367.0
-offset_top = 97.0
-offset_right = 2817.0
-offset_bottom = 176.0
+offset_left = 2360.0
+offset_top = 81.0
+offset_right = 2824.0
+offset_bottom = 160.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("7_s3djy")
+_y = 80.0
 
 [node name="Water3" type="ColorRect" parent="." index="7"]
+visible = false
 z_index = 15
 material = SubResource("ShaderMaterial_02icq")
 anchors_preset = 8
@@ -221,15 +253,17 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -1456.0
-offset_top = 96.0
-offset_right = -894.0
-offset_bottom = 176.0
+offset_left = -1464.0
+offset_top = 80.0
+offset_right = -888.0
+offset_bottom = 160.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("7_s3djy")
+_y = 80.0
 
 [node name="Water4" type="ColorRect" parent="." index="8"]
+visible = false
 z_index = 15
 material = SubResource("ShaderMaterial_02icq")
 anchors_preset = 8
@@ -237,15 +271,17 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -2817.0
-offset_top = 97.0
-offset_right = -2367.0
-offset_bottom = 176.0
+offset_left = -2824.0
+offset_top = 81.0
+offset_right = -2360.0
+offset_bottom = 160.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("7_s3djy")
+_y = 80.0
 
 [node name="Water5" type="ColorRect" parent="." index="9"]
+visible = false
 z_index = 15
 material = SubResource("ShaderMaterial_02icq")
 anchors_preset = 8
@@ -254,14 +290,16 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -3014.0
-offset_top = 97.0
+offset_top = 81.0
 offset_right = -2916.0
-offset_bottom = 176.0
+offset_bottom = 160.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("7_s3djy")
+_y = 80.0
 
 [node name="Water6" type="ColorRect" parent="." index="10"]
+visible = false
 z_index = 15
 material = SubResource("ShaderMaterial_02icq")
 anchors_preset = 8
@@ -270,12 +308,13 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = 2916.0
-offset_top = 97.0
+offset_top = 81.0
 offset_right = 3014.0
-offset_bottom = 176.0
+offset_bottom = 160.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("7_s3djy")
+_y = 80.0
 
 [node name="sprite_stage" parent="." index="11"]
 modulate = Color(0.7, 0.54436666, 0.539, 1)
@@ -283,6 +322,7 @@ visibility_layer = 2
 texture = ExtResource("3_s3djy")
 
 [node name="Sprite2D" type="Sprite2D" parent="sprite_stage" index="0"]
+modulate = Color(0.88931596, 0.7635019, 0.5725957, 1)
 z_index = -1
 texture_repeat = 2
 position = Vector2(4, 128)
@@ -293,6 +333,7 @@ region_rect = Rect2(0, 0, 1600, 96)
 script = ExtResource("5_oc5dm")
 
 [node name="Sprite2D2" type="Sprite2D" parent="sprite_stage" index="1"]
+modulate = Color(0.8987058, 0.781329, 0.7824164, 1)
 z_index = -1
 texture_repeat = 2
 position = Vector2(-4, 128)
@@ -300,6 +341,52 @@ texture = ExtResource("3_2cilj")
 offset = Vector2(0, -48)
 region_enabled = true
 region_rect = Rect2(0, 0, 1600, 96)
+script = ExtResource("5_oc5dm")
+timer_offset = 0.5
+
+[node name="Sprite2D3" type="Sprite2D" parent="sprite_stage" index="2"]
+modulate = Color(0.88931596, 0.7635019, 0.5725957, 1)
+z_index = -1
+texture_repeat = 2
+position = Vector2(2032, 128)
+texture = ExtResource("3_2cilj")
+offset = Vector2(0, -48)
+region_enabled = true
+region_rect = Rect2(0, 0, 500, 96)
+script = ExtResource("5_oc5dm")
+
+[node name="Sprite2D4" type="Sprite2D" parent="sprite_stage" index="3"]
+modulate = Color(0.8987058, 0.781329, 0.7824164, 1)
+z_index = -1
+texture_repeat = 2
+position = Vector2(2024, 128)
+texture = ExtResource("3_2cilj")
+offset = Vector2(0, -48)
+region_enabled = true
+region_rect = Rect2(0, 0, 500, 96)
+script = ExtResource("5_oc5dm")
+timer_offset = 0.5
+
+[node name="Sprite2D5" type="Sprite2D" parent="sprite_stage" index="4"]
+modulate = Color(0.88931596, 0.7635019, 0.5725957, 1)
+z_index = -1
+texture_repeat = 2
+position = Vector2(-2006, 128)
+texture = ExtResource("3_2cilj")
+offset = Vector2(0, -48)
+region_enabled = true
+region_rect = Rect2(0, 0, 500, 96)
+script = ExtResource("5_oc5dm")
+
+[node name="Sprite2D6" type="Sprite2D" parent="sprite_stage" index="5"]
+modulate = Color(0.8987058, 0.781329, 0.7824164, 1)
+z_index = -1
+texture_repeat = 2
+position = Vector2(-2014, 128)
+texture = ExtResource("3_2cilj")
+offset = Vector2(0, -48)
+region_enabled = true
+region_rect = Rect2(0, 0, 500, 96)
 script = ExtResource("5_oc5dm")
 timer_offset = 0.5
 
@@ -322,7 +409,7 @@ offset_bottom = 215.03937
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("7_s3djy")
-_y = 125.0
+_y = 136.0
 
 [node name="background" parent="." index="14"]
 position = Vector2(0, -24)
@@ -744,12 +831,14 @@ timer_offset = 4.5
 
 [node name="background_near" parent="." index="19"]
 modulate = Color(0.81, 0.602235, 0.5913, 1)
+position = Vector2(0, -16)
 factor = 0.8
 
 [node name="Sprite2D" type="Sprite2D" parent="background_near" index="0"]
 z_index = -1
 texture_repeat = 2
-position = Vector2(4, 118.399994)
+material = SubResource("ShaderMaterial_c0wkv")
+position = Vector2(4, 134.4)
 scale = Vector2(0.9, 0.9)
 texture = ExtResource("3_2cilj")
 offset = Vector2(0, -48)
@@ -761,7 +850,8 @@ timer_offset = 4.0
 [node name="Sprite2D2" type="Sprite2D" parent="background_near" index="1"]
 z_index = -1
 texture_repeat = 2
-position = Vector2(-4, 118.399994)
+material = SubResource("ShaderMaterial_c0wkv")
+position = Vector2(-4, 134.4)
 scale = Vector2(0.9, 0.9)
 texture = ExtResource("3_2cilj")
 offset = Vector2(0, -48)
@@ -777,6 +867,122 @@ position = Vector2(0, 108)
 texture = ExtResource("24_tghsh")
 region_enabled = true
 region_rect = Rect2(0, 0, 8384, 32)
+
+[node name="Sprite2D7" type="Sprite2D" parent="background_near" index="3"]
+z_index = -1
+texture_repeat = 2
+material = SubResource("ShaderMaterial_8rq8p")
+position = Vector2(-948, 122.399994)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("3_2cilj")
+offset = Vector2(0, -48)
+region_enabled = true
+region_rect = Rect2(0, 0, 800, 96)
+script = ExtResource("5_oc5dm")
+
+[node name="Sprite2D8" type="Sprite2D" parent="background_near" index="4"]
+z_index = -1
+texture_repeat = 2
+material = SubResource("ShaderMaterial_8rq8p")
+position = Vector2(-956, 122.399994)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("3_2cilj")
+offset = Vector2(0, -48)
+region_enabled = true
+region_rect = Rect2(0, 0, 800, 96)
+script = ExtResource("5_oc5dm")
+timer_offset = 0.5
+
+[node name="Sprite2D9" type="Sprite2D" parent="background_near" index="5"]
+z_index = -1
+texture_repeat = 2
+material = SubResource("ShaderMaterial_8rq8p")
+position = Vector2(956, 122.399994)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("3_2cilj")
+offset = Vector2(0, -48)
+region_enabled = true
+region_rect = Rect2(0, 0, 800, 96)
+script = ExtResource("5_oc5dm")
+
+[node name="Sprite2D10" type="Sprite2D" parent="background_near" index="6"]
+z_index = -1
+texture_repeat = 2
+material = SubResource("ShaderMaterial_8rq8p")
+position = Vector2(948, 122.399994)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("3_2cilj")
+offset = Vector2(0, -48)
+region_enabled = true
+region_rect = Rect2(0, 0, 800, 96)
+script = ExtResource("5_oc5dm")
+timer_offset = 0.5
+
+[node name="Sprite2D11" type="Sprite2D" parent="background_near" index="7"]
+z_index = -1
+texture_repeat = 2
+material = SubResource("ShaderMaterial_8rq8p")
+position = Vector2(2282, 118.399994)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("3_2cilj")
+offset = Vector2(0, -48)
+region_enabled = true
+region_rect = Rect2(0, 0, 1000, 96)
+script = ExtResource("5_oc5dm")
+
+[node name="Sprite2D12" type="Sprite2D" parent="background_near" index="8"]
+z_index = -1
+texture_repeat = 2
+material = SubResource("ShaderMaterial_8rq8p")
+position = Vector2(2274, 118.399994)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("3_2cilj")
+offset = Vector2(0, -48)
+region_enabled = true
+region_rect = Rect2(0, 0, 1000, 96)
+script = ExtResource("5_oc5dm")
+timer_offset = 0.5
+
+[node name="Sprite2D13" type="Sprite2D" parent="background_near" index="9"]
+z_index = -1
+texture_repeat = 2
+material = SubResource("ShaderMaterial_8rq8p")
+position = Vector2(-2532, 122.399994)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("3_2cilj")
+offset = Vector2(0, -48)
+region_enabled = true
+region_rect = Rect2(0, 0, 800, 96)
+script = ExtResource("5_oc5dm")
+
+[node name="Sprite2D14" type="Sprite2D" parent="background_near" index="10"]
+z_index = -1
+texture_repeat = 2
+material = SubResource("ShaderMaterial_8rq8p")
+position = Vector2(-2540, 122.399994)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("3_2cilj")
+offset = Vector2(0, -48)
+region_enabled = true
+region_rect = Rect2(0, 0, 800, 96)
+script = ExtResource("5_oc5dm")
+timer_offset = 0.5
+
+[node name="Water8" type="ColorRect" parent="background_near" index="11"]
+material = SubResource("ShaderMaterial_pxudg")
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -3012.0
+offset_top = 104.0
+offset_right = 3011.0
+offset_bottom = 183.03937
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("7_s3djy")
+_y = 80.0
 
 [node name="background_nearEX" parent="." index="20"]
 factor = 1.5
@@ -1005,7 +1211,6 @@ position = Vector2(12, 16)
 shape = SubResource("RectangleShape2D_2cilj")
 
 [node name="ui" parent="." index="24"]
-visible = false
 z_index = 15
 
 [node name="light" parent="lights" index="0" instance=ExtResource("5_at007")]
