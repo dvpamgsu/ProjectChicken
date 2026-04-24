@@ -7,9 +7,21 @@ var mat : ShaderMaterial
 
 func _ready() -> void:
 	main = get_node("/root/Main")
-	position.x = main.camera_2d.position.x + main.rng.randf_range(-main.width/2.0, main.width/2.0)
-	position.y = -main.height/2.0 - 32
-	speed_x = main.rng.randf_range(-30.0,30.0)
+	var cnt = 0
+	var space_state = get_world_2d().direct_space_state
+	while true:
+		position.x = main.camera_2d.position.x + main.rng.randf_range(-main.width/2.0, main.width/2.0)
+		position.y = -main.height/2.0 - 32
+		speed_x = main.rng.randf_range(-30.0,30.0)
+		var query = PhysicsRayQueryParameters2D.create(position, position+Vector2(speed_x, 100)*4000)
+		query.collision_mask = 1
+		var result = space_state.intersect_ray(query)
+		if result:
+			break
+		cnt += 1
+		if cnt > 10:
+			queue_free()
+			return
 	frame = 1
 	mat = material
 	
