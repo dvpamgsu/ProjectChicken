@@ -15,7 +15,7 @@ res://scene/stage/stage.tscn::1ce9fa195bb79d8e91208d3e41201940::1776834660::res:
 res://scene/player/player_single.tscn::525d66a89288ac5845ac25675aa0135c::1776073710::res://.godot/exported/133200997/export-0615eb83cc26edda66f0855488dd8457-player_single.scn
 res://scene/player/player_ai.tscn::4a39d9c6ba854f80c51ee1f0c3e91508::1776073726::res://.godot/exported/133200997/export-75f3bc87ffb0c80a79e30b56e9f9b5a1-player_ai.scn
 res://scene/player/player_local_alter.tscn::9390c114243c8d68f46f1370111a491e::1776073738::res://.godot/exported/133200997/export-8ee90ce77a0c5287640bc1a2221f4570-player_local_alter.scn
-res://scene/stage/stage001.tscn::cb0248df9d0e70a1838e7911a6bc97f8::1776924866::res://.godot/exported/133200997/export-c90eab279546ab99b2ad250438eb7b3a-stage001.scn
+res://scene/stage/stage001.tscn::1f2a30388251a275235b0ed9fe609760::1777005595::res://.godot/exported/133200997/export-c90eab279546ab99b2ad250438eb7b3a-stage001.scn
 res://resources/fnl.tres::c1b1f2e856f734c1c558cc22197f0f76::1775111699::res://.godot/exported/133200997/export-a1bff71231cb5624269b4edc88713c63-fnl.res
 res://resources/noise.tres::220dff53aea8c34fefe3550da3d9b05c::1775111699::res://.godot/exported/133200997/export-61a2c2ac57c92aad0c6927c2de6062bd-noise.res
 res://scene/light.tscn::1eb1b32707acbcf170890b712ca43981::1775124748::res://.godot/exported/133200997/export-c84f2ed1f5e99280771ae53ecdcb9a7c-light.scn

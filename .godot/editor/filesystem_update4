@@ -16,3 +16,6 @@ res://shaders/postprocess/retro.gdshader
 res://shaders/postprocess/cinema.gdshader
 res://shaders/dissolve.gdshader
 res://shaders/flip.gdshader
+res://shaders/blur_filter.gdshader
+res://scene/stage/background_movement.gd
+res://scene/stage/background_movement_control.gd

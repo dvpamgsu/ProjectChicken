@@ -1,4 +1,4 @@
-[gd_scene load_steps=60 format=3 uid="uid://dt2gtnj2wolrf"]
+[gd_scene load_steps=63 format=3 uid="uid://dt2gtnj2wolrf"]
 
 [ext_resource type="PackedScene" uid="uid://dqdqa03uv7qbe" path="res://scene/stage/stage.tscn" id="1_1l11k"]
 [ext_resource type="Script" uid="uid://b1kw4gqvdvr8w" path="res://scene/stage/stage_001.gd" id="2_xk278"]
@@ -26,7 +26,9 @@
 [ext_resource type="Texture2D" uid="uid://dqm7aktiicpjj" path="res://texture/stage/stage001/st01_silo_01.png" id="18_c0wkv"]
 [ext_resource type="Texture2D" uid="uid://ekhh2ibeyj8j" path="res://texture/stage/stage001/st01_silo_02.png" id="19_8rq8p"]
 [ext_resource type="Texture2D" uid="uid://dag45ragbg6gu" path="res://texture/stage/stage001/st01_tower.png" id="20_cakgq"]
+[ext_resource type="Shader" uid="uid://knyhx6dg8eaw" path="res://shaders/blur_filter.gdshader" id="24_a6i2t"]
 [ext_resource type="Texture2D" uid="uid://c2ehmjoyokego" path="res://texture/stage/stage001/st1_JAN_D.png" id="24_tghsh"]
+[ext_resource type="Script" uid="uid://djkmydxvwa0vc" path="res://scene/stage/background_movement_control.gd" id="25_02icq"]
 
 [sub_resource type="Gradient" id="Gradient_s3djy"]
 
@@ -91,15 +93,19 @@ shader_parameter/hue_shift = -0.03499995416250001
 shader_parameter/saturation_scale = 1.0650000505875
 shader_parameter/value_scale = 0.462000021945
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_cakgq"]
+shader = ExtResource("24_a6i2t")
+shader_parameter/blur_amount = 1.0000000475
+
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_c0wkv"]
 shader = ExtResource("11_ux388")
 shader_parameter/hue_shift = 0.0
-shader_parameter/saturation_scale = 1.2930000614175001
+shader_parameter/saturation_scale = 1.2930000614175
 shader_parameter/value_scale = 0.910000043225
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_8rq8p"]
 shader = ExtResource("11_ux388")
-shader_parameter/hue_shift = -0.010999953022500009
+shader_parameter/hue_shift = -0.0109999530225
 shader_parameter/saturation_scale = 1.13600005396
 shader_parameter/value_scale = 0.91600004351
 
@@ -829,7 +835,24 @@ region_rect = Rect2(0, 0, 8400, 96)
 script = ExtResource("5_oc5dm")
 timer_offset = 4.5
 
-[node name="background_near" parent="." index="19"]
+[node name="Blur" type="ColorRect" parent="." index="19"]
+z_index = 5
+material = SubResource("ShaderMaterial_cakgq")
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -384.0
+offset_top = -236.0
+offset_right = 384.0
+offset_bottom = 292.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("25_02icq")
+factor = 0.0
+
+[node name="background_near" parent="." index="20"]
 modulate = Color(0.81, 0.602235, 0.5913, 1)
 position = Vector2(0, -16)
 factor = 0.8
@@ -984,7 +1007,7 @@ grow_vertical = 2
 script = ExtResource("7_s3djy")
 _y = 80.0
 
-[node name="background_nearEX" parent="." index="20"]
+[node name="background_nearEX" parent="." index="21"]
 factor = 1.5
 has_bound = true
 boundary_max_y = 1000
@@ -1017,8 +1040,7 @@ region_rect = Rect2(0, 0, 8400, 96)
 script = ExtResource("5_oc5dm")
 timer_offset = 8.5
 
-[node name="collision" parent="." index="21"]
-visible = false
+[node name="collision" parent="." index="22"]
 z_index = 50
 
 [node name="StaticBody2D" type="StaticBody2D" parent="collision" index="0"]
@@ -1196,21 +1218,21 @@ shape = SubResource("RectangleShape2D_tghsh")
 position = Vector2(-2683, -33)
 shape = SubResource("RectangleShape2D_alhdj")
 
-[node name="Area2DP1" parent="." index="22"]
+[node name="Area2DP1" parent="." index="23"]
 position = Vector2(2992, -118)
 
 [node name="CollisionShape2D" parent="Area2DP1" index="0"]
 position = Vector2(-12, 2)
 shape = SubResource("RectangleShape2D_vxm7k")
 
-[node name="Area2DP2" parent="." index="23"]
+[node name="Area2DP2" parent="." index="24"]
 position = Vector2(-2992, -132)
 
 [node name="CollisionShape2D" parent="Area2DP2" index="0"]
 position = Vector2(12, 16)
 shape = SubResource("RectangleShape2D_2cilj")
 
-[node name="ui" parent="." index="24"]
+[node name="ui" parent="." index="25"]
 z_index = 15
 
 [node name="light" parent="lights" index="0" instance=ExtResource("5_at007")]

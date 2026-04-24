@@ -1,15 +1,14 @@
-AnimatedSprite2D
 BackBufferCopy
+ColorRect
+AnimatedSprite2D
 SubViewport
 SubViewportContainer
 CanvasLayer
 Camera2D
 CanvasGroup
 Node2D
-ColorRect
 Sprite2D
 Button
 VBoxContainer
 ScrollContainer
 TextureButton
-TextureRect
