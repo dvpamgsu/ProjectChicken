@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://dre811xugl3tp"]
+
+[ext_resource type="PackedScene" uid="uid://c7wix0kckkhnu" path="res://scene/stage/fragment.tscn" id="1_pni24"]
+[ext_resource type="Texture2D" uid="uid://cobqwn7r5bekt" path="res://texture/stage/UI_hpfragment1.png" id="2_gw4nf"]
+
+[node name="fragment1" instance=ExtResource("1_pni24")]
+
+[node name="Sprite2D" parent="." index="0"]
+position = Vector2(0, -4)
+texture = ExtResource("2_gw4nf")

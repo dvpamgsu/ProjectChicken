@@ -6,3 +6,4 @@
 [node name="simple_effect_hit1" instance=ExtResource("1_bx2b2")]
 texture = ExtResource("2_puc4l")
 hframes = 6
+rate = 0.05

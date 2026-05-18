@@ -30,6 +30,7 @@ enabled=PackedStringArray("res://addons/softbody2d/plugin.cfg")
 player=""
 head=""
 leg=""
+ice=""
 
 [input]
 
@@ -129,6 +130,7 @@ pp3={
 2d_physics/layer_4="head"
 2d_physics/layer_5="leg"
 2d_physics/layer_6="others_type1"
+2d_physics/layer_7="mine"
 
 [rendering]
 

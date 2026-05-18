@@ -3,6 +3,7 @@ extends RigidBody2D
 var player_name = ""
 var id = 0
 
+var first_pos = Vector2.ZERO
 @export var alive = true
 @export var corpse = false
 @export var is_host_player = false
@@ -21,6 +22,8 @@ var id = 0
 
 @onready var jumpcharge: TextureProgressBar = $jumpcharge
 
+
+
 var mat : ShaderMaterial
 var jump_timer = 0.0
 const jump_time_max = 1.0
@@ -34,7 +37,8 @@ var spare_timer = 0.0
 # 스크립트 상단에 쿨다운 변수를 추가해 주세요.
 func _enter_tree() -> void:
 	set_multiplayer_authority(name.to_int())
-	
+	if is_multiplayer_authority():
+		print(name + " XX ")
 	
 var char_code = 1
 func basic_ready():
@@ -68,12 +72,13 @@ func _ready() -> void:
 	basic_ready()
 	
 	if is_multiplayer_authority():
+		position = first_pos
 		if main.is_host:
-			#position = main.stage.spawn_1.position
+			position = main.stage.spawn_1.position
 			initial_pos = position
 			flip_dir = 1
 		else:
-			#position = main.stage.spawn_2.position
+			position = main.stage.spawn_2.position
 			initial_pos = position
 			flip_dir = -1
 	#print(is_multiplayer_authority())
@@ -383,15 +388,17 @@ func create_ghost():
 	var ghost_tween = create_tween()
 	# 0.4초 동안 투명도를 0으로 만들고, 완료되면 노드를 삭제함
 	ghost_tween.tween_property(ghost, "modulate:a", 0.0, 0.4)
-	ghost_tween.finished.connect(func(): ghost.queue_free())
+	ghost_tween.finished.connect(func():
+		if ghost:
+			ghost.queue_free())
 	
 
 @export var lv := Vector2.ZERO
 var shock_timer = 0.0
 @export var particle_timer = 0.0
 var max_dist
+var first = true
 func _physics_process(delta: float) -> void:
-	
 	find_alter()
 	check_flip()
 	#print(freeze)
@@ -470,11 +477,21 @@ func _physics_process(delta: float) -> void:
 	#------------------------------------------------------------
 	if !is_multiplayer_authority():
 		return
+		
+	sprite_2d.flip_h = sync_flip_h
+	
+	if first:
+		alive_timer += delta
+		alive = true
+		if alive_timer < 0.1:
+			position = initial_pos
+		if alive_timer > 0.5:
+			first = false
+		return
 	
 	# 다시 원래대로 돌아오게 하고 싶다면
 	# tween.tween_property(mat, "shader_parameter/whiten_strength", 0.0, 0.2).set_delay(0.1)
 		
-	sprite_2d.flip_h = sync_flip_h
 	
 	if hit_timer > 0.0:
 		hit_timer -= delta
@@ -552,6 +569,7 @@ func _physics_process(delta: float) -> void:
 	if (floor_cnt > 0 or jump_cnt > 0) and jump_result == 3:
 		var jump_dir = Vector2(cos(rotation-PI/2.0), sin(rotation-PI/2.0))
 		if floor_cnt <= 0:
+			jump_cnt -= 1
 			gen_air_jump_effect()
 			#PhysicsServer2D.body_set_state(get_rid(), PhysicsServer2D.BODY_STATE_LINEAR_VELOCITY, Vector2.ZERO)
 			apply_impulse(jump_power*jump_dir*(jump_timer+0.5))
@@ -560,8 +578,6 @@ func _physics_process(delta: float) -> void:
 			apply_impulse(jump_power*jump_dir*(jump_timer+0.5))
 			var r = sign(rotation)*min(abs(rotation),PI/8.0)
 			apply_torque_impulse(-r*jump_torque_power)
-		if floor_cnt <= 0:
-			jump_cnt -= 1
 	if jump_result == 0 or jump_result == 3:
 		if floor_cnt > 0:
 			$Sprite2D.frame = 0
@@ -702,6 +718,7 @@ func dead():
 	if is_multiplayer_authority():
 		collision_layer = 4
 		collision_mask = 1
+		change_col_layers(false)
 		alive = false
 		corpse = true
 		#$TimerCorpse.start()
@@ -804,6 +821,8 @@ var shock = false
 @onready var hit_particle: CPUParticles2D = $HitParticle
 @onready var timer_hit_ghost_emit: Timer = $TimerHitGhostEmit
 
+signal hitted(is_host, hp)
+signal rebirth(is_host)
 var pre_hit_by_player = false
 func hit(by_player = false, way = Vector2.ZERO):
 	if !is_multiplayer_authority():
@@ -814,6 +833,7 @@ func hit(by_player = false, way = Vector2.ZERO):
 		return
 	if !alive:
 		return
+	hitted.emit(is_host_player, hp)
 	hp -= 1
 	mat.set_shader_parameter("hit_strength", 0.35)
 	set_ghost(true)
@@ -850,9 +870,11 @@ func _on_timer_rebirth_timeout() -> void:
 		initialize()
 		collision_layer = 2
 		collision_mask = 3
+		change_col_layers(true)
 		shock = false
 		alive = true
 		hp = 3
+		rebirth.emit(is_host_player)
 		$TimerDissolveBirth.start()
 		#freeze = false # 다시 움직일 수 있도록 해제
 
@@ -879,7 +901,7 @@ func get_jump():
 
 func _on_area_2d_head_area_entered(area: Area2D) -> void:
 	if area.is_in_group("leg"):
-		if alive and area.alive:
+		if alive_timer >= 0.1 and area.player.alive_timer >= 0.1:
 			var way = (global_position-area.global_position).normalized()
 			hit(true, way)
 			apply_impulse(way*500.0)
@@ -916,4 +938,11 @@ func explosion():
 	gen_dead_particle()
 	start_rebirth()
 	
+@onready var area_leg: Area2D = $col2/Area2DFLeg
+
+func change_col_layers(_alive = true):
+	if _alive:
+		area_leg.collision_layer = 16
+	else:
+		area_leg.collision_layer = 4
 	

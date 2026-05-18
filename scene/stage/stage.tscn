@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3 uid="uid://dqdqa03uv7qbe"]
+[gd_scene load_steps=28 format=3 uid="uid://dqdqa03uv7qbe"]
 
 [ext_resource type="Script" uid="uid://7eiec3ticvn6" path="res://scene/stage/stage.gd" id="1_v4pcg"]
 [ext_resource type="Script" uid="uid://dr4q8w4sa78sx" path="res://scene/stage/ui.gd" id="2_foayd"]
@@ -10,6 +10,8 @@
 [ext_resource type="Texture2D" uid="uid://b6vvreu7uvvjy" path="res://texture/player/way_.png" id="6_gxjd3"]
 [ext_resource type="Shader" uid="uid://dc6osjf3ccive" path="res://shaders/circle.gdshader" id="8_r5rt7"]
 [ext_resource type="Texture2D" uid="uid://bc6jsbc41al33" path="res://texture/bridget.png" id="9_4n35m"]
+[ext_resource type="Texture2D" uid="uid://c3irsri4odxx5" path="res://texture/stage/UI_hpegg.png" id="10_2rnjc"]
+[ext_resource type="Script" uid="uid://4m0c58abt6q3" path="res://scene/stage/hp.gd" id="11_dd3yr"]
 
 [sub_resource type="Environment" id="Environment_v4pcg"]
 background_mode = 3
@@ -190,17 +192,17 @@ offset_bottom = 128.0
 scale = Vector2(-1, 1)
 
 [node name="player1Label" type="Label" parent="ui"]
-offset_left = 128.0
-offset_top = 112.0
-offset_right = 176.0
-offset_bottom = 144.0
+offset_left = 132.0
+offset_top = 48.0
+offset_right = 180.0
+offset_bottom = 80.0
 theme = ExtResource("3_7efvv")
 
 [node name="player2Label" type="Label" parent="ui"]
-offset_left = 976.0
-offset_top = 112.0
-offset_right = 1024.0
-offset_bottom = 144.0
+offset_left = 668.0
+offset_top = 48.0
+offset_right = 1020.0
+offset_bottom = 80.0
 theme = ExtResource("3_7efvv")
 horizontal_alignment = 2
 
@@ -269,6 +271,48 @@ fill_mode = 5
 nine_patch_stretch = true
 texture_progress = SubResource("GradientTexture1D_ngctk")
 tint_progress = Color(0, 0, 0, 0.50980395)
+
+[node name="hp1_1" type="Sprite2D" parent="ui"]
+position = Vector2(144, 124)
+scale = Vector2(2, 2)
+texture = ExtResource("10_2rnjc")
+hframes = 2
+script = ExtResource("11_dd3yr")
+
+[node name="hp1_2" type="Sprite2D" parent="ui"]
+position = Vector2(176, 124)
+scale = Vector2(2, 2)
+texture = ExtResource("10_2rnjc")
+hframes = 2
+script = ExtResource("11_dd3yr")
+
+[node name="hp1_3" type="Sprite2D" parent="ui"]
+position = Vector2(208, 124)
+scale = Vector2(2, 2)
+texture = ExtResource("10_2rnjc")
+hframes = 2
+script = ExtResource("11_dd3yr")
+
+[node name="hp2_1" type="Sprite2D" parent="ui"]
+position = Vector2(1008, 124)
+scale = Vector2(2, 2)
+texture = ExtResource("10_2rnjc")
+hframes = 2
+script = ExtResource("11_dd3yr")
+
+[node name="hp2_2" type="Sprite2D" parent="ui"]
+position = Vector2(976, 124)
+scale = Vector2(2, 2)
+texture = ExtResource("10_2rnjc")
+hframes = 2
+script = ExtResource("11_dd3yr")
+
+[node name="hp2_3" type="Sprite2D" parent="ui"]
+position = Vector2(944, 124)
+scale = Vector2(2, 2)
+texture = ExtResource("10_2rnjc")
+hframes = 2
+script = ExtResource("11_dd3yr")
 
 [node name="lights" type="Node2D" parent="."]
 

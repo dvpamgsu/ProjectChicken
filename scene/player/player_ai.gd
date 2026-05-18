@@ -1,6 +1,8 @@
 extends "res://scene/player/player.gd"
 
+@onready var polygon_2d: Polygon2D = $Polygon2D
 
+var way = -1
 
 func _enter_tree() -> void:
 	pass
@@ -14,8 +16,6 @@ func _ready() -> void:
 	#position = main.stage.spawn_2.position
 	initial_pos = position
 	flip_dir = -1
-	ai_target_position = position
-	first_touch = false
 	
 	
 	
@@ -27,10 +27,8 @@ var is_right = false
 var pre_right = false
 
 var ai_jump_timer = 0.0
-var ai_target_timer = 0.0
-var ai_target_position = Vector2.ZERO
+var ai_jump_cool = 0.0
 var stuck_timer = 0.0
-var first_touch = false
 var pre_alter_alive = true
 var pre_check_type = 0
 
@@ -46,105 +44,106 @@ func ai_process(delta: float):
 		pre_right = false
 		return
 	
-	#if fool_timer < 1.0:
-		#fool_timer += delta
-	#else:
-		#fool_timer = 0.0
-	#if fool_timer > 0.8:
-		#return
-	
-	# calculate next target position
-	$Polygon2D.global_position = ai_target_position
-	#print(ai_target_position)
-	var space_state = get_world_2d().direct_space_state
-	var query
-	var result
-	var check = false
-	if alter.alive and alter.alive_timer >= alive_timer - 0.5:
-		check = true
-	elif floor_cnt > 0:
-		check = true
-	#elif floor_cnt > 0 and !alter.alive:
-		#check = true
-		#pre_check_type = 2
-	#elif floor_cnt > 0 and footpos.global_position.x < ai_target_position.x + 32:
-		#check = true
-		#pre_check_type = 3
-	#else:
-		#pre_check_type = 0
-	ai_target_timer += delta
-	if ai_target_timer > 0.1 and check:
-		ai_target_timer = 0.0
-		var last_y = 10000.0
-		var cnt = 0.0
-		var step = 8.0
-		var x = footpos.global_position.x + flip_dir * step
-		var dist = 10000
-		if alter.alive and (alter.alive_timer >= alive_timer - 0.5 or flip_dir > 0):
-			#x = ai_target_position.x + flip_dir * step
-			dist = abs(alter.position.x-x)
+	var alter_flag = false
+	if alter.alive and (alter.alive_timer > alive_timer + 0.5 or abs(alter.alive_timer - alive_timer)<0.5):
+		if alter.position.x < position.x:
+			way = -1
 		else:
-			x = footpos.global_position.x + flip_dir * step * 6.0
-		var flag = false
-		while x > main.cam_bl_pos.x and x < main.cam_tr_pos.x:
-			query = PhysicsRayQueryParameters2D.create(Vector2(x, -1000.0), Vector2(x, -1000.0) + Vector2.DOWN*3000.0)
-			query.collision_mask = 1
-			query.exclude = [get_rid()]
-			result = space_state.intersect_ray(query)
-			
-			if result:
-				#if last_y < 9999 and last_y > result.position.y + 8.0:
-					#last_y = result.position.y
-					#break
-				if alter.alive and (alive_timer <= alter.alive_timer + 0.5 or flip_dir > 0) and abs(x - alter.position.x) < step:
-					last_y = alter.position.y
-					break
-				#if flag:
-					##print("!")
-					#last_y = result.position.y
-					#x += flip_dir * step * 2.0
-					#break
-				last_y = result.position.y
-			else:
-				flag = true
-				if last_y < 9999:
-					x -= flip_dir * step
-					break
-			x += flip_dir * step
-			if alter.alive and alive_timer <= alter.alive_timer + 0.5 and abs(x-alter.position.x) > dist:
-				x = alter.position.x
-				last_y = alter.position.y
-				break
-			cnt += step
-			if cnt > 256:
-				break
-		ai_target_position = Vector2(x, last_y)
-	
-	var way = -1
-	if ai_target_position.x < footpos.global_position.x:
+			way = 1
+		alter_flag = true
+	else:
 		way = -1
-	else:
-		way = 1
-		
+	
 	var target_angle = 0.0
-	var dist = (ai_target_position - footpos.global_position).length()
-	var dist_val = min(dist, 300.0)/300.0
 	if floor_cnt > 0:
-		target_angle = way * PI / (24.0 + 12.0*(1.0-dist_val))
-		if alter.alive and alter.alive_timer + 0.5 >= alive_timer:
-			if dist < 32:
-				target_angle = way * PI / 8.0
-	else:
-		if jump_cnt > 0 and dist_val > 0.1 and knee_cnt <= 0:
-			target_angle = way * PI / (8.0 + 8.0*(0.9-dist_val))
+		if way < 0:
+			target_angle = -PI/18.0
 		else:
-			target_angle = way * PI / 24.0
-	if !first_touch:
-		target_angle = 0.0
+			target_angle = PI/18.0
+		
+	
+	var space_state = get_world_2d().direct_space_state
+	
+	var x1 = position.x
+	var y1 = position.y
+	var x2 = x1
+	var x_fall = position.x
+	for i in range(1000):
+		var query = PhysicsRayQueryParameters2D.create(Vector2(x1,-1000), Vector2(x1,-1000) + Vector2(0, 10000))
+		query.collision_mask = 1
+		var result = space_state.intersect_ray(query)
+		if result:
+			y1 = result.position.y
+			x2 = result.position.x + way * 4.0
+			break
+		x1 -= way * 2.0
+	var y2 = y1
+	var r_flag = false
+	var flag = false
+	for i in range(1000):
+		var query =PhysicsRayQueryParameters2D.create(Vector2(x2,-1000), Vector2(x2,-1000) + Vector2(0, 10000))
+		query.collision_mask = 1
+		var result = space_state.intersect_ray(query)
+		if result:
+			r_flag = true
+			if abs(result.position.y - y1) > 2.0:
+				y2 = result.position.y
+				break
+		elif r_flag:
+			flag = true
+			x_fall = x2
+			break
+		x2 += way * 2.0
+	var target_position = Vector2(x2 - way * 48.0, y2)
+	if !flag:
+		target_position += Vector2(way*96.0, 0.0)
+	if alter_flag:
+		target_position = alter.col_3.global_position
+	polygon_2d.global_position = target_position
+	
+	var v0 = calculate_required_velocity(target_position, 0.8)
+	var impulse = (v0 - linear_velocity)*mass
+	if sign(x2-position.x) == sign(way):
+		impulse *= 0.8
+	
+	var jump_dir = Vector2(cos(rotation-PI/2.0), sin(rotation-PI/2.0))
+	var cur_impulse = jump_power*jump_dir*(ai_jump_timer+0.5)
+	if floor_cnt > 0 and (ai_jump_cool > 0.2 or (flag and abs(x_fall - position.x)<32.0)):
+		print(str(flag)+", "+str(x_fall)+", "+str(position.x))
+		if ai_jump_timer < 1.0 and (!flag or abs(x_fall - position.x)>0.5):
+			ai_jump_timer += delta
+			is_jump = true
+		else:
+			ai_jump_cool = 0.0
+			ai_jump_timer = 0.0
+			is_jump = false
+	elif jump_cnt > 0 and floor_cnt <= 0 and ai_jump_cool > 0.1:
+		if cur_impulse.distance_to(impulse) > 0.5 and ai_jump_timer < 0.8:
+			is_jump = true
+			ai_jump_timer += delta
+			if impulse.x > cur_impulse.x+0.1:
+				target_angle = PI/6.0
+			elif impulse.x < cur_impulse.x -0.1:
+				target_angle = -PI/6.0
+			else:
+				ai_jump_timer = 0.9
+		else:
+			ai_jump_cool = 0.0
+			ai_jump_timer = 0.0
+			is_jump = false
+	else:
+		ai_jump_timer = 0.0
+		if jump_cnt > 0:
+			ai_jump_cool += delta
+		else:
+			ai_jump_cool = 0.0
 			
+	if floor_cnt <= 0 and jump_cnt <= 0:
+		target_angle = 0.0
+	
 	rotation = wrapf(rotation, -PI, PI)
 	if flip_dir > 0:
-		if rotation > target_angle + PI/40.0:
+		if rotation > target_angle + PI/60.0:
 			is_left = true
 			is_right = false
 		elif rotation < target_angle:
@@ -157,52 +156,37 @@ func ai_process(delta: float):
 		if rotation > target_angle:
 			is_left = true
 			is_right = false
-		elif rotation < target_angle - PI/40.0:
+		elif rotation < target_angle - PI/60.0:
 			is_right = true
 			is_left = false
 		else:
 			is_right = false
 			is_left = false
+			
 	
-	if floor_cnt > 0:
-		first_touch = true
-		if ai_jump_timer < 0.4:
-			is_jump = false
-		elif ai_jump_timer < 0.4 + 1.0 * dist_val:
-			is_jump = true
-		elif way*rotation > PI/30.0:
-			is_jump = false
-			ai_jump_timer = 0.0
-	elif floor_cnt <= 0 and jump_cnt > 0:
-		#print(str(ai_jump_timer) + ", " + str(0.2 + 0.3 * pow(dist_val, 7)))
-		if ai_jump_timer < 0.1:
-			is_jump = false
-		elif ai_jump_timer < 0.09 + 0.35 * pow(dist_val, 2):
-			is_jump = true
-		elif way*rotation > PI/30.0:
-			is_jump = false
-	else:
-		if (floor_cnt <= 0 and jump_cnt <= 0):
-			ai_jump_timer = 0.0
-		is_jump = false
-		
-	if alive_timer < 1.0:
-		is_jump = false
-		
-	if !is_jump and jump_cnt <= 0 and knee_cnt > 0:
+	if (floor_cnt <= 0 or !foot_ray_cast_2d.is_colliding()) and knee_cnt > 0:
 		stuck_timer += delta
-		if stuck_timer > 0.1:
+		if stuck_timer > 0.1 and stuck_timer < 0.2:
 			is_jump = true
-			stuck_timer = 0.0
+		elif stuck_timer >= 0.2:
+			is_jump = false
 	else:
 		stuck_timer = 0.0
-		
-	if ai_jump_timer < 2.0:
-		ai_jump_timer += delta
-	else:
-		ai_jump_timer = 0.0
 	
 	pre_alter_alive = alter.alive
+	
+func calculate_required_velocity(target_pos: Vector2, duration: float) -> Vector2:
+	var p0 = global_position
+	var vt = target_pos
+	var g = ProjectSettings.get_setting("physics/2d/default_gravity") * gravity_scale
+	
+	# x축: (target_x - start_x) / t
+	var vx = (vt.x - p0.x) / duration
+	
+	# y축: (target_y - start_y - 0.5 * g * t^2) / t
+	var vy = (vt.y - p0.y - 0.5 * g * duration * duration) / duration
+	
+	return Vector2(vx, vy)
 	
 func _physics_process(delta: float) -> void:
 	
@@ -214,21 +198,7 @@ func _physics_process(delta: float) -> void:
 	pre_jump = is_jump
 	
 func get_flip():
-	var _flip_dir = 1
-	if alter.alive_timer + 0.5 < alive_timer:
-		if position.distance_to(alter.position) < 128.0:
-			if alter.position.x < position.x:
-				_flip_dir = -1
-			else:
-				_flip_dir = 1
-		else:
-			_flip_dir = -1
-	else:
-		if alter.position.x < position.x:
-			_flip_dir = -1
-		else:
-			_flip_dir = 1
-	return _flip_dir
+	return way
 	
 func get_direction():
 	var direction = 0
@@ -239,10 +209,8 @@ func get_direction():
 	return direction
 func _on_timer_rebirth_timeout() -> void:
 	super()
-	ai_target_position = position
 	ai_jump_timer = 0.0
 	stuck_timer = 0.0
-	first_touch = false
 	
 	
 func get_jump():
@@ -256,7 +224,6 @@ func get_jump():
 	
 func _on_area_2d_floor_body_entered(body: Node2D) -> void:
 	super(body)
-	first_touch = true
 	ai_jump_timer = 0.0
 
 var knee_cnt = 0

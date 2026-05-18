@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://c7wix0kckkhnu"]
+
+[ext_resource type="Script" uid="uid://b03m15tx0dfm" path="res://scene/stage/fragment.gd" id="1_1kgqu"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_kc2ih"]
+
+[node name="fragment" type="RigidBody2D"]
+z_index = 20
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_1kgqu")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(2, 2)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_kc2ih")

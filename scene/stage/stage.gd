@@ -20,6 +20,12 @@ extends Node2D
 @onready var alivetimer_1: TextureProgressBar = $ui/alivetimer1
 @onready var alivetimer_2: TextureProgressBar = $ui/alivetimer2
 
+@onready var hp_1_1: Sprite2D = $ui/hp1_1
+@onready var hp_1_2: Sprite2D = $ui/hp1_2
+@onready var hp_1_3: Sprite2D = $ui/hp1_3
+@onready var hp_2_1: Sprite2D = $ui/hp2_1
+@onready var hp_2_2: Sprite2D = $ui/hp2_2
+@onready var hp_2_3: Sprite2D = $ui/hp2_3
 
 @onready var way_chicken: Sprite2D = $ui/way_chicken
 
@@ -121,9 +127,92 @@ func _physics_process(delta: float) -> void:
 var target_way = 0
 var cur_w = 0
 var way_angle := 0.0
+
+const FRAGMENT_1 = preload("uid://dre811xugl3tp")
+const FRAGMENT_2 = preload("uid://d3m6rdj8ql0is")
+const FRAGMENT_3 = preload("uid://cvivh7f3wbefc")
+
+func rebirth(is_host):
+	rebirth_rpc.rpc(is_host)
+	
+@rpc("any_peer", "call_local")
+func rebirth_rpc(is_host):
+	rebirth_anim(is_host, 3)
+	
+func rebirth_anim(is_host, num):
+	if is_host:
+		if num == 3:
+			hp_1_3.rebirth()
+		elif num == 2:
+			hp_1_2.rebirth()
+		elif num == 1:
+			hp_1_1.rebirth()
+	else:
+		if num == 3:
+			hp_2_3.rebirth()
+		elif num == 2:
+			hp_2_2.rebirth()
+		elif num == 1:
+			hp_2_1.rebirth()
+	if num > 1:
+		var tween = create_tween()
+		tween.tween_property(self, "position", Vector2.ZERO, 0.3)
+		tween.finished.connect(rebirth_anim.bind(is_host, num-1))
+
+func gen_fragment(is_host, hp):
+	gen_fragment_rpc.rpc(is_host, hp)
+
+@rpc("any_peer", "call_local")
+func gen_fragment_rpc(is_host, hp):
+	var start_p = Vector2.ZERO
+	if is_host:
+		if hp == 3:
+			start_p = hp_1_3.global_position
+			hp_1_3.crack()
+		elif hp == 2:
+			start_p = hp_1_2.global_position
+			hp_1_2.crack()
+		elif hp == 1:
+			start_p = hp_1_1.global_position
+			hp_1_1.crack()
+	else:
+		if hp == 3:
+			start_p = hp_2_3.global_position
+			hp_2_3.crack()
+		elif hp == 2:
+			start_p = hp_2_2.global_position
+			hp_2_2.crack()
+		elif hp == 1:
+			start_p = hp_2_1.global_position
+			hp_2_1.crack()
+			
+	var f1 : RigidBody2D = FRAGMENT_1.instantiate()
+	var f2 : RigidBody2D= FRAGMENT_2.instantiate()
+	var f3 : RigidBody2D = FRAGMENT_3.instantiate()
+	
+	f1.position = start_p
+	f2.position = start_p
+	f3.position = start_p
+	
+	f1.force = Vector2.LEFT.rotated(main.rng.randf_range(PI/9.0,PI/6.0))*100.0
+	f2.force = Vector2.UP.rotated(main.rng.randf_range(-PI/9.0,PI/9.0))*100.0
+	f3.force = Vector2.RIGHT.rotated(main.rng.randf_range(-PI/6.0,-PI/9.0))*100.0
+	
+	f1.tq = main.rng.randf_range(-100,100)
+	f2.tq = main.rng.randf_range(-100,100)
+	f3.tq = main.rng.randf_range(-100,100)
+	
+	f1.scale = Vector2(1.2,1.2)
+	f2.scale = Vector2(1.2,1.2)
+	f3.scale = Vector2(1.2,1.2)
+	
+	main.call_deferred("add_child", f1)
+	main.call_deferred("add_child", f2)
+	main.call_deferred("add_child", f3)
+	
+	
+var egg_timer = 0.0
 func ui_update(delta):
-	
-	
 	
 	if !p1 or !p2:
 		for pk in main.players:
@@ -132,8 +221,13 @@ func ui_update(delta):
 				continue
 			if p.is_host_player:
 				p1 = main.players[pk]
+				p1.hitted.connect(gen_fragment)
+				p1.rebirth.connect(rebirth)
 			else:
-				p2 = main.players[pk]
+				p2 = main.players[pk]		
+				p2.hitted.connect(gen_fragment)	
+				p2.rebirth.connect(rebirth)
+	
 	if p1 == null or p2 == null:
 		return
 	if p1.alive_timer > p2.alive_timer + 0.5:
@@ -217,6 +311,24 @@ func ui_update(delta):
 	
 	way_chicken.scale.x = sin(way_angle)
 	way_angle = wrapf(way_angle, -PI, PI)
+	
+	#hp_1_3.frame = 0 if p1.hp >= 3 and p1.alive else 1
+	#hp_1_2.frame = 0 if p1.hp >= 2 and p1.alive else 1
+	#hp_1_1.frame = 0 if p1.alive else 1
+	#hp_2_3.frame = 0 if p2.hp >= 3 and p2.alive else 1
+	#hp_2_2.frame = 0 if p2.hp >= 2 and p2.alive else 1
+	#hp_2_1.frame = 0 if p2.alive else 1
+	
+	var x = egg_timer / 2.0 * TAU
+	egg_timer += delta
+	egg_timer = wrapf(egg_timer, 0.0, 2.0)
+	var h = 3.0
+	hp_1_3.position.y = 124.0 + sin(x)*h
+	hp_1_2.position.y = 124.0 + sin(x-0.4)*h
+	hp_1_1.position.y = 124.0 + sin(x-0.8)*h
+	hp_2_3.position.y = 124.0 + sin(x)*h
+	hp_2_2.position.y = 124.0 + sin(x-0.4)*h
+	hp_2_1.position.y = 124.0 + sin(x-0.8)*h
 
 func get_relative_value(x):
 	return clamp(100.0*(x-cam_bl.global_position.x)/(cam_tr.global_position.x - cam_bl.global_position.x), 0, 100)

@@ -4,24 +4,28 @@ enum STATE {arrive, stand, leave}
 var state = STATE.arrive
 var main
 var mat : ShaderMaterial
+var target_x = 0
+var target_y = 0
 
 func _ready() -> void:
 	main = get_node("/root/Main")
 	var cnt = 0
 	var space_state = get_world_2d().direct_space_state
+	position.y = -main.height/2.0 - 128
 	while true:
-		position.x = main.camera_2d.position.x + main.rng.randf_range(-main.width/2.0, main.width/2.0)
-		position.y = -main.height/2.0 - 32
-		speed_x = main.rng.randf_range(-30.0,30.0)
-		var query = PhysicsRayQueryParameters2D.create(position, position+Vector2(speed_x, 100)*4000)
+		target_x = main.camera_2d.position.x + main.rng.randf_range(-main.width/2.0, main.width/2.0)
+		var query = PhysicsRayQueryParameters2D.create(Vector2(target_x, -4000),Vector2(target_x, 4000))
 		query.collision_mask = 1
 		var result = space_state.intersect_ray(query)
 		if result:
+			target_y = result.position.y
 			break
 		cnt += 1
-		if cnt > 10:
+		if cnt > 1000:
 			queue_free()
 			return
+	speed_x = main.rng.randf_range(-30.0, 30.0)
+	position.x = target_x - speed_x * (position.y - target_y)/100.0
 	frame = 1
 	mat = material
 	
@@ -50,7 +54,7 @@ func _physics_process(delta: float) -> void:
 		STATE.leave:
 			position.x += speed_x*delta
 			position.y -= 100.0*delta
-			if position.y < -main.height/2.0-32:
+			if position.y < -main.height/2.0-128:
 				queue_free()
 		
 	match state:

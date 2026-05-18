@@ -5,6 +5,10 @@ var peer : SteamMultiplayerPeer
 var is_host : bool = false
 var is_joining : bool = false
 
+@onready var stage_option: OptionButton = $CanvasLayer/StageOption
+
+@onready var loading: ColorRect = $CanvasLayer/loading
+
 @onready var host_button: Button = $CanvasLayer/mainmenu/host_button
 @onready var single_button: Button = $CanvasLayer/mainmenu/single_button
 
@@ -80,7 +84,7 @@ const PLAYER = preload("uid://bh58c7wn1bdd1")
 
 var players = {}
 
-enum STATE {MAIN, LOBBY, FRIEND_LOBBIES, GAME, GAMEWIN, LOBBY_SINGLE, GAME_SINGLE, GAMEWIN_SINGLE, LOBBY_LOCAL, GAME_LOCAL, GAMEWIN_LOCAL}
+enum STATE {MAIN, LOBBY, LOADING, FRIEND_LOBBIES, GAME, GAMEWIN, LOBBY_SINGLE, GAME_SINGLE, GAMEWIN_SINGLE, LOBBY_LOCAL, GAME_LOCAL, GAMEWIN_LOCAL}
 var state : STATE = STATE.MAIN
 
 @onready var rng = RandomNumberGenerator.new()
@@ -132,6 +136,7 @@ func _ready() -> void:
 	lobby_local.visible = false
 	blasteffect.visible = false
 	crackeffect.visible = false
+	loading.modulate.a = 0
 	
 	label_players.append(label_player_1)
 	label_players.append(label_player_2)
@@ -283,6 +288,14 @@ func _process(delta: float) -> void:
 			button_back.visible = true
 		_:
 			button_back.visible = false
+			
+	match state:
+		STATE.LOBBY:
+			stage_option.visible = true
+		STATE.LOBBY_LOCAL, STATE.LOBBY_SINGLE:
+			stage_option.visible = true
+		_:
+			stage_option.visible = false
 	
 	normal_process(delta)
 		
@@ -298,7 +311,6 @@ func _process(delta: float) -> void:
 			
 @onready var select: Node2D = $CanvasLayer/lobby/select
 @onready var select_2: Node2D = $CanvasLayer/lobby/select2
-
 func _physics_process(delta: float) -> void:
 	if state != STATE.GAME and state != STATE.GAME_SINGLE and state != STATE.GAME_LOCAL:
 		cam_target.position = Vector2.ZERO
@@ -321,6 +333,10 @@ func _physics_process(delta: float) -> void:
 			pass
 		STATE.GAME, STATE.GAME_SINGLE, STATE.GAME_LOCAL:
 			
+			if loading.modulate.a > 0.5:
+				var tween = create_tween()
+				tween.tween_interval(0.5)
+				tween.tween_property(loading,"modulate",Color(1,1,1,0),0.5)
 			
 			if state == STATE.GAME:
 				if !multiplayer.is_server():
@@ -334,8 +350,9 @@ func _physics_process(delta: float) -> void:
 							p1 = players[pk]
 						else:
 							p2 = players[pk]
-					if p1.player_name == "" or p2.player_name == "" or p1.id == 0 or p2.id == 0:
-						request_player_info.rpc_id(1)
+					if p1 and p2:
+						if p1.player_name == "" or p2.player_name == "" or p1.id == 0 or p2.id == 0:
+							request_player_info.rpc_id(1)
 			
 			if state == STATE.GAME:
 				if Input.is_action_just_pressed("debug1"):
@@ -353,8 +370,7 @@ func _physics_process(delta: float) -> void:
 				$Camera2D/boundary1.collision_layer = 8
 				$Camera2D/boundary2.collision_layer = 16
 				
-			
-			camera_2d.position = camera_2d.position.lerp(cam_target.position, 5.0 * delta)
+			camera_2d.position = camera_2d.position.lerp(cam_target.position, 1.0 * delta)
 			if is_camera_action:
 				camera_2d.position = cam_target.position
 			
@@ -475,6 +491,7 @@ func _on_lobby_chat_update(l_id: int, changed_id: int, making_change_id: int, ch
 				for pk in players:
 					var p = players[pk]
 					if p:
+						print("???")
 						p.queue_free()
 						#var p_steam_id = peer.get_steam_id_for_peer_id(p.name.to_int())
 					Steam.setLobbyMemberData(lobby_id, "ready", "0")
@@ -543,29 +560,32 @@ func update_lobby_members_ui() -> void:
 			select.disable_selector()
 			select_2.enable_selector()
 	
-	if ready_count == 2 and player_ids.size() == 2:
-		start_game.rpc()
-
+	if ready_count == 2 and player_ids.size() == 2 and is_host:
+		if state == STATE.LOBBY:
+			start_game.rpc()
+			
+var is_starting: bool = false
 @rpc("authority", "call_local")
 func start_game() -> void:
-	
-	
+	if is_starting:
+		return
+	is_starting = true
+	var tween = create_tween()
+	tween.tween_property(loading, "modulate", Color(1,1,1,1), 0.5)
+	await tween.finished
+	state = STATE.GAME
 	is_single_game = false
 	is_local_game = false
 	camera_2d.position = Vector2.ZERO
-	if state != STATE.LOBBY:
-		return
 	lobby.visible = false
-	var s = stages[1].instantiate()
+	var s = stages[stage_option.selected].instantiate()
 	add_child(s)
 	stage = s
+	await get_tree().process_frame
 	if multiplayer.is_server():
 		for id in player_ids:
 			spawn_player(id)
-	state = STATE.GAME
-	
-	
-	
+	is_starting = false
 
 func _bomb_lobby() -> void:
 	print("로비 파괴 프로세스 시작...")
@@ -753,13 +773,13 @@ func spawn_player(id: int = 1):
 	#player.set_multiplayer_authority(id)
 	var host_steam_id = Steam.getLobbyOwner(lobby_id)
 	var member_steam_id = peer.get_steam_id_for_peer_id(id)
-	if id == 1 or member_steam_id == host_steam_id:
+	if id == 1:
 		player.is_host_player = true
-		player.position = stage.get_node("spawn1").global_position
+		player.first_pos = stage.get_node("spawn1").global_position
 		print("host player spawned")
 	else:
 		player.is_host_player = false
-		player.position = stage.get_node("spawn2").global_position
+		player.first_pos = stage.get_node("spawn2").global_position
 		print("client player spawned")
 	
 	
@@ -775,6 +795,7 @@ func set_player_info(multiplayer_id = 0, steam_id = 0, name = ""):
 		p.player_name = name
 	
 func _remove_player(id : int):
+	print("remove_player")
 	#player_info.erase(id)
 	if players.has(id):
 		players.erase(id) # 딕셔너리에서 제거
@@ -946,6 +967,7 @@ func _on_button_refresh_pressed() -> void:
 
 
 func _on_timer_win_timeout() -> void:
+	print("on_timer_win_timeout")
 	state = STATE.LOBBY
 	if stage:
 		stage.queue_free()
@@ -987,6 +1009,9 @@ const PLAYER_AI = preload("uid://c26cids0j3463")
 var is_single_game = false
 func single_game_start():
 	
+	var tween = create_tween()
+	tween.tween_property(loading, "modulate", Color(1,1,1,1), 0.5)
+	await tween.finished
 	p1_code = select_single.character_selector.current_profile_code
 	print(p1_code)
 	p2_code = rng.randi_range(1, character_num)
@@ -994,7 +1019,7 @@ func single_game_start():
 	is_single_game = true
 	is_local_game = false
 	camera_2d.position = Vector2.ZERO
-	var s = stages[1].instantiate()
+	var s = stages[stage_option.selected].instantiate()
 	add_child(s)
 	stage = s
 	var p
@@ -1005,15 +1030,18 @@ func single_game_start():
 	#p.player_profile = get_steam_avatar(Steam.getSteamID())
 	p.is_host_player = true
 	p.global_position = stage.get_node("spawn1").global_position
+	p.first_pos = stage.get_node("spawn1").global_position
 	add_child(p)
 	p = PLAYER_AI.instantiate()
 	p.name = "2"
 	p.player_name = "AI"
 	p.global_position = stage.get_node("spawn2").global_position
+	p.first_pos = stage.get_node("spawn2").global_position
 	add_child(p)
 	state = STATE.GAME_SINGLE
 	
 func to_title():
+	print("to_title")
 	state = STATE.MAIN
 	if stage:
 		stage.queue_free()
@@ -1075,6 +1103,7 @@ func single_win(num):
 	$TimerWinSingle.start()
 	
 func _on_timer_win_single_timeout() -> void:
+	print("on_timer_win_single_timeout")
 	if stage:
 		stage.queue_free()
 		stage = null
@@ -1114,13 +1143,16 @@ var is_local_game = false
 
 func local_game_start():
 	
+	var tween = create_tween()
+	tween.tween_property(loading, "modulate", Color(1,1,1,1), 0.5)
+	await tween.finished
 	p1_code = select_local.character_selector.current_profile_code
 	p2_code = select_local_2.character_selector.current_profile_code
 	
 	is_local_game = true
 	is_single_game = false
 	camera_2d.position = Vector2.ZERO
-	var s = stages[1].instantiate()
+	var s = stages[stage_option.selected].instantiate()
 	
 	add_child(s)
 	stage = s
@@ -1130,11 +1162,13 @@ func local_game_start():
 	p.player_name = "Player 1"
 	p.is_host_player = true
 	p.global_position = stage.get_node("spawn1").global_position
+	p.first_pos = stage.get_node("spawn1").global_position
 	add_child(p)
 	p = PLAYER_LOCAL_ALTER.instantiate()
 	p.name = "2"
 	p.player_name = "Player 2"
 	p.global_position = stage.get_node("spawn2").global_position
+	p.first_pos = stage.get_node("spawn2").global_position
 	add_child(p)
 	state = STATE.GAME_LOCAL
 	

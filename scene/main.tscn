@@ -1,9 +1,10 @@
-[gd_scene load_steps=26 format=3 uid="uid://cr7wv4h5j6efm"]
+[gd_scene load_steps=27 format=3 uid="uid://cr7wv4h5j6efm"]
 
 [ext_resource type="Script" uid="uid://d28h4b1ulmne7" path="res://scene/main.gd" id="1_itxqv"]
-[ext_resource type="PackedScene" uid="uid://djnt8fbxvb051" path="res://scene/stage/stage_test.tscn" id="2_v0l8b"]
+[ext_resource type="PackedScene" uid="uid://c5t3ponioxivh" path="res://scene/stage/stage002.tscn" id="3_jcbur"]
 [ext_resource type="PackedScene" uid="uid://dt2gtnj2wolrf" path="res://scene/stage/stage001.tscn" id="3_wp4xf"]
 [ext_resource type="PackedScene" uid="uid://c854n0n8nyq0o" path="res://scene/effect/simple_effect_jump.tscn" id="4_brvut"]
+[ext_resource type="PackedScene" uid="uid://cmhy1bylxrhh3" path="res://scene/stage/stage004.tscn" id="4_smf0o"]
 [ext_resource type="PackedScene" uid="uid://dbsx3dipfeqda" path="res://scene/effect/simple_effect_landing.tscn" id="5_0ha60"]
 [ext_resource type="PackedScene" uid="uid://d3p6cvj65jyjb" path="res://scene/effect/simple_effect_air_jump.tscn" id="6_4j5ol"]
 [ext_resource type="PackedScene" uid="uid://c2ks8rvs536o4" path="res://scene/effect/simple_effect_hit_1.tscn" id="7_b5f6u"]
@@ -128,7 +129,7 @@ b = Vector2(0, 320)
 [node name="Main" type="Node2D"]
 script = ExtResource("1_itxqv")
 character_num = 3
-stages = [ExtResource("2_v0l8b"), ExtResource("3_wp4xf")]
+stages = [ExtResource("3_wp4xf"), ExtResource("3_jcbur"), null, ExtResource("4_smf0o")]
 effect_package = {
 "airjump": ExtResource("6_4j5ol"),
 "hit1": ExtResource("7_b5f6u"),
@@ -286,7 +287,6 @@ offset_bottom = 303.0
 text = "reset pos"
 
 [node name="lobby" type="Node2D" parent="CanvasLayer"]
-visible = false
 z_index = 10
 
 [node name="Label_player1" type="Label" parent="CanvasLayer/lobby"]
@@ -417,6 +417,7 @@ text = "start"
 position = Vector2(492, 299)
 
 [node name="lobby_local" type="Node2D" parent="CanvasLayer"]
+visible = false
 z_index = 10
 
 [node name="local_start_button" type="Button" parent="CanvasLayer/lobby_local"]
@@ -559,6 +560,34 @@ offset_bottom = 448.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+
+[node name="loading" type="ColorRect" parent="CanvasLayer"]
+modulate = Color(1, 1, 1, 0)
+z_index = 50
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="StageOption" type="OptionButton" parent="CanvasLayer"]
+offset_left = 384.0
+offset_top = 512.0
+offset_right = 768.0
+offset_bottom = 544.0
+selected = 0
+allow_reselect = true
+item_count = 4
+popup/item_0/text = "STAGE 1"
+popup/item_0/id = 0
+popup/item_1/text = "STAGE 2"
+popup/item_1/id = 1
+popup/item_2/text = "STAGE 3(선택하지마셔)"
+popup/item_2/id = 2
+popup/item_3/text = "STAGE 4"
+popup/item_3/id = 3
 
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(1.6, 1.6)
