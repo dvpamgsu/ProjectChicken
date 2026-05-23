@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=3 uid="uid://cr7wv4h5j6efm"]
+[gd_scene load_steps=29 format=3 uid="uid://cr7wv4h5j6efm"]
 
 [ext_resource type="Script" uid="uid://d28h4b1ulmne7" path="res://scene/main.gd" id="1_itxqv"]
 [ext_resource type="PackedScene" uid="uid://c5t3ponioxivh" path="res://scene/stage/stage002.tscn" id="3_jcbur"]
@@ -11,6 +11,7 @@
 [ext_resource type="Shader" uid="uid://34gyp4r03b4t" path="res://shaders/effect/blast.gdshader" id="7_p1hux"]
 [ext_resource type="Shader" uid="uid://ctbfwrigx12vx" path="res://shaders/effect/crack.gdshader" id="8_of57s"]
 [ext_resource type="PackedScene" uid="uid://ogqrso2b1tut" path="res://scene/effect/simple_effect_hit_2.tscn" id="8_tqoya"]
+[ext_resource type="PackedScene" uid="uid://bco5f7adahevm" path="res://scene/effect/simple_effect_explosion.tscn" id="10_tv8i1"]
 [ext_resource type="Shader" uid="uid://dcpgu6k362oxo" path="res://shaders/effect/wave.gdshader" id="11_k65ib"]
 [ext_resource type="Shader" uid="uid://kx41wcw5uddh" path="res://shaders/effect/zaworld.gdshader" id="12_v2gmf"]
 [ext_resource type="Shader" uid="uid://dq3p85hjcqmcq" path="res://shaders/postprocess/vhs.gdshader" id="12_wscrc"]
@@ -122,9 +123,11 @@ shader_parameter/roll_strength = 0.15
 shader_parameter/glow_strength = 0.25
 shader_parameter/glow_threshold = 0.65
 
-[sub_resource type="SegmentShape2D" id="SegmentShape2D_wp4xf"]
-a = Vector2(0, -344)
-b = Vector2(0, 320)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_tv8i1"]
+size = Vector2(1022, 10000)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_0vlqb"]
+size = Vector2(1044, 10000)
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_itxqv")
@@ -132,6 +135,7 @@ character_num = 3
 stages = [ExtResource("3_wp4xf"), ExtResource("3_jcbur"), null, ExtResource("4_smf0o")]
 effect_package = {
 "airjump": ExtResource("6_4j5ol"),
+"explosion": ExtResource("10_tv8i1"),
 "hit1": ExtResource("7_b5f6u"),
 "hit2": ExtResource("8_tqoya"),
 "jump": ExtResource("4_brvut"),
@@ -597,13 +601,15 @@ position_smoothing_speed = 3.0
 position = Vector2(-360, 0)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Camera2D/boundary1"]
-shape = SubResource("SegmentShape2D_wp4xf")
+position = Vector2(-511, 0)
+shape = SubResource("RectangleShape2D_tv8i1")
 
 [node name="boundary2" type="StaticBody2D" parent="Camera2D"]
 position = Vector2(360, 0)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Camera2D/boundary2"]
-shape = SubResource("SegmentShape2D_wp4xf")
+position = Vector2(522, 0)
+shape = SubResource("RectangleShape2D_0vlqb")
 
 [node name="Cam_target" type="Node2D" parent="."]
 

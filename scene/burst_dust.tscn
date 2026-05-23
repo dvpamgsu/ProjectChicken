@@ -1,0 +1,29 @@
+[gd_scene load_steps=6 format=3 uid="uid://clisncgduh61j"]
+
+[ext_resource type="Texture2D" uid="uid://dv3bwyr0xjdyc" path="res://texture/dust.png" id="1_bru42"]
+[ext_resource type="Script" uid="uid://bt5e3o5jv4biv" path="res://scene/burst_dust.gd" id="2_1ncps"]
+
+[sub_resource type="Gradient" id="Gradient_1ncps"]
+offsets = PackedFloat32Array(0, 0.12669684, 0.20588236, 0.3438914, 0.5361991, 1)
+colors = PackedColorArray(1, 1, 1, 1, 0.95592326, 0.8115591, 0, 1, 1, 0.5924135, 0.1153628, 1, 0.6450908, 0.043407246, 4.813075e-08, 1, 0, 0, 0, 1, 0, 0, 0, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_6rbwp"]
+gradient = SubResource("Gradient_1ncps")
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1ncps"]
+radius = 8.062258
+
+[node name="burst_dust" type="RigidBody2D"]
+z_index = 15
+collision_layer = 0
+gravity_scale = 0.0
+linear_damp = 10.0
+angular_damp = 10.0
+script = ExtResource("2_1ncps")
+cs = SubResource("GradientTexture1D_6rbwp")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_bru42")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_1ncps")

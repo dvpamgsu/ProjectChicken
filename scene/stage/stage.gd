@@ -210,6 +210,9 @@ func gen_fragment_rpc(is_host, hp):
 	main.call_deferred("add_child", f2)
 	main.call_deferred("add_child", f3)
 	
+func instance_death_gen_fragment(is_host, hp):
+	for i in range(hp, 0, -1):
+		gen_fragment(is_host, i)
 	
 var egg_timer = 0.0
 func ui_update(delta):
@@ -222,10 +225,12 @@ func ui_update(delta):
 			if p.is_host_player:
 				p1 = main.players[pk]
 				p1.hitted.connect(gen_fragment)
+				p1.instance_death.connect(instance_death_gen_fragment)
 				p1.rebirth.connect(rebirth)
 			else:
 				p2 = main.players[pk]		
 				p2.hitted.connect(gen_fragment)	
+				p2.instance_death.connect(instance_death_gen_fragment)
 				p2.rebirth.connect(rebirth)
 	
 	if p1 == null or p2 == null:

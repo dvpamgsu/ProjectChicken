@@ -1,6 +1,10 @@
 extends "res://scene/player/player.gd"
 
 @onready var polygon_2d: Polygon2D = $Polygon2D
+@onready var polygon_2d_2: Polygon2D = $Polygon2D2
+@onready var polygon_2d_3: Polygon2D = $Polygon2D3
+
+
 
 var way = -1
 
@@ -33,6 +37,7 @@ var pre_alter_alive = true
 var pre_check_type = 0
 
 var fool_timer = 0.0
+var emergency_jump = false
 func ai_process(delta: float):
 	
 	if !alive:
@@ -64,11 +69,11 @@ func ai_process(delta: float):
 	
 	var space_state = get_world_2d().direct_space_state
 	
-	var x1 = position.x
+	var x1 = position.x + way * 16.0
 	var y1 = position.y
 	var x2 = x1
 	var x_fall = position.x
-	for i in range(1000):
+	for i in range(128):
 		var query = PhysicsRayQueryParameters2D.create(Vector2(x1,-1000), Vector2(x1,-1000) + Vector2(0, 10000))
 		query.collision_mask = 1
 		var result = space_state.intersect_ray(query)
@@ -80,7 +85,7 @@ func ai_process(delta: float):
 	var y2 = y1
 	var r_flag = false
 	var flag = false
-	for i in range(1000):
+	for i in range(400):
 		var query =PhysicsRayQueryParameters2D.create(Vector2(x2,-1000), Vector2(x2,-1000) + Vector2(0, 10000))
 		query.collision_mask = 1
 		var result = space_state.intersect_ray(query)
@@ -91,39 +96,63 @@ func ai_process(delta: float):
 				break
 		elif r_flag:
 			flag = true
-			x_fall = x2
 			break
 		x2 += way * 2.0
-	var target_position = Vector2(x2 - way * 48.0, y2)
+	var target_position = Vector2(x2 - way * 24.0, y2)
 	if !flag:
-		target_position += Vector2(way*96.0, 0.0)
+		target_position += Vector2(way*48.0, 0.0)
 	if alter_flag:
 		target_position = alter.col_3.global_position
-	polygon_2d.global_position = target_position
 	
-	var v0 = calculate_required_velocity(target_position, 0.8)
-	var impulse = (v0 - linear_velocity)*mass
-	if sign(x2-position.x) == sign(way):
-		impulse *= 0.8
+	x_fall = position.x
+	for i in range(400):
+		var query =PhysicsRayQueryParameters2D.create(Vector2(x_fall,-1000), Vector2(x_fall,-1000) + Vector2(0, 10000))
+		query.collision_mask = 1
+		var result = space_state.intersect_ray(query)
+		if !result:
+			break
+		x_fall += way * 2.0
+		
+	polygon_2d.global_position = target_position
+	polygon_2d_3.global_position = Vector2(x_fall, y2)
+	
+	for m in main.mines:
+		if !m:
+			continue
+		if target_position.distance_to(m.global_position) < 8.0:
+			target_position += way*Vector2(8.0, 0.0)
 	
 	var jump_dir = Vector2(cos(rotation-PI/2.0), sin(rotation-PI/2.0))
 	var cur_impulse = jump_power*jump_dir*(ai_jump_timer+0.5)
-	if floor_cnt > 0 and (ai_jump_cool > 0.2 or (flag and abs(x_fall - position.x)<32.0)):
-		print(str(flag)+", "+str(x_fall)+", "+str(position.x))
-		if ai_jump_timer < 1.0 and (!flag or abs(x_fall - position.x)>0.5):
+	var predicted_land_pos = predict_landing_position(cur_impulse, target_position.y)
+	polygon_2d_2.global_position = predicted_land_pos
+	if floor_cnt > 0 and ai_jump_cool > 0.1:
+		if ai_jump_timer < 1.0 and abs(x_fall - position.x) > 2.0:
 			ai_jump_timer += delta
 			is_jump = true
 		else:
+			if abs(x_fall - position.x) <= 2.0:
+				emergency_jump = true
 			ai_jump_cool = 0.0
 			ai_jump_timer = 0.0
 			is_jump = false
 	elif jump_cnt > 0 and floor_cnt <= 0 and ai_jump_cool > 0.1:
-		if cur_impulse.distance_to(impulse) > 0.5 and ai_jump_timer < 0.8:
+		var off_flag = false
+		if predicted_land_pos.distance_to(target_position) > 0.5 or ai_jump_timer < 0.2:
+			off_flag = true
+		if sign(target_position.x-predicted_land_pos.x)*sign(way) > 0:
+			off_flag = true
+		if ai_jump_timer > 0.8:
+			off_flag = false
+		if emergency_jump and ai_jump_timer > 0.2:
+			emergency_jump = false
+			off_flag = false
+		if off_flag:
 			is_jump = true
 			ai_jump_timer += delta
-			if impulse.x > cur_impulse.x+0.1:
+			if target_position.x > predicted_land_pos.x:
 				target_angle = PI/6.0
-			elif impulse.x < cur_impulse.x -0.1:
+			elif target_position.x < predicted_land_pos.x:
 				target_angle = -PI/6.0
 			else:
 				ai_jump_timer = 0.9
@@ -138,25 +167,25 @@ func ai_process(delta: float):
 		else:
 			ai_jump_cool = 0.0
 			
-	if floor_cnt <= 0 and jump_cnt <= 0:
-		target_angle = 0.0
+	#if floor_cnt <= 0 and jump_cnt <= 0:
+		#target_angle = 0.0
 	
 	rotation = wrapf(rotation, -PI, PI)
 	if flip_dir > 0:
-		if rotation > target_angle + PI/60.0:
+		if rotation > target_angle + PI/90.0:
 			is_left = true
 			is_right = false
-		elif rotation < target_angle:
+		elif rotation < target_angle - PI/90.0:
 			is_right = true
 			is_left = false
 		else:
 			is_right = false
 			is_left = false
 	else:
-		if rotation > target_angle:
+		if rotation > target_angle + PI/90.0:
 			is_left = true
 			is_right = false
-		elif rotation < target_angle - PI/60.0:
+		elif rotation < target_angle - PI/90.0:
 			is_right = true
 			is_left = false
 		else:
@@ -174,6 +203,42 @@ func ai_process(delta: float):
 		stuck_timer = 0.0
 	
 	pre_alter_alive = alter.alive
+	
+func predict_landing_position(impulse: Vector2, ground_y: float) -> Vector2:
+	# 1. 힘(Impulse)이 가해진 직후의 초기 속도 계산
+	# 공식: 속도 변화량 = 충격량 / 질량
+	var initial_velocity = linear_velocity + (impulse / mass)
+	
+	# 2. 현재 위치와 중력 가속도 가져오기
+	var start_pos = footpos.global_position
+	# 프로젝트 설정의 기본 중력 값과 오브젝트의 중력 스케일을 곱함
+	var gravity = ProjectSettings.get_setting("physics/2d/default_gravity") * gravity_scale
+	
+	# 3. Y축 기준, 착지 바닥까지 도달하는 데 걸리는 시간(t) 구하기
+	# 근의 공식 (at^2 + bt + c = 0) 활용
+	# 0.5 * gravity * t^2 + initial_velocity.y * t + (start_pos.y - ground_y) = 0
+	
+	var a = 0.5 * gravity
+	var b = initial_velocity.y
+	var c = start_pos.y - ground_y
+	
+	# 판별식 계산 (b^2 - 4ac)
+	var discriminant = (b * b) - (4 * a * c)
+	
+	if discriminant < 0:
+		# 판별식이 0보다 작으면 물리적으로 바닥에 도달할 수 없음 (예: 이미 바닥보다 아래에 있거나 위로만 날아감)
+		return Vector2.ZERO 
+		
+	# 근의 공식 적용 (시간 t는 항상 양수여야 하므로 더 큰 값을 선택)
+	var t1 = (-b + sqrt(discriminant)) / (2 * a)
+	var t2 = (-b - sqrt(discriminant)) / (2 * a)
+	var t = max(t1, t2)
+	
+	# 4. 구한 시간(t)을 X축 공식에 대입하여 최종 착지 위치 계산
+	# 등속도 운동 가정 (공기 저항이 없다면 X축 가속도는 0)
+	var landing_x = start_pos.x + (initial_velocity.x * t)
+	
+	return Vector2(landing_x, ground_y)
 	
 func calculate_required_velocity(target_pos: Vector2, duration: float) -> Vector2:
 	var p0 = global_position

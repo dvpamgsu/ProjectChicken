@@ -17,16 +17,19 @@ var first_pos = Vector2.ZERO
 @onready var main:Node2D
 
 @export var torque_power := 650.0
-@export var jump_power := 300.0
+var jump_power := 280.0
 @export var jump_torque_power := 8000.0
 
 @onready var jumpcharge: TextureProgressBar = $jumpcharge
 
-
+var is_wind = false
+var wind : Node2D
 
 var mat : ShaderMaterial
 var jump_timer = 0.0
 const jump_time_max = 1.0
+
+var mine_force := Vector2.ZERO
 
 @export var hit_timer = 0.0
 
@@ -130,27 +133,27 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 		if target is RigidBody2D and target.is_in_group("player"):
 			
 			# [A] 벡터 수학: 충돌 법선과 상대 속도 추출
-			var collision_normal = state.get_contact_local_normal(i)
-			# target.lv는 동기화된 속도 변수, state.linear_velocity는 나의 현재 속도
-			var relative_vel = target.lv - state.linear_velocity
-			
-			# [B] 내적(Dot Product): 서로 마주 보고 달려오는 속도 성분만 계산
-			var approach_speed = relative_vel.dot(collision_normal)
-			
-			# [C] 판단: 서로 충분히 강하게 들이받는 상황인가?
-			if approach_speed > 20.0: # 미세한 비비기 방지
-				var contact_global_pos = state.get_contact_local_position(i)
-				
-				# 회전력(Torque) 제어: 중심에서 멀수록 회전하지만, 과도하지 않게 0.4~0.5 곱함
-				var impulse_offset = (contact_global_pos - global_position) * 0.4
-				
-				# [D] 충격량 계산: 상대방의 속도를 '나를 밀어내는 방향'으로 변환
-				# 에너지가 폭발하지 않도록 approach_speed를 베이스로 계산
-				var impact_strength = clamp(approach_speed * additional_force, 0, max_impulse)
-				var impulse = collision_normal * impact_strength
-				
-				# [E] 최종 힘 적용
-				state.apply_impulse(impulse, impulse_offset)
+			#var collision_normal = state.get_contact_local_normal(i)
+			## target.lv는 동기화된 속도 변수, state.linear_velocity는 나의 현재 속도
+			#var relative_vel = target.lv - state.linear_velocity
+			#
+			## [B] 내적(Dot Product): 서로 마주 보고 달려오는 속도 성분만 계산
+			#var approach_speed = relative_vel.dot(collision_normal)
+			#
+			## [C] 판단: 서로 충분히 강하게 들이받는 상황인가?
+			#if approach_speed > 20.0: # 미세한 비비기 방지
+				#var contact_global_pos = state.get_contact_local_position(i)
+				#
+				## 회전력(Torque) 제어: 중심에서 멀수록 회전하지만, 과도하지 않게 0.4~0.5 곱함
+				#var impulse_offset = (contact_global_pos - global_position) * 0.4
+				#
+				## [D] 충격량 계산: 상대방의 속도를 '나를 밀어내는 방향'으로 변환
+				## 에너지가 폭발하지 않도록 approach_speed를 베이스로 계산
+				#var impact_strength = clamp(approach_speed * additional_force, 0, max_impulse)
+				#var impulse = collision_normal * impact_strength
+				#
+				## [E] 최종 힘 적용
+				#state.apply_impulse(impulse, impulse_offset)
 				
 				
 				hit_applied = true
@@ -172,20 +175,20 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 	var max_y = cam_y + main.height / 2
 
 	#t.origin.x = clamp(t.origin.x, min_x, max_x)
-	t.origin.y = max(t.origin.y, min_y)
-	if is_host_player:
-		t.origin.x = max(min_x, t.origin.x)
-		if t.origin.x > max_x:
-			dead()
-	else:
-		t.origin.x = min(max_x, t.origin.x)
-		if t.origin.x < min_x:
-			dead()
+	if alive:
+		t.origin.y = max(t.origin.y, min_y)
+		if is_host_player:
+			t.origin.x = max(min_x, t.origin.x)
+			if t.origin.x > max_x:
+				dead()
+		else:
+			t.origin.x = min(max_x, t.origin.x)
+			if t.origin.x < min_x:
+				dead()
 
 	#state.transform = t
 			
-	#print(state.linear_velocity)
-	state.linear_velocity = state.linear_velocity.limit_length(300.0)
+	#linear_velocity = linear_velocity.limit_length(1000.0)	
 	
 	if position.x < main.cam_bl_pos.x:
 		position.x = main.cam_bl_pos.x
@@ -209,7 +212,7 @@ func gen_jump_effect():
 		_flip_h = true
 	if flip_dir == -1 and rotation < PI/6.0:
 		_flip_h = true
-	main.rpc_id(1, "gen_effect", e_code, pos, rot, _flip_h, 5)
+	main.rpc_id(1, "gen_effect", e_code, pos, rot, _flip_h, 15)
 	
 @onready var jump_particle: CPUParticles2D = $JumpParticle
 func gen_air_jump_effect():
@@ -218,7 +221,7 @@ func gen_air_jump_effect():
 	var rot = rotation
 	var e_code = "airjump"
 	var _flip_h = rotation <= 0.0
-	main.rpc_id(1, "gen_effect", e_code, pos, rot, _flip_h, 5)
+	main.rpc_id(1, "gen_effect", e_code, pos, rot, _flip_h, 15)
 	
 	if is_multiplayer_authority():
 		gen_jump_particle.rpc()
@@ -271,7 +274,7 @@ func check_landing(state):
 			var rot = 0
 			var e_code = "landing"
 			var _flip_h = rotation > 0.0
-			main.rpc_id(1, "gen_effect", e_code, pos, rot, _flip_h, 5)
+			main.rpc_id(1, "gen_effect", e_code, pos, rot, _flip_h, 15)
 		air_timer = 0.0
 	else:
 		if air_timer < 2.0:
@@ -498,7 +501,17 @@ func _physics_process(delta: float) -> void:
 	else:
 		hit_timer = 0.0
 		
+	if mine_force.length() > 1.0:
+		if linear_velocity.y > 0.0:
+			linear_velocity.y = 0.0
+		apply_central_force(mine_force)
+		mine_force += (Vector2.ZERO-mine_force)*40.0*delta
+	else:
+		mine_force = Vector2.ZERO
 	
+	#if !is_host_player:
+		#print(linear_velocity)
+		
 	if particle_timer > 0.0:
 		particle_timer -= delta
 	else:
@@ -551,6 +564,18 @@ func _physics_process(delta: float) -> void:
 	apply_force(force_dir*direction*torque_power, offset)
 	apply_force(-force_dir*direction*torque_power, -offset)
 	
+	if is_wind:
+		var wind_f = abs(footpos.global_position.y - wind.position.y)
+		var wind_h = abs(col_3.global_position.y - wind.position.y)
+		wind_f = wind.force/clamp(wind_f, 1.0, wind_f)
+		if wind_f < 100.0:
+			wind_f = 0.0
+		wind_h = wind.force/clamp(wind_h, 1.0, wind_h)
+		if wind_h < 100.0:
+			wind_h = 0.0
+		apply_force(wind_f*Vector2.UP, footpos.position)
+		apply_force(wind_h*Vector2.UP, col_3.position)
+	
 	if floor_cnt > 0 or forced:
 		# air
 		#center_of_mass = Vector2(0, 24)
@@ -573,7 +598,7 @@ func _physics_process(delta: float) -> void:
 			gen_air_jump_effect()
 			#PhysicsServer2D.body_set_state(get_rid(), PhysicsServer2D.BODY_STATE_LINEAR_VELOCITY, Vector2.ZERO)
 			apply_impulse(jump_power*jump_dir*(jump_timer+0.5))
-		if floor_cnt > 0:
+		else:
 			gen_jump_effect()
 			apply_impulse(jump_power*jump_dir*(jump_timer+0.5))
 			var r = sign(rotation)*min(abs(rotation),PI/8.0)
@@ -715,6 +740,8 @@ func set_initial_pos():
 func dead():
 	if !alive:
 		return
+	if hp > 0:
+		instance_death.emit(is_host_player, hp)
 	if is_multiplayer_authority():
 		collision_layer = 4
 		collision_mask = 1
@@ -822,6 +849,7 @@ var shock = false
 @onready var timer_hit_ghost_emit: Timer = $TimerHitGhostEmit
 
 signal hitted(is_host, hp)
+signal instance_death(is_host, hp)
 signal rebirth(is_host)
 var pre_hit_by_player = false
 func hit(by_player = false, way = Vector2.ZERO):
@@ -840,10 +868,14 @@ func hit(by_player = false, way = Vector2.ZERO):
 		#main.gen_crack.rpc(col_3.global_position + way * 4.0, way)
 	hit_timer = 0.5
 	var ptype = 1 if is_host_player else 2
+	if by_player:
+		apply_central_impulse((way * 850.0))
 	if hp <= 0:
 		hp = 3
 		#main.gen_crack.rpc(col_3.global_position)
 		if by_player:
+			main.gen_blast.rpc(col_3.global_position, way)
+			particle_timer = 0.5
 			main.request_hit_stop.rpc(true, ptype)
 		dead()
 	else:
@@ -852,8 +884,6 @@ func hit(by_player = false, way = Vector2.ZERO):
 	timer_hit_ghost_emit.start()
 	if by_player:
 		main.gen_blast.rpc(col_3.global_position, way)
-		#hit_particle.restart()
-		#hit_particle.emitting = true
 		particle_timer = 0.5
 	pre_hit_by_player = by_player
 
@@ -904,7 +934,7 @@ func _on_area_2d_head_area_entered(area: Area2D) -> void:
 		if alive_timer >= 0.1 and area.player.alive_timer >= 0.1:
 			var way = (global_position-area.global_position).normalized()
 			hit(true, way)
-			apply_impulse(way*500.0)
+			#apply_impulse(way*500.0)
 			
 			gen_hit1_effect()
 			

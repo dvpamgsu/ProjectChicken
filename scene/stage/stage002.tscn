@@ -1,8 +1,9 @@
-[gd_scene load_steps=21 format=3 uid="uid://c5t3ponioxivh"]
+[gd_scene load_steps=23 format=3 uid="uid://c5t3ponioxivh"]
 
 [ext_resource type="PackedScene" uid="uid://dqdqa03uv7qbe" path="res://scene/stage/stage.tscn" id="1_ebpnt"]
 [ext_resource type="Texture2D" uid="uid://bv8mtryx3xklq" path="res://texture/stage/stage002/stage2_.png" id="2_hrt8s"]
 [ext_resource type="PhysicsMaterial" uid="uid://dp2krnycrluou" path="res://scene/pm/pm_ground.tres" id="3_6rr2s"]
+[ext_resource type="PackedScene" uid="uid://de42eng3vhfex" path="res://scene/stage/windzone.tscn" id="4_652c6"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hrt8s"]
 size = Vector2(31, 160)
@@ -42,6 +43,9 @@ size = Vector2(52, 160)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_vd7av"]
 size = Vector2(323, 160)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ow703"]
+size = Vector2(190, 192)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_3k2mv"]
 size = Vector2(190, 208)
@@ -156,7 +160,7 @@ shape = SubResource("RectangleShape2D_vd7av")
 
 [node name="CollisionShape2D4" type="CollisionShape2D" parent="collision/StaticBody2D3" index="1"]
 position = Vector2(-1457, 80)
-shape = SubResource("RectangleShape2D_3k2mv")
+shape = SubResource("RectangleShape2D_ow703")
 
 [node name="CollisionShape2D5" type="CollisionShape2D" parent="collision/StaticBody2D3" index="2"]
 position = Vector2(-2105, 72)
@@ -272,3 +276,18 @@ position = Vector2(3548, -100)
 
 [node name="Area2DP2" parent="." index="15"]
 position = Vector2(-3552, -100)
+
+[node name="windzone" parent="." index="19" instance=ExtResource("4_652c6")]
+position = Vector2(-2268, 176)
+
+[node name="CollisionShape2D" parent="windzone" index="0"]
+position = Vector2(0, -378)
+
+[node name="windzone2" parent="." index="20" instance=ExtResource("4_652c6")]
+position = Vector2(1620, 176)
+
+[node name="CollisionShape2D" parent="windzone2" index="0"]
+position = Vector2(0, -378)
+
+[editable path="windzone"]
+[editable path="windzone2"]

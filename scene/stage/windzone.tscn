@@ -1,0 +1,24 @@
+[gd_scene load_steps=3 format=3 uid="uid://de42eng3vhfex"]
+
+[ext_resource type="Script" uid="uid://bcetwtuqlp1" path="res://scene/stage/windzone.gd" id="1_nip2m"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5kgtu"]
+size = Vector2(136, 756)
+
+[node name="windzone" type="Area2D"]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("1_nip2m")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_5kgtu")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+offset_left = -68.0
+offset_top = -40.0
+offset_right = 68.0
+offset_bottom = 40.0
+color = Color(0, 0.8588014, 0.75424737, 1)
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="body_exited" from="." to="." method="_on_body_exited"]

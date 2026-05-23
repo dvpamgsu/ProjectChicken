@@ -1,13 +1,50 @@
-[gd_scene load_steps=5 format=3 uid="uid://j2o86gql4dbi"]
+[gd_scene load_steps=8 format=3 uid="uid://j2o86gql4dbi"]
 
 [ext_resource type="Script" uid="uid://dw6jjncdl8k3x" path="res://mine.gd" id="1_ilfau"]
-[ext_resource type="Texture2D" uid="uid://dmkic6q7vyx8n" path="res://icon.svg" id="2_kb263"]
+[ext_resource type="Texture2D" uid="uid://bqdyrvgd24hgs" path="res://texture/stage/mine-Sheet.png" id="2_ilfau"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2d4fa"]
-size = Vector2(8, 8)
+size = Vector2(16, 8)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_ilfau"]
 radius = 32.0
+
+[sub_resource type="Animation" id="Animation_kb263"]
+resource_name = "idle"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.033333335, 0.53333336),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [0, 1]
+}
+
+[sub_resource type="Animation" id="Animation_2d4fa"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_ly0g2"]
+_data = {
+&"RESET": SubResource("Animation_2d4fa"),
+&"idle": SubResource("Animation_kb263")
+}
 
 [node name="mine" type="Area2D"]
 collision_layer = 64
@@ -15,9 +52,9 @@ collision_mask = 2
 script = ExtResource("1_ilfau")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-position = Vector2(-1.1920929e-07, -1.1920929e-07)
-scale = Vector2(0.062499996, 0.062499996)
-texture = ExtResource("2_kb263")
+position = Vector2(-1.1920929e-07, -4)
+texture = ExtResource("2_ilfau")
+hframes = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_2d4fa")
@@ -28,6 +65,11 @@ collision_mask = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 shape = SubResource("CircleShape2D_ilfau")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_ly0g2")
+}
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]
 [connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]

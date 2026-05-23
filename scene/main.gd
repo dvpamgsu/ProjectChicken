@@ -87,6 +87,8 @@ var players = {}
 enum STATE {MAIN, LOBBY, LOADING, FRIEND_LOBBIES, GAME, GAMEWIN, LOBBY_SINGLE, GAME_SINGLE, GAMEWIN_SINGLE, LOBBY_LOCAL, GAME_LOCAL, GAMEWIN_LOCAL}
 var state : STATE = STATE.MAIN
 
+var mines = []
+
 @onready var rng = RandomNumberGenerator.new()
 
 func toggle_fullscreen():
@@ -491,7 +493,6 @@ func _on_lobby_chat_update(l_id: int, changed_id: int, making_change_id: int, ch
 				for pk in players:
 					var p = players[pk]
 					if p:
-						print("???")
 						p.queue_free()
 						#var p_steam_id = peer.get_steam_id_for_peer_id(p.name.to_int())
 					Steam.setLobbyMemberData(lobby_id, "ready", "0")
