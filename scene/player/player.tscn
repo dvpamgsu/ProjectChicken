@@ -188,7 +188,7 @@ colors = PackedColorArray(1, 1, 1, 1, 0.68, 0.68, 0.68, 0)
 [node name="Player" type="RigidBody2D" groups=["player"]]
 z_index = 15
 collision_layer = 2
-collision_mask = 3
+collision_mask = 403
 physics_material_override = SubResource("PhysicsMaterial_cm2cf")
 gravity_scale = 0.5
 center_of_mass_mode = 1
@@ -239,6 +239,11 @@ script = ExtResource("5_ajqqa")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="col2/Area2DFLeg"]
 shape = SubResource("CapsuleShape2D_5lop3")
+
+[node name="RayCast2D" type="RayCast2D" parent="."]
+z_index = 30
+position = Vector2(0, -20)
+target_position = Vector2(0, 11)
 
 [node name="col3" type="CollisionShape2D" parent="."]
 z_index = 5

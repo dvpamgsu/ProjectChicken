@@ -14,7 +14,7 @@ var first_pos = Vector2.ZERO
 @onready var col_3: CollisionShape2D = $col3
 @onready var footpos: Node2D = $footpos
 
-@onready var main:Node2D
+var main:Node2D
 
 @export var torque_power := 650.0
 var jump_power := 280.0
@@ -70,18 +70,24 @@ func basic_ready():
 	name_code += ".png"
 	sprite_2d.texture = load("res://texture/player/skin"+name_code)
 	
+	
+	if is_host_player:
+		position = Vector2(-213.0, 33.0)
+	else:
+		position = Vector2(213.0, 33.0)
+	
 func _ready() -> void:
 	
 	basic_ready()
 	
 	if is_multiplayer_authority():
-		position = first_pos
+		#position = first_pos
 		if main.is_host:
-			position = main.stage.spawn_1.position
+			#position = main.stage.spawn_1.position
 			initial_pos = position
 			flip_dir = 1
 		else:
-			position = main.stage.spawn_2.position
+			#position = main.stage.spawn_2.position
 			initial_pos = position
 			flip_dir = -1
 	#print(is_multiplayer_authority())
@@ -481,9 +487,32 @@ func _physics_process(delta: float) -> void:
 	if !is_multiplayer_authority():
 		return
 		
+	$RayCast2D.global_position = col_3.global_position
+	$RayCast2D.target_position = Vector2(0.0, 11.0).rotated(-rotation)
+	if alive and $RayCast2D.is_colliding():
+		if hit_timer <= 0.0 and alive:
+				shock_timer = 0.0
+				shock = true
+		hit()
+		
+	if alter:
+		if alive_timer > alter.alive_timer+0.5:
+			if is_host_player:
+				collision_mask = 1+2+16+128
+			else:
+				collision_mask = 1+2+16+256
+		elif alive_timer+0.5 < alter.alive_timer:
+			if is_host_player:
+				collision_mask = 1+2+16+128
+			else:
+				collision_mask = 1+2+16+256
+		else:
+			collision_mask = 1+2+16+128+256
+		
 	sprite_2d.flip_h = sync_flip_h
 	
 	if first:
+		hp = 3
 		alive_timer += delta
 		alive = true
 		if alive_timer < 0.1:
@@ -813,36 +842,30 @@ func _on_body_exited(body: Node) -> void:
 	
 
 
-var head_touch = []
 func _on_area_2d_head_body_entered(body: Node2D) -> void:
-
-	#print("X")	
-	#if body.is_in_group("leg"):
-		#hit()
-		#return
 	
-	head_touch.append(body)
-	# 1. 물리 서버 상태 가져오기
-	var space_state = get_world_2d().direct_space_state
-	
-	# 2. 아주 짧은 레이 발사 (머리 위치에서 아래로 10픽셀만)
-	# 충돌한 지점의 '각도'를 알기 위함입니다.
-	var query = PhysicsRayQueryParameters2D.create(col_3.global_position, col_3.global_position + Vector2(0, 10))
-	query.collision_mask = 1 # 바닥 레이어
-	query.exclude = [get_rid()] # 자기 자신 제외
-	
-	var result = space_state.intersect_ray(query)
-	
-	if result and alive and (!body.is_in_group("player") or body.alive):
-		# 3. 충돌한 면의 방향(Normal) 확인
-		# result.normal이 (0, -1)에 가깝다면 그것은 '바닥'의 윗면입니다.
-		if result.normal.dot(Vector2.UP) > 0.7: 
-			# dot product가 0.7 이상이면 대략 45도 미만의 평평한 바닥임을 의미
-			if hit_timer <= 0.0 and alive and hp > 1:
-				shock_timer = 0.0
-				shock = true
-			gen_hit1_effect()
-			hit()
+	pass
+	## 1. 물리 서버 상태 가져오기
+	#var space_state = get_world_2d().direct_space_state
+	#
+	## 2. 아주 짧은 레이 발사 (머리 위치에서 아래로 10픽셀만)
+	## 충돌한 지점의 '각도'를 알기 위함입니다.
+	#var query = PhysicsRayQueryParameters2D.create(col_3.global_position, col_3.global_position + Vector2(0, 16))
+	#query.collision_mask = 1 # 바닥 레이어
+	#query.exclude = [get_rid()] # 자기 자신 제외
+	#
+	#var result = space_state.intersect_ray(query)
+	#
+	#if result and alive and (!body.is_in_group("player") or body.alive):
+		## 3. 충돌한 면의 방향(Normal) 확인
+		## result.normal이 (0, -1)에 가깝다면 그것은 '바닥'의 윗면입니다.
+		#if result.normal.dot(Vector2.UP) > 0.7: 
+			## dot product가 0.7 이상이면 대략 45도 미만의 평평한 바닥임을 의미
+			#if hit_timer <= 0.0 and alive and hp > 1:
+				#shock_timer = 0.0
+				#shock = true
+			#gen_hit1_effect()
+			#hit()
 			
 var shock = false
 @onready var hit_particle: CPUParticles2D = $HitParticle
@@ -871,13 +894,13 @@ func hit(by_player = false, way = Vector2.ZERO):
 	if by_player:
 		apply_central_impulse((way * 850.0))
 	if hp <= 0:
-		hp = 3
 		#main.gen_crack.rpc(col_3.global_position)
 		if by_player:
 			main.gen_blast.rpc(col_3.global_position, way)
 			particle_timer = 0.5
 			main.request_hit_stop.rpc(true, ptype)
 		dead()
+		hp = 3
 	else:
 		if by_player or (!timer_hit_ghost_emit.is_stopped() and pre_hit_by_player):
 			main.request_hit_stop.rpc(false)
@@ -899,7 +922,10 @@ func _on_timer_rebirth_timeout() -> void:
 	if is_multiplayer_authority():
 		initialize()
 		collision_layer = 2
-		collision_mask = 3
+		if is_host_player:
+			collision_mask = 1+2+16+128
+		else:
+			collision_mask = 1+2+16+256
 		change_col_layers(true)
 		shock = false
 		alive = true
@@ -910,7 +936,7 @@ func _on_timer_rebirth_timeout() -> void:
 
 
 func _on_area_2d_head_body_exited(body: Node2D) -> void:
-	head_touch.erase(body)
+	pass
 
 
 func _on_timer_dissolve_die_timeout() -> void:

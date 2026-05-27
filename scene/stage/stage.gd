@@ -35,6 +35,9 @@ const TETO = preload("uid://dwnbqw3txwioa")
 var p1
 var p2
 
+var egg_cool1 = [0.0, 0.0, 0.0]
+var egg_cool2 = [0.0, 0.0, 0.0]
+
 		
 func _on_area_2dp_1_body_entered(body: Node2D) -> void:
 	#print("area1, " + str(body))
@@ -100,6 +103,12 @@ func _stage_process(delta):
 var cloud_timer = 0.0
 var cloud_time = 60.0
 func _physics_process(delta: float) -> void:
+	for i in range(3):
+		if egg_cool1[i] > 0:
+			egg_cool1[i] -= delta
+		if egg_cool2[i] > 0:
+			egg_cool2[i] -= delta
+	
 	$background.position = main.camera_2d.global_position + background_offset
 
 	cloud_timer += delta
@@ -166,23 +175,29 @@ func gen_fragment(is_host, hp):
 func gen_fragment_rpc(is_host, hp):
 	var start_p = Vector2.ZERO
 	if is_host:
-		if hp == 3:
+		if hp == 3 and egg_cool1[2] <= 0:
+			egg_cool1[2] = 0.4
 			start_p = hp_1_3.global_position
 			hp_1_3.crack()
-		elif hp == 2:
+		elif hp == 2 and egg_cool1[1] <= 0:
+			egg_cool1[1] = 0.4
 			start_p = hp_1_2.global_position
 			hp_1_2.crack()
-		elif hp == 1:
+		elif hp == 1 and egg_cool1[0] <= 0:
+			egg_cool1[0] = 0.4
 			start_p = hp_1_1.global_position
 			hp_1_1.crack()
 	else:
-		if hp == 3:
+		if hp == 3 and egg_cool2[2] <= 0:
+			egg_cool2[2] = 0.4
 			start_p = hp_2_3.global_position
 			hp_2_3.crack()
-		elif hp == 2:
+		elif hp == 2 and egg_cool2[1] <= 0:
+			egg_cool2[1] = 0.4
 			start_p = hp_2_2.global_position
 			hp_2_2.crack()
-		elif hp == 1:
+		elif hp == 1 and egg_cool2[0] <= 0:
+			egg_cool2[0] = 0.4
 			start_p = hp_2_1.global_position
 			hp_2_1.crack()
 			
@@ -212,7 +227,7 @@ func gen_fragment_rpc(is_host, hp):
 	
 func instance_death_gen_fragment(is_host, hp):
 	for i in range(hp, 0, -1):
-		gen_fragment(is_host, i)
+		gen_fragment_rpc.rpc(is_host, i)
 	
 var egg_timer = 0.0
 func ui_update(delta):
@@ -222,13 +237,13 @@ func ui_update(delta):
 			var p = main.players[pk]
 			if !p:
 				continue
-			if p.is_host_player:
-				p1 = main.players[pk]
+			if !p1 and p.is_host_player:
+				p1 = p
 				p1.hitted.connect(gen_fragment)
 				p1.instance_death.connect(instance_death_gen_fragment)
 				p1.rebirth.connect(rebirth)
-			else:
-				p2 = main.players[pk]		
+			elif !p2:
+				p2 = p	
 				p2.hitted.connect(gen_fragment)	
 				p2.instance_death.connect(instance_death_gen_fragment)
 				p2.rebirth.connect(rebirth)

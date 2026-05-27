@@ -37,7 +37,7 @@ radius = 8.0
 height = 40.0
 
 [node name="Player_AI" instance=ExtResource("1_xfw8x")]
-collision_mask = 19
+collision_mask = 147
 script = ExtResource("2_lqv4w")
 
 [node name="Sprite2D" parent="." index="2"]

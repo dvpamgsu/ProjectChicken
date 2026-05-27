@@ -290,14 +290,30 @@ func _process(delta: float) -> void:
 			button_back.visible = true
 		_:
 			button_back.visible = false
+	
 			
 	match state:
 		STATE.LOBBY:
 			stage_option.visible = true
+			if is_host:
+				select.enable_selector()
+				select_2.disable_selector()
+			else:
+				select.disable_selector()
+				select_2.enable_selector()
 		STATE.LOBBY_LOCAL, STATE.LOBBY_SINGLE:
 			stage_option.visible = true
 		_:
 			stage_option.visible = false
+			
+	match state:
+		STATE.LOBBY, STATE.GAME:
+			if multiplayer.is_server():
+				is_host = true
+			else:
+				is_host = false
+		STATE.GAME_SINGLE, STATE.GAME_LOCAL:
+			is_host = true
 	
 	normal_process(delta)
 		
@@ -328,30 +344,28 @@ func _physics_process(delta: float) -> void:
 		STATE.MAIN:
 			pass
 		STATE.LOBBY:
-			
-			
-			
-			
 			pass
 		STATE.GAME, STATE.GAME_SINGLE, STATE.GAME_LOCAL:
-			
+				
 			if loading.modulate.a > 0.5:
 				var tween = create_tween()
 				tween.tween_interval(0.5)
 				tween.tween_property(loading,"modulate",Color(1,1,1,0),0.5)
 			
+			var p1 = null
+			var p2 = null
+			for pk in players:
+				var p = players[pk]
+				if !p:
+					continue
+				if p.is_host_player:
+					p1 = players[pk]
+				else:
+					p2 = players[pk]
+					
+							
 			if state == STATE.GAME:
 				if !multiplayer.is_server():
-					var p1 = null
-					var p2 = null
-					for pk in players:
-						var p = players[pk]
-						if !p:
-							continue
-						if p.is_host_player:
-							p1 = players[pk]
-						else:
-							p2 = players[pk]
 					if p1 and p2:
 						if p1.player_name == "" or p2.player_name == "" or p1.id == 0 or p2.id == 0:
 							request_player_info.rpc_id(1)
@@ -361,16 +375,6 @@ func _physics_process(delta: float) -> void:
 					win.rpc(1)
 				if Input.is_action_just_pressed("debug2"):
 					win.rpc(2)
-		
-				if is_host:
-					$Camera2D/boundary1.collision_layer = 1
-					$Camera2D/boundary2.collision_layer = 8
-				else:
-					$Camera2D/boundary1.collision_layer = 8
-					$Camera2D/boundary2.collision_layer = 1
-			if state == STATE.GAME_SINGLE or state == STATE.GAME_LOCAL:
-				$Camera2D/boundary1.collision_layer = 8
-				$Camera2D/boundary2.collision_layer = 16
 				
 			camera_2d.position = camera_2d.position.lerp(cam_target.position, 1.0 * delta)
 			if is_camera_action:
@@ -384,18 +388,11 @@ func _physics_process(delta: float) -> void:
 				
 			if member_count == 2 and players.size() == 2:
 				var pos_center = Vector2.ZERO
-				var p1 = null
-				var p2 = null
-				#print(players)
 				var alive_cnt = 0
 				for pk in players:
 					var p = players[pk]
 					if !p:
 						continue
-					if p.is_host_player:
-						p1 = players[pk]
-					else:
-						p2 = players[pk]
 					if players[pk].alive:
 						pos_center += players[pk].position
 						alive_cnt += 1
@@ -416,9 +413,9 @@ func _physics_process(delta: float) -> void:
 					if p1.alive and p2.alive:
 						if p1.position.x > p2.position.x:
 							if p1.alive_timer > p2.alive_timer+0.5:
-								cam_target.position.x = p1.position.x - width/6
+								cam_target.position.x = p1.position.x + width/6
 							elif p1.alive_timer+0.5 < p2.alive_timer:
-								cam_target.position.x = p2.position.x + width/6
+								cam_target.position.x = p2.position.x - width/6
 						if p1.alive_timer > p2.alive_timer+0.5:
 							dominant = 1
 						elif p1.alive_timer + 0.5 < p2.alive_timer:
@@ -554,12 +551,6 @@ func update_lobby_members_ui() -> void:
 		select_2.visible = false
 	else:
 		select_2.visible = true
-		if is_host:
-			select.enable_selector()
-			select_2.disable_selector()
-		else:
-			select.disable_selector()
-			select_2.enable_selector()
 	
 	if ready_count == 2 and player_ids.size() == 2 and is_host:
 		if state == STATE.LOBBY:
@@ -582,7 +573,6 @@ func start_game() -> void:
 	var s = stages[stage_option.selected].instantiate()
 	add_child(s)
 	stage = s
-	await get_tree().process_frame
 	if multiplayer.is_server():
 		for id in player_ids:
 			spawn_player(id)
@@ -776,11 +766,11 @@ func spawn_player(id: int = 1):
 	var member_steam_id = peer.get_steam_id_for_peer_id(id)
 	if id == 1:
 		player.is_host_player = true
-		player.first_pos = stage.get_node("spawn1").global_position
+		#player.first_pos = stage.get_node("spawn1").global_position
 		print("host player spawned")
 	else:
 		player.is_host_player = false
-		player.first_pos = stage.get_node("spawn2").global_position
+		#player.first_pos = stage.get_node("spawn2").global_position
 		print("client player spawned")
 	
 	
@@ -1030,14 +1020,14 @@ func single_game_start():
 	
 	#p.player_profile = get_steam_avatar(Steam.getSteamID())
 	p.is_host_player = true
-	p.global_position = stage.get_node("spawn1").global_position
-	p.first_pos = stage.get_node("spawn1").global_position
+	#p.global_position = stage.get_node("spawn1").global_position
+	#p.first_pos = stage.get_node("spawn1").global_position
 	add_child(p)
 	p = PLAYER_AI.instantiate()
 	p.name = "2"
 	p.player_name = "AI"
-	p.global_position = stage.get_node("spawn2").global_position
-	p.first_pos = stage.get_node("spawn2").global_position
+	#p.global_position = stage.get_node("spawn2").global_position
+	#p.first_pos = stage.get_node("spawn2").global_position
 	add_child(p)
 	state = STATE.GAME_SINGLE
 	
@@ -1162,14 +1152,14 @@ func local_game_start():
 	p.name = "1"
 	p.player_name = "Player 1"
 	p.is_host_player = true
-	p.global_position = stage.get_node("spawn1").global_position
-	p.first_pos = stage.get_node("spawn1").global_position
+	#p.global_position = stage.get_node("spawn1").global_position
+	#p.first_pos = stage.get_node("spawn1").global_position
 	add_child(p)
 	p = PLAYER_LOCAL_ALTER.instantiate()
 	p.name = "2"
 	p.player_name = "Player 2"
-	p.global_position = stage.get_node("spawn2").global_position
-	p.first_pos = stage.get_node("spawn2").global_position
+	#p.global_position = stage.get_node("spawn2").global_position
+	#p.first_pos = stage.get_node("spawn2").global_position
 	add_child(p)
 	state = STATE.GAME_LOCAL
 	

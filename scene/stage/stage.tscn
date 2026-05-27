@@ -112,7 +112,7 @@ colors = PackedColorArray(0, 0, 0, 1)
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_ngctk"]
 gradient = SubResource("Gradient_dd3yr")
 
-[node name="stage" type="Node2D"]
+[node name="stage" type="Node2D" groups=["stage"]]
 script = ExtResource("1_v4pcg")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]

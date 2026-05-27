@@ -31,6 +31,7 @@ player=""
 head=""
 leg=""
 ice=""
+stage=""
 
 [input]
 
@@ -131,6 +132,8 @@ pp3={
 2d_physics/layer_5="leg"
 2d_physics/layer_6="others_type1"
 2d_physics/layer_7="mine"
+2d_physics/layer_8="boundary1"
+2d_physics/layer_9="boundary2"
 
 [rendering]
 

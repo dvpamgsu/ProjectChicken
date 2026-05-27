@@ -123,7 +123,7 @@ func ai_process(delta: float):
 			target_position += way*Vector2(8.0, 0.0)
 	
 	var jump_dir = Vector2(cos(rotation-PI/2.0), sin(rotation-PI/2.0))
-	var cur_impulse = jump_power*jump_dir*(ai_jump_timer+0.5)
+	var cur_impulse = jump_power*jump_dir*(ai_jump_timer+0.5)*0.8
 	var predicted_land_pos = predict_landing_position(cur_impulse, target_position.y)
 	polygon_2d_2.global_position = predicted_land_pos
 	if floor_cnt > 0 and ai_jump_cool > 0.1:
