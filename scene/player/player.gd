@@ -493,6 +493,7 @@ func _physics_process(delta: float) -> void:
 		if hit_timer <= 0.0 and alive:
 				shock_timer = 0.0
 				shock = true
+		gen_hit1_effect()
 		hit()
 		
 	if alter:
