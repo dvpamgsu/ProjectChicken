@@ -9,8 +9,8 @@ var is_joining : bool = false
 
 @onready var loading: ColorRect = $CanvasLayer/loading
 
-@onready var host_button: Button = $CanvasLayer/mainmenu/host_button
-@onready var single_button: Button = $CanvasLayer/mainmenu/single_button
+@onready var host_button: TextureButton = $CanvasLayer/mainmenu/host_button
+@onready var single_button: TextureButton = $CanvasLayer/mainmenu/single_button
 
 
 @onready var value_bounce: LineEdit = $CanvasLayer/debug/value_bounce
@@ -31,7 +31,7 @@ var is_joining : bool = false
 @onready var button_jump: Button = $CanvasLayer/debug/Button_jump
 @onready var button_reset: Button = $CanvasLayer/debug/Button_reset
 
-@onready var button_back: Button = $CanvasLayer/ButtonBack
+@onready var button_back: TextureButton = $CanvasLayer/ButtonBack
 
 
 @onready var mainmenu: Node2D = $CanvasLayer/mainmenu
@@ -55,7 +55,7 @@ var is_joining : bool = false
 @onready var game_ui: Node2D = $CanvasLayer/Game_UI
 @onready var label_win: Label = $CanvasLayer/Game_UI/LabelWin
 
-@onready var local_button: Button = $CanvasLayer/mainmenu/local_Button
+@onready var local_button: TextureButton = $CanvasLayer/mainmenu/local_Button
 @onready var lobby_local: Node2D = $CanvasLayer/lobby_local
 
 @onready var settings: Node2D = $CanvasLayer/settings
@@ -65,6 +65,7 @@ var is_joining : bool = false
 @onready var pp_retro: ColorRect = $CanvasLayer/BackBufferCopy_retro/pp_retro
 @onready var pp_cinema: ColorRect = $CanvasLayer/BackBufferCopy_cinema/pp_cinema
 
+const SFX_BUTTON = preload("uid://cuhxb1h1mj8p1")
 
 
 @export var character_num = 2
@@ -133,9 +134,17 @@ func _unhandled_input(event: InputEvent) -> void:
 		$Camera2D/boundary1.position.x = -width/2.0
 		$Camera2D/boundary2.position.x = width/2.0
 
+@onready var tr_option_button: OptionButton = $CanvasLayer/settings/TR_OptionButton
+var languages = ["en","ko","ja"]
 func _ready() -> void:
 	
 	RenderingServer.set_default_clear_color(Color.BLACK)
+	
+	tr_option_button.add_item("ENGLISH")
+	tr_option_button.add_item("한국어")
+	tr_option_button.add_item("日本語")
+	
+	TranslationServer.set_locale("en")
 	
 	width = 1152.0 / camera_2d.zoom.x
 	height = 648.0 / camera_2d.zoom.x
@@ -360,6 +369,10 @@ func _process(delta: float) -> void:
 @onready var select: Node2D = $CanvasLayer/lobby/select
 @onready var select_2: Node2D = $CanvasLayer/lobby/select2
 func _physics_process(delta: float) -> void:
+	
+	if volume_check_timer > 0.0:
+		volume_check_timer -= delta
+	
 	if state != STATE.GAME and state != STATE.GAME_SINGLE and state != STATE.GAME_LOCAL:
 		cam_target.position = Vector2.ZERO
 		camera_2d.position = Vector2.ZERO		
@@ -473,7 +486,7 @@ func _physics_process(delta: float) -> void:
 							cx += 4
 							if cx > camera_2d.position.x + width/2:
 								break
-						cam_target.position.y = (max_y-64+min_y+64)/2.0 - 20
+						cam_target.position.y = (max_y+min_y)/2.0 - 20
 					
 					cam_target.position.x = clamp(cam_target.position.x, cam_bl_pos.x + width/2, cam_tr_pos.x - width/2)
 					cam_target.position.y = clamp(cam_target.position.y, cam_tr_pos.y + height/2, cam_bl_pos.y - height/2)
@@ -827,6 +840,8 @@ func _remove_player(id : int):
 	player_ids = [1]
 
 func _on_host_button_pressed() -> void:
+	play_audio(SFX_BUTTON)
+	
 	host_lobby()
 	host_button.release_focus()
 	
@@ -844,6 +859,7 @@ func _on_host_button_pressed() -> void:
 
 # --- Bounce 수정 ---
 func _on_button_bounce_pressed() -> void:
+	play_audio(SFX_BUTTON)
 	var new_val = value_bounce.text.to_float()
 	# 1. 모든 피어(서버+클라이언트)에게 이 함수를 실행하라고 보냄
 	f_bounce.rpc(new_val)
@@ -862,6 +878,7 @@ func f_bounce(new_val: float):
 
 # --- Additional Force 수정 ---
 func _on_button_additional_pressed() -> void:
+	play_audio(SFX_BUTTON)
 	var new_val = value_additional.text.to_float()
 	f_additional.rpc(new_val)
 	value_additional.text = ""
@@ -876,6 +893,7 @@ func f_additional(new_val: float):
 
 # --- Torque Power 수정 ---
 func _on_button_torque_pressed() -> void:
+	play_audio(SFX_BUTTON)
 	var new_val = value_torque.text.to_float()
 	f_torque.rpc(new_val)
 	value_torque.text = ""
@@ -890,6 +908,7 @@ func f_torque(new_val: float):
 
 # --- Jump Power 수정 ---
 func _on_button_jump_pressed() -> void:
+	play_audio(SFX_BUTTON)
 	var new_val = value_jump.text.to_float()
 	f_jump.rpc(new_val)
 	value_jump.text = ""
@@ -904,6 +923,7 @@ func f_jump(new_val: float):
 
 # --- Initialize (Reset) 수정 ---
 func _on_button_reset_pressed() -> void:
+	play_audio(SFX_BUTTON)
 	initialize.rpc()
 	button_reset.release_focus()
 
@@ -915,6 +935,7 @@ func initialize():
 			p.initialize()
 	
 func _on_lobby_button_pressed() -> void:
+	play_audio(SFX_BUTTON)
 	mainmenu.visible = false
 	friend_lobbies.visible = true
 	state = STATE.FRIEND_LOBBIES
@@ -970,6 +991,7 @@ func _create_friend_lobby_button(friend_name: String, lobby_id: int, steam_id: i
 	member_list.add_child(h_box)
 
 func _on_button_ready_pressed() -> void:
+	play_audio(SFX_BUTTON)
 	# 현재 상태 읽기 (기존에 1이었으면 0으로, 0이었으면 1로 토글)
 	var my_steam_id = Steam.getSteamID()
 	var current_status = Steam.getLobbyMemberData(lobby_id, my_steam_id, "ready")
@@ -984,6 +1006,7 @@ func _on_button_ready_pressed() -> void:
 
 
 func _on_button_refresh_pressed() -> void:
+	play_audio(SFX_BUTTON)
 	refresh_friends_lobbies()
 
 
@@ -1011,12 +1034,14 @@ func _on_timer_win_timeout() -> void:
 
 
 func _on_single_button_pressed() -> void:
+	play_audio(SFX_BUTTON)
 	mainmenu.visible = false
 	lobby_single.visible = true
 	state = STATE.LOBBY_SINGLE
 
 
 func _on_single_start_button_pressed() -> void:
+	play_audio(SFX_BUTTON)
 	lobby_single.visible = false
 	state = STATE.GAME_SINGLE
 	single_game_start()
@@ -1147,12 +1172,14 @@ func _on_timer_win_single_timeout() -> void:
 
 
 func _on_local_button_pressed() -> void:
+	play_audio(SFX_BUTTON)
 	mainmenu.visible = false
 	lobby_local.visible = true
 	state = STATE.LOBBY_LOCAL
 
 
 func _on_local_start_button_pressed() -> void:
+	play_audio(SFX_BUTTON)
 	lobby_local.visible = false
 	state = STATE.GAME_LOCAL
 	local_game_start()
@@ -1195,6 +1222,7 @@ func local_game_start():
 	
 
 func _on_button_back_pressed() -> void:
+	play_audio(SFX_BUTTON)
 	if state == STATE.LOBBY:
 		_bomb_lobby()
 	lobby.visible = false
@@ -1376,6 +1404,7 @@ func _on_select_2_changed() -> void:
 
 @onready var fullscreen: CheckButton = $CanvasLayer/settings/fullscreen
 func _on_fullscreen_pressed() -> void:
+	play_audio(SFX_BUTTON)
 	var current_mode = DisplayServer.window_get_mode()
 	if fullscreen.button_pressed:
 		# 창 모드일 경우 전체화면으로 전환
@@ -1386,6 +1415,52 @@ func _on_fullscreen_pressed() -> void:
 
 
 func _on_button_pressed() -> void:
+	play_audio(SFX_BUTTON)
 	mainmenu.visible = false
 	settings.visible = true
 	state = STATE.SETTINGS
+
+func language_update(language := "en"):
+	TranslationServer.set_locale(language)
+	
+	$CanvasLayer/mainmenu/host_button/Label.text = tr("HOST")
+	$CanvasLayer/mainmenu/lobby_button/Label.text = tr("LOBBIES")
+	$CanvasLayer/mainmenu/single_button/Label.text = tr("SINGLE PLAY")
+	$CanvasLayer/mainmenu/local_Button/Label.text = tr("LOCAL MULTI")
+	$CanvasLayer/mainmenu/settings_Button/Label.text = tr("SETTINGS")
+	
+	$CanvasLayer/lobby/Button_ready/Label.text = tr("READY")
+	
+	$CanvasLayer/friend_lobbies/Button_refresh/Label.text = tr("REFRESH")
+	
+	$CanvasLayer/lobby_single/single_start_button/Label.text = tr("START")
+	
+	$CanvasLayer/lobby_local/local_start_button/Label.text = tr("START")
+	
+	$CanvasLayer/settings/fs_label.text = tr("FULLSCREEN")
+	
+	$CanvasLayer/settings/volume.text = tr("VOLUME")
+	
+	$CanvasLayer/settings/Language.text = tr("LANGUAGE")
+	
+	$CanvasLayer/ButtonBack/Label.text = tr("BACK")
+	
+
+
+func _on_tr_option_button_item_selected(index: int) -> void:
+	play_audio(SFX_BUTTON)
+	language_update(languages[tr_option_button.selected])
+
+const AUDIO_FX = preload("uid://cpkdy0uiqi7kt")
+const SFX_CHECK = preload("res://audio/sfx/hit.wav")
+var volume_check_timer = 0.0
+func _on_h_scroll_bar_value_changed(value: float) -> void:
+	var afx : AudioStreamPlayer = AUDIO_FX.instantiate()
+	afx.stream = SFX_CHECK
+	add_child(afx)
+	
+func play_audio(audio : AudioStream):
+	var afx : AudioStreamPlayer = AUDIO_FX.instantiate()
+	afx.stream = audio
+	afx.pitch_scale = rng.randf_range(0.5, 1.5)
+	add_child(afx)

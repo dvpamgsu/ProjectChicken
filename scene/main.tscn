@@ -1,4 +1,4 @@
-[gd_scene load_steps=37 format=3 uid="uid://cr7wv4h5j6efm"]
+[gd_scene load_steps=45 format=3 uid="uid://cr7wv4h5j6efm"]
 
 [ext_resource type="Script" uid="uid://d28h4b1ulmne7" path="res://scene/main.gd" id="1_itxqv"]
 [ext_resource type="PackedScene" uid="uid://c5t3ponioxivh" path="res://scene/stage/stage002.tscn" id="3_jcbur"]
@@ -12,11 +12,17 @@
 [ext_resource type="Shader" uid="uid://ctbfwrigx12vx" path="res://shaders/effect/crack.gdshader" id="8_of57s"]
 [ext_resource type="PackedScene" uid="uid://ogqrso2b1tut" path="res://scene/effect/simple_effect_hit_2.tscn" id="8_tqoya"]
 [ext_resource type="PackedScene" uid="uid://bco5f7adahevm" path="res://scene/effect/simple_effect_explosion.tscn" id="10_tv8i1"]
+[ext_resource type="Texture2D" uid="uid://dkye0l1dcyk55" path="res://texture/ui/button_normal.png" id="11_io27d"]
 [ext_resource type="Shader" uid="uid://dcpgu6k362oxo" path="res://shaders/effect/wave.gdshader" id="11_k65ib"]
+[ext_resource type="Texture2D" uid="uid://bl3u7vw7f5n10" path="res://texture/ui/button_click.png" id="12_fa8t4"]
 [ext_resource type="Shader" uid="uid://kx41wcw5uddh" path="res://shaders/effect/zaworld.gdshader" id="12_v2gmf"]
 [ext_resource type="Shader" uid="uid://dq3p85hjcqmcq" path="res://shaders/postprocess/vhs.gdshader" id="12_wscrc"]
 [ext_resource type="Shader" uid="uid://c5psfkvdys1qh" path="res://shaders/postprocess/retro.gdshader" id="13_mswub"]
+[ext_resource type="Texture2D" uid="uid://wuy6fvom52f3" path="res://texture/ui/button_hover.png" id="13_rg6nf"]
 [ext_resource type="Shader" uid="uid://bj58jevpex137" path="res://shaders/postprocess/cinema.gdshader" id="14_hybxs"]
+[ext_resource type="Texture2D" uid="uid://dvsamiulv5cvd" path="res://texture/qiqi.jpg" id="15_fa8t4"]
+[ext_resource type="Texture2D" uid="uid://cpgubjtmr5ty0" path="res://texture/ui/scroll.png" id="15_mjuaj"]
+[ext_resource type="Texture2D" uid="uid://b6483abaokafp" path="res://texture/ui/grabber_normal.png" id="16_gj7ui"]
 [ext_resource type="PackedScene" uid="uid://jnxlfytv5jlj" path="res://scene/select.tscn" id="16_jcbur"]
 [ext_resource type="Script" uid="uid://b5h7sdc2usr6c" path="res://scene/mainimage.gd" id="19_gtqqq"]
 [ext_resource type="Texture2D" uid="uid://bo8phtog47d00" path="res://texture/main/main.png" id="20_gn2wi"]
@@ -29,6 +35,16 @@
 
 [sub_resource type="Theme" id="Theme_v0l8b"]
 default_font_size = 48
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_bmc2w"]
+texture = ExtResource("15_mjuaj")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_7ty4q"]
+texture = ExtResource("16_gj7ui")
+texture_margin_left = 8.0
+texture_margin_top = 8.0
+texture_margin_right = 8.0
+texture_margin_bottom = 8.0
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_b5f6u"]
 shader = ExtResource("8_of57s")
@@ -160,7 +176,7 @@ layer = 4
 [node name="mainmenu" type="Node2D" parent="CanvasLayer"]
 z_index = 10
 
-[node name="host_button" type="Button" parent="CanvasLayer/mainmenu"]
+[node name="host_button" type="TextureButton" parent="CanvasLayer/mainmenu"]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -174,19 +190,38 @@ grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
-text = "host
-"
-alignment = 2
+texture_normal = ExtResource("11_io27d")
+texture_pressed = ExtResource("12_fa8t4")
+texture_hover = ExtResource("13_rg6nf")
 
-[node name="lobby_button" type="Button" parent="CanvasLayer/mainmenu"]
+[node name="Label" type="Label" parent="CanvasLayer/mainmenu/host_button"]
+layout_mode = 0
+offset_right = 128.0
+offset_bottom = 32.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "HOST"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="lobby_button" type="TextureButton" parent="CanvasLayer/mainmenu"]
 offset_left = 928.0
 offset_top = 432.0
 offset_right = 1056.0
 offset_bottom = 464.0
-text = "friend lobbies"
-alignment = 2
+texture_normal = ExtResource("11_io27d")
+texture_pressed = ExtResource("12_fa8t4")
+texture_hover = ExtResource("13_rg6nf")
 
-[node name="single_button" type="Button" parent="CanvasLayer/mainmenu"]
+[node name="Label" type="Label" parent="CanvasLayer/mainmenu/lobby_button"]
+layout_mode = 0
+offset_right = 128.0
+offset_bottom = 32.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "LOBBIES"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="single_button" type="TextureButton" parent="CanvasLayer/mainmenu"]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -198,24 +233,54 @@ offset_right = 1056.0
 offset_bottom = 512.0
 grow_horizontal = 2
 grow_vertical = 2
-text = "singleplay"
-alignment = 2
+texture_normal = ExtResource("11_io27d")
+texture_pressed = ExtResource("12_fa8t4")
+texture_hover = ExtResource("13_rg6nf")
 
-[node name="local_Button" type="Button" parent="CanvasLayer/mainmenu"]
+[node name="Label" type="Label" parent="CanvasLayer/mainmenu/single_button"]
+layout_mode = 0
+offset_right = 128.0
+offset_bottom = 32.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "SINGLE PLAY"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="local_Button" type="TextureButton" parent="CanvasLayer/mainmenu"]
 offset_left = 928.0
 offset_top = 528.0
 offset_right = 1056.0
 offset_bottom = 560.0
-text = "localplay"
-alignment = 2
+texture_normal = ExtResource("11_io27d")
+texture_pressed = ExtResource("12_fa8t4")
+texture_hover = ExtResource("13_rg6nf")
 
-[node name="Button" type="Button" parent="CanvasLayer/mainmenu"]
+[node name="Label" type="Label" parent="CanvasLayer/mainmenu/local_Button"]
+layout_mode = 0
+offset_right = 128.0
+offset_bottom = 32.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "LOCAL MULTI"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="settings_Button" type="TextureButton" parent="CanvasLayer/mainmenu"]
 offset_left = 928.0
 offset_top = 576.0
 offset_right = 1056.0
 offset_bottom = 607.0
-text = "settings"
-alignment = 2
+texture_normal = ExtResource("11_io27d")
+texture_pressed = ExtResource("12_fa8t4")
+texture_hover = ExtResource("13_rg6nf")
+
+[node name="Label" type="Label" parent="CanvasLayer/mainmenu/settings_Button"]
+layout_mode = 0
+offset_right = 128.0
+offset_bottom = 32.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "SETTINGS"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="debug" type="Node2D" parent="CanvasLayer"]
 visible = false
@@ -341,12 +406,23 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "player 2"
 
-[node name="Button_ready" type="Button" parent="CanvasLayer/lobby"]
-offset_left = 384.0
+[node name="Button_ready" type="TextureButton" parent="CanvasLayer/lobby"]
+offset_left = 512.0
 offset_top = 464.0
-offset_right = 768.0
-offset_bottom = 495.0
-text = "ready"
+offset_right = 640.0
+offset_bottom = 496.0
+texture_normal = ExtResource("11_io27d")
+texture_pressed = ExtResource("12_fa8t4")
+texture_hover = ExtResource("13_rg6nf")
+
+[node name="Label" type="Label" parent="CanvasLayer/lobby/Button_ready"]
+layout_mode = 0
+offset_right = 128.0
+offset_bottom = 32.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "READY"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="TextureRect1" type="TextureRect" parent="CanvasLayer/lobby"]
 anchors_preset = 8
@@ -397,13 +473,23 @@ offset_bottom = 576.0
 [node name="MemberList" type="VBoxContainer" parent="CanvasLayer/friend_lobbies/ScrollContainer"]
 layout_mode = 2
 
-[node name="Button_refresh" type="Button" parent="CanvasLayer/friend_lobbies"]
-offset_left = 800.0
-offset_top = 64.0
-offset_right = 865.0
-offset_bottom = 95.0
-text = "refresh
-"
+[node name="Button_refresh" type="TextureButton" parent="CanvasLayer/friend_lobbies"]
+offset_left = 1008.0
+offset_top = 80.0
+offset_right = 1136.0
+offset_bottom = 112.0
+texture_normal = ExtResource("11_io27d")
+texture_pressed = ExtResource("12_fa8t4")
+texture_hover = ExtResource("13_rg6nf")
+
+[node name="Label" type="Label" parent="CanvasLayer/friend_lobbies/Button_refresh"]
+layout_mode = 0
+offset_right = 128.0
+offset_bottom = 32.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "REFRESH"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="Game_UI" type="Node2D" parent="CanvasLayer"]
 visible = false
@@ -430,36 +516,57 @@ vertical_alignment = 1
 visible = false
 z_index = 10
 
-[node name="single_start_button" type="Button" parent="CanvasLayer/lobby_single"]
-offset_left = 608.0
-offset_top = 300.0
-offset_right = 672.0
-offset_bottom = 340.0
-text = "start"
+[node name="single_start_button" type="TextureButton" parent="CanvasLayer/lobby_single"]
+offset_left = 560.0
+offset_top = 304.0
+offset_right = 688.0
+offset_bottom = 336.0
+texture_normal = ExtResource("11_io27d")
+texture_pressed = ExtResource("12_fa8t4")
+texture_hover = ExtResource("13_rg6nf")
+
+[node name="Label" type="Label" parent="CanvasLayer/lobby_single/single_start_button"]
+layout_mode = 0
+offset_right = 128.0
+offset_bottom = 32.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "START"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="select" parent="CanvasLayer/lobby_single" instance=ExtResource("16_jcbur")]
-position = Vector2(492, 299)
+position = Vector2(464, 304)
 
 [node name="lobby_local" type="Node2D" parent="CanvasLayer"]
 visible = false
 z_index = 10
 
-[node name="local_start_button" type="Button" parent="CanvasLayer/lobby_local"]
+[node name="local_start_button" type="TextureButton" parent="CanvasLayer/lobby_local"]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = 544.0
+offset_left = 511.5
 offset_top = 304.0
-offset_right = 607.0
-offset_bottom = 344.0
+offset_right = 639.5
+offset_bottom = 336.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
-text = "start
-"
+texture_normal = ExtResource("11_io27d")
+texture_pressed = ExtResource("12_fa8t4")
+texture_hover = ExtResource("13_rg6nf")
+
+[node name="Label" type="Label" parent="CanvasLayer/lobby_local/local_start_button"]
+layout_mode = 0
+offset_right = 128.0
+offset_bottom = 32.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "START"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="select" parent="CanvasLayer/lobby_local" instance=ExtResource("16_jcbur")]
 position = Vector2(440, 304)
@@ -469,45 +576,85 @@ position = Vector2(672, 304)
 
 [node name="settings" type="Node2D" parent="CanvasLayer"]
 
+[node name="TextureRect" type="ColorRect" parent="CanvasLayer/settings"]
+offset_left = 448.0
+offset_top = 128.0
+offset_right = 704.0
+offset_bottom = 512.0
+color = Color(0.6293536, 0.6038971, 0.88241476, 0.5568628)
+
 [node name="fs_label" type="Label" parent="CanvasLayer/settings"]
 offset_left = 512.0
-offset_top = 272.0
+offset_top = 304.0
 offset_right = 591.0
-offset_bottom = 304.0
+offset_bottom = 336.0
 text = "Fullscreen"
 vertical_alignment = 1
 
 [node name="volume" type="Label" parent="CanvasLayer/settings"]
 offset_left = 512.0
-offset_top = 320.0
+offset_top = 352.0
 offset_right = 640.0
-offset_bottom = 352.0
+offset_bottom = 384.0
 text = "Volume"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="fullscreen" type="CheckButton" parent="CanvasLayer/settings"]
 offset_left = 592.0
-offset_top = 272.0
+offset_top = 304.0
 offset_right = 640.0
-offset_bottom = 304.0
+offset_bottom = 336.0
 
 [node name="HScrollBar" type="HScrollBar" parent="CanvasLayer/settings"]
 offset_left = 512.0
-offset_top = 352.0
+offset_top = 384.0
 offset_right = 640.0
-offset_bottom = 360.0
-value = 100.0
+offset_bottom = 400.0
+theme_override_styles/scroll = SubResource("StyleBoxTexture_bmc2w")
+theme_override_styles/grabber = SubResource("StyleBoxTexture_7ty4q")
+step = 20.0
+value = 80.0
 custom_step = 0.0
 
-[node name="ButtonBack" type="Button" parent="CanvasLayer"]
+[node name="Language" type="Label" parent="CanvasLayer/settings"]
+offset_left = 512.0
+offset_top = 416.0
+offset_right = 640.0
+offset_bottom = 448.0
+text = "Language"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TR_OptionButton" type="OptionButton" parent="CanvasLayer/settings"]
+offset_left = 512.0
+offset_top = 448.0
+offset_right = 640.0
+offset_bottom = 468.0
+
+[node name="Sprite2D" type="Sprite2D" parent="CanvasLayer/settings"]
+position = Vector2(576, 224)
+scale = Vector2(0.17414966, 0.17462485)
+texture = ExtResource("15_fa8t4")
+
+[node name="ButtonBack" type="TextureButton" parent="CanvasLayer"]
 z_index = 10
-offset_left = 1024.0
+offset_left = 1008.0
 offset_top = 32.0
-offset_right = 1088.0
+offset_right = 1136.0
 offset_bottom = 64.0
-text = "Back
-"
+texture_normal = ExtResource("11_io27d")
+texture_pressed = ExtResource("12_fa8t4")
+texture_hover = ExtResource("13_rg6nf")
+
+[node name="Label" type="Label" parent="CanvasLayer/ButtonBack"]
+layout_mode = 0
+offset_right = 128.0
+offset_bottom = 32.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "BACK"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="BackBufferCopy_crack" type="BackBufferCopy" parent="CanvasLayer"]
 visible = false
@@ -630,9 +777,9 @@ mouse_filter = 2
 color = Color(0, 0, 0, 1)
 
 [node name="StageOption" type="OptionButton" parent="CanvasLayer"]
-offset_left = 384.0
+offset_left = 464.0
 offset_top = 512.0
-offset_right = 768.0
+offset_right = 688.0
 offset_bottom = 544.0
 selected = 0
 allow_reselect = true
@@ -665,7 +812,7 @@ collision_layer = 256
 collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Camera2D/boundary2"]
-position = Vector2(522, -48)
+position = Vector2(520, -32)
 shape = SubResource("RectangleShape2D_0vlqb")
 
 [node name="mainimage" type="Node2D" parent="Camera2D"]
@@ -720,7 +867,7 @@ bus = &"bgm"
 [connection signal="pressed" from="CanvasLayer/mainmenu/lobby_button" to="." method="_on_lobby_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/mainmenu/single_button" to="." method="_on_single_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/mainmenu/local_Button" to="." method="_on_local_button_pressed"]
-[connection signal="pressed" from="CanvasLayer/mainmenu/Button" to="." method="_on_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/mainmenu/settings_Button" to="." method="_on_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/debug/Button_bounce" to="." method="_on_button_bounce_pressed"]
 [connection signal="pressed" from="CanvasLayer/debug/Button_additional" to="." method="_on_button_additional_pressed"]
 [connection signal="pressed" from="CanvasLayer/debug/Button_torque" to="." method="_on_button_torque_pressed"]
@@ -733,6 +880,8 @@ bus = &"bgm"
 [connection signal="pressed" from="CanvasLayer/lobby_single/single_start_button" to="." method="_on_single_start_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/lobby_local/local_start_button" to="." method="_on_local_start_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/settings/fullscreen" to="." method="_on_fullscreen_pressed"]
+[connection signal="value_changed" from="CanvasLayer/settings/HScrollBar" to="." method="_on_h_scroll_bar_value_changed"]
+[connection signal="item_selected" from="CanvasLayer/settings/TR_OptionButton" to="." method="_on_tr_option_button_item_selected"]
 [connection signal="pressed" from="CanvasLayer/ButtonBack" to="." method="_on_button_back_pressed"]
 [connection signal="timeout" from="Camera2D/mainimage/Timer" to="Camera2D/mainimage" method="_on_timer_timeout"]
 [connection signal="timeout" from="TimerWin" to="." method="_on_timer_win_timeout"]

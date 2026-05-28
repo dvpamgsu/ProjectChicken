@@ -19,8 +19,8 @@ func _process(delta: float) -> void:
 	timer = wrapf(timer, 0.0, 2.0)
 	$title.position.y = -153 + sin(timer/2.0*TAU)*4.0
 	
-	$title.modulate.a += (target_a - $title.modulate.a) * delta
-	$black.modulate.a += (1.0-target_a - $black.modulate.a) * delta
+	$title.modulate.a += (target_a - $title.modulate.a) * delta * 10.0
+	$black.modulate.a += ((1.0-target_a)*0.5 - $black.modulate.a) * delta * 10.0
 	
 	if $title.modulate.a < 0.01 and target_a < 0.1:
 		$title.modulate.a = 0.0

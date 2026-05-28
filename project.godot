@@ -123,6 +123,10 @@ pp3={
 ]
 }
 
+[internationalization]
+
+locale/translations=PackedStringArray("res://translation.en.translation", "res://translation.ja.translation", "res://translation.ko.translation")
+
 [layer_names]
 
 2d_physics/layer_1="ground"

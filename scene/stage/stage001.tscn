@@ -702,6 +702,7 @@ script = ExtResource("5_oc5dm")
 timer_offset = 4.5
 
 [node name="background_middle2" parent="." index="18"]
+visible = false
 modulate = Color(0.41374218, 0.27957952, 0.3400187, 1)
 position = Vector2(0, -42.000004)
 scale = Vector2(1.5, 1.5)
