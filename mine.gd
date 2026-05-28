@@ -5,6 +5,9 @@ var respawn_time = 5.0
 
 var main
 
+
+const AUDIO_FX = preload("uid://cpkdy0uiqi7kt")
+	
 func _ready() -> void:
 	main = get_node("/root/Main")
 	main.mines.append(self)
@@ -17,10 +20,15 @@ func _on_body_entered(body: Node2D) -> void:
 
 const BURST_DUST = preload("uid://clisncgduh61j")
 
+const SFX_EXPLOSION = preload("uid://c1wo2kgie77ay")
 
 @rpc("any_peer", "call_local")
 func explosion(pos := Vector2.ZERO):
 	if visible:
+		var afx : AudioStreamPlayer = AUDIO_FX.instantiate()
+		afx.stream = SFX_EXPLOSION
+		afx.pitch_scale = main.rng.randf_range(0.5, 1.5)
+		main.add_child(afx)
 		respawn_timer = 0.0
 		visible = false
 		for p in players:

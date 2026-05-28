@@ -13,7 +13,7 @@ config_version=5
 config/name="project_chicken"
 run/main_scene="uid://cr7wv4h5j6efm"
 config/features=PackedStringArray("4.5", "Forward Plus")
-config/icon="res://icon.svg"
+config/icon="uid://bmtm0fifpidos"
 
 [display]
 

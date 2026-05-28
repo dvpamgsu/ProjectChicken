@@ -58,10 +58,14 @@ var is_joining : bool = false
 @onready var local_button: Button = $CanvasLayer/mainmenu/local_Button
 @onready var lobby_local: Node2D = $CanvasLayer/lobby_local
 
+@onready var settings: Node2D = $CanvasLayer/settings
+
 
 @onready var pp_vhs: ColorRect = $CanvasLayer/BackBufferCopy_vhs/pp_vhs
 @onready var pp_retro: ColorRect = $CanvasLayer/BackBufferCopy_retro/pp_retro
 @onready var pp_cinema: ColorRect = $CanvasLayer/BackBufferCopy_cinema/pp_cinema
+
+
 
 @export var character_num = 2
 
@@ -84,7 +88,11 @@ const PLAYER = preload("uid://bh58c7wn1bdd1")
 
 var players = {}
 
-enum STATE {MAIN, LOBBY, LOADING, FRIEND_LOBBIES, GAME, GAMEWIN, LOBBY_SINGLE, GAME_SINGLE, GAMEWIN_SINGLE, LOBBY_LOCAL, GAME_LOCAL, GAMEWIN_LOCAL}
+enum STATE {MAIN, LOBBY, LOADING, FRIEND_LOBBIES,
+	GAME, GAMEWIN,
+	LOBBY_SINGLE, GAME_SINGLE, GAMEWIN_SINGLE,
+	LOBBY_LOCAL, GAME_LOCAL, GAMEWIN_LOCAL,
+	SETTINGS}
 var state : STATE = STATE.MAIN
 
 var mines = []
@@ -127,6 +135,8 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _ready() -> void:
 	
+	RenderingServer.set_default_clear_color(Color.BLACK)
+	
 	width = 1152.0 / camera_2d.zoom.x
 	height = 648.0 / camera_2d.zoom.x
 	mainmenu.visible = true
@@ -138,6 +148,7 @@ func _ready() -> void:
 	lobby_local.visible = false
 	blasteffect.visible = false
 	crackeffect.visible = false
+	settings.visible = false
 	loading.modulate.a = 0
 	
 	label_players.append(label_player_1)
@@ -276,6 +287,7 @@ func request_hit_stop(by_player = false, ptype = 0):
 	)
 	
 
+@onready var audiostage: AudioStreamPlayer = $audiostage
 
 var is_effect_on = false
 func _process(delta: float) -> void:
@@ -286,7 +298,7 @@ func _process(delta: float) -> void:
 
 				
 	match state:
-		STATE.LOBBY, STATE.LOBBY_SINGLE, STATE.LOBBY_LOCAL, STATE.FRIEND_LOBBIES:
+		STATE.LOBBY, STATE.LOBBY_SINGLE, STATE.LOBBY_LOCAL, STATE.FRIEND_LOBBIES, STATE.SETTINGS:
 			button_back.visible = true
 		_:
 			button_back.visible = false
@@ -326,6 +338,24 @@ func _process(delta: float) -> void:
 		pp_retro.visible = !pp_retro.visible
 	if Input.is_action_just_pressed("pp3"):
 		pp_cinema.visible = !pp_cinema.visible
+		
+	var master_bus_idx = AudioServer.get_bus_index("Master")
+	AudioServer.set_bus_volume_db(master_bus_idx, linear_to_db($CanvasLayer/settings/HScrollBar.value/100.0))
+	
+	
+	match state:
+		STATE.GAME, STATE.GAME_SINGLE, STATE.GAME_LOCAL:
+			if stage_option.selected == 0:
+				if !audiostage.playing:
+					var tween = create_tween()
+					audiostage.volume_db = -40.0
+					tween.tween_property(audiostage, "volume_db", 0.0, 1.0)
+					audiostage.play()
+		_:
+			if audiostage.playing:
+				var tween = create_tween()
+				tween.tween_property(audiostage, "volume_db", -40.0, 1.0)
+				tween.tween_callback(func():audiostage.stop())
 			
 @onready var select: Node2D = $CanvasLayer/lobby/select
 @onready var select_2: Node2D = $CanvasLayer/lobby/select2
@@ -1173,6 +1203,7 @@ func _on_button_back_pressed() -> void:
 	friend_lobbies.visible = false
 	state = STATE.MAIN
 	mainmenu.visible = true
+	settings.visible = false
 	
 	pass # Replace with function body.
 
@@ -1342,3 +1373,19 @@ func _on_select_changed() -> void:
 func _on_select_2_changed() -> void:
 	Steam.setLobbyMemberData(lobby_id, "char_code", str(select_2.character_selector.current_profile_code))
 	update_lobby_members_ui()
+
+@onready var fullscreen: CheckButton = $CanvasLayer/settings/fullscreen
+func _on_fullscreen_pressed() -> void:
+	var current_mode = DisplayServer.window_get_mode()
+	if fullscreen.button_pressed:
+		# 창 모드일 경우 전체화면으로 전환
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+	else:
+		# 전체화면(또는 최대화 등)일 경우 다시 창 모드로 전환
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+
+
+func _on_button_pressed() -> void:
+	mainmenu.visible = false
+	settings.visible = true
+	state = STATE.SETTINGS

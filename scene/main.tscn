@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3 uid="uid://cr7wv4h5j6efm"]
+[gd_scene load_steps=37 format=3 uid="uid://cr7wv4h5j6efm"]
 
 [ext_resource type="Script" uid="uid://d28h4b1ulmne7" path="res://scene/main.gd" id="1_itxqv"]
 [ext_resource type="PackedScene" uid="uid://c5t3ponioxivh" path="res://scene/stage/stage002.tscn" id="3_jcbur"]
@@ -18,6 +18,14 @@
 [ext_resource type="Shader" uid="uid://c5psfkvdys1qh" path="res://shaders/postprocess/retro.gdshader" id="13_mswub"]
 [ext_resource type="Shader" uid="uid://bj58jevpex137" path="res://shaders/postprocess/cinema.gdshader" id="14_hybxs"]
 [ext_resource type="PackedScene" uid="uid://jnxlfytv5jlj" path="res://scene/select.tscn" id="16_jcbur"]
+[ext_resource type="Script" uid="uid://b5h7sdc2usr6c" path="res://scene/mainimage.gd" id="19_gtqqq"]
+[ext_resource type="Texture2D" uid="uid://bo8phtog47d00" path="res://texture/main/main.png" id="20_gn2wi"]
+[ext_resource type="Texture2D" uid="uid://cj6t1spac6abm" path="res://texture/main/comb.png" id="21_p8adh"]
+[ext_resource type="Texture2D" uid="uid://76vmypl6x1js" path="res://texture/main/beak.png" id="22_oldxj"]
+[ext_resource type="Texture2D" uid="uid://byyesqb7r4xmx" path="res://texture/main/comb_f.png" id="23_4jm02"]
+[ext_resource type="Texture2D" uid="uid://wiu52jml0k6q" path="res://texture/main/title.png" id="24_p8adh"]
+[ext_resource type="Texture2D" uid="uid://dnus1o2eddi0i" path="res://texture/main/black.png" id="25_oldxj"]
+[ext_resource type="AudioStream" uid="uid://bmqifi7vnujb2" path="res://audio/Sunlight_on_the_Blade.mp3" id="26_oldxj"]
 
 [sub_resource type="Theme" id="Theme_v0l8b"]
 default_font_size = 48
@@ -150,7 +158,6 @@ spawn_path = NodePath("..")
 layer = 4
 
 [node name="mainmenu" type="Node2D" parent="CanvasLayer"]
-visible = false
 z_index = 10
 
 [node name="host_button" type="Button" parent="CanvasLayer/mainmenu"]
@@ -159,23 +166,25 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = 544.5
-offset_top = 306.5
-offset_right = 607.5
-offset_bottom = 341.5
+offset_left = 928.0
+offset_top = 384.0
+offset_right = 1056.0
+offset_bottom = 416.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 text = "host
 "
+alignment = 2
 
 [node name="lobby_button" type="Button" parent="CanvasLayer/mainmenu"]
-offset_left = 520.0
-offset_top = 368.0
-offset_right = 635.0
-offset_bottom = 399.0
+offset_left = 928.0
+offset_top = 432.0
+offset_right = 1056.0
+offset_bottom = 464.0
 text = "friend lobbies"
+alignment = 2
 
 [node name="single_button" type="Button" parent="CanvasLayer/mainmenu"]
 anchors_preset = 8
@@ -183,20 +192,30 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = 528.0
-offset_top = 424.0
-offset_right = 624.0
-offset_bottom = 455.0
+offset_left = 928.0
+offset_top = 480.0
+offset_right = 1056.0
+offset_bottom = 512.0
 grow_horizontal = 2
 grow_vertical = 2
 text = "singleplay"
+alignment = 2
 
 [node name="local_Button" type="Button" parent="CanvasLayer/mainmenu"]
-offset_left = 528.0
-offset_top = 480.0
-offset_right = 624.0
-offset_bottom = 512.0
+offset_left = 928.0
+offset_top = 528.0
+offset_right = 1056.0
+offset_bottom = 560.0
 text = "localplay"
+alignment = 2
+
+[node name="Button" type="Button" parent="CanvasLayer/mainmenu"]
+offset_left = 928.0
+offset_top = 576.0
+offset_right = 1056.0
+offset_bottom = 607.0
+text = "settings"
+alignment = 2
 
 [node name="debug" type="Node2D" parent="CanvasLayer"]
 visible = false
@@ -291,6 +310,7 @@ offset_bottom = 303.0
 text = "reset pos"
 
 [node name="lobby" type="Node2D" parent="CanvasLayer"]
+visible = false
 z_index = 10
 
 [node name="Label_player1" type="Label" parent="CanvasLayer/lobby"]
@@ -446,6 +466,39 @@ position = Vector2(440, 304)
 
 [node name="select2" parent="CanvasLayer/lobby_local" instance=ExtResource("16_jcbur")]
 position = Vector2(672, 304)
+
+[node name="settings" type="Node2D" parent="CanvasLayer"]
+
+[node name="fs_label" type="Label" parent="CanvasLayer/settings"]
+offset_left = 512.0
+offset_top = 272.0
+offset_right = 591.0
+offset_bottom = 304.0
+text = "Fullscreen"
+vertical_alignment = 1
+
+[node name="volume" type="Label" parent="CanvasLayer/settings"]
+offset_left = 512.0
+offset_top = 320.0
+offset_right = 640.0
+offset_bottom = 352.0
+text = "Volume"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="fullscreen" type="CheckButton" parent="CanvasLayer/settings"]
+offset_left = 592.0
+offset_top = 272.0
+offset_right = 640.0
+offset_bottom = 304.0
+
+[node name="HScrollBar" type="HScrollBar" parent="CanvasLayer/settings"]
+offset_left = 512.0
+offset_top = 352.0
+offset_right = 640.0
+offset_bottom = 360.0
+value = 100.0
+custom_step = 0.0
 
 [node name="ButtonBack" type="Button" parent="CanvasLayer"]
 z_index = 10
@@ -612,8 +665,42 @@ collision_layer = 256
 collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Camera2D/boundary2"]
-position = Vector2(522, 0)
+position = Vector2(522, -48)
 shape = SubResource("RectangleShape2D_0vlqb")
+
+[node name="mainimage" type="Node2D" parent="Camera2D"]
+z_index = -10
+scale = Vector2(0.625, 0.625)
+script = ExtResource("19_gtqqq")
+
+[node name="main" type="Sprite2D" parent="Camera2D/mainimage"]
+texture = ExtResource("20_gn2wi")
+
+[node name="comb" type="Sprite2D" parent="Camera2D/mainimage"]
+position = Vector2(-291, 126)
+texture = ExtResource("21_p8adh")
+hframes = 6
+
+[node name="beak" type="Sprite2D" parent="Camera2D/mainimage"]
+position = Vector2(-360, 80)
+texture = ExtResource("22_oldxj")
+
+[node name="comb_f" type="Sprite2D" parent="Camera2D/mainimage"]
+position = Vector2(-395.2, -195.2)
+texture = ExtResource("23_4jm02")
+hframes = 6
+
+[node name="Timer" type="Timer" parent="Camera2D/mainimage"]
+wait_time = 0.125
+autostart = true
+
+[node name="title" type="Sprite2D" parent="Camera2D/mainimage"]
+position = Vector2(283.19998, -153.59999)
+texture = ExtResource("24_p8adh")
+
+[node name="black" type="Sprite2D" parent="Camera2D/mainimage"]
+modulate = Color(1, 1, 1, 0)
+texture = ExtResource("25_oldxj")
 
 [node name="Cam_target" type="Node2D" parent="."]
 
@@ -625,10 +712,15 @@ one_shot = true
 wait_time = 3.0
 one_shot = true
 
+[node name="audiostage" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("26_oldxj")
+bus = &"bgm"
+
 [connection signal="pressed" from="CanvasLayer/mainmenu/host_button" to="." method="_on_host_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/mainmenu/lobby_button" to="." method="_on_lobby_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/mainmenu/single_button" to="." method="_on_single_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/mainmenu/local_Button" to="." method="_on_local_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/mainmenu/Button" to="." method="_on_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/debug/Button_bounce" to="." method="_on_button_bounce_pressed"]
 [connection signal="pressed" from="CanvasLayer/debug/Button_additional" to="." method="_on_button_additional_pressed"]
 [connection signal="pressed" from="CanvasLayer/debug/Button_torque" to="." method="_on_button_torque_pressed"]
@@ -640,6 +732,8 @@ one_shot = true
 [connection signal="pressed" from="CanvasLayer/friend_lobbies/Button_refresh" to="." method="_on_button_refresh_pressed"]
 [connection signal="pressed" from="CanvasLayer/lobby_single/single_start_button" to="." method="_on_single_start_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/lobby_local/local_start_button" to="." method="_on_local_start_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/settings/fullscreen" to="." method="_on_fullscreen_pressed"]
 [connection signal="pressed" from="CanvasLayer/ButtonBack" to="." method="_on_button_back_pressed"]
+[connection signal="timeout" from="Camera2D/mainimage/Timer" to="Camera2D/mainimage" method="_on_timer_timeout"]
 [connection signal="timeout" from="TimerWin" to="." method="_on_timer_win_timeout"]
 [connection signal="timeout" from="TimerWinSingle" to="." method="_on_timer_win_single_timeout"]

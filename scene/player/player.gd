@@ -14,6 +14,11 @@ var first_pos = Vector2.ZERO
 @onready var col_3: CollisionShape2D = $col3
 @onready var footpos: Node2D = $footpos
 
+const SFX_HIT = preload("uid://c7xl1qnrhyn73")
+const SFX_HIT_BY_PLAYER = preload("uid://dox84cu7yusr7")
+const SFX_JUMP = preload("uid://da1s4vdohlevk")
+
+
 var main:Node2D
 
 @export var torque_power := 650.0
@@ -37,6 +42,9 @@ var mine_force := Vector2.ZERO
 
 @export var bounce = 0.1
 var spare_timer = 0.0
+
+const AUDIO_FX = preload("uid://cpkdy0uiqi7kt")
+
 # 스크립트 상단에 쿨다운 변수를 추가해 주세요.
 func _enter_tree() -> void:
 	set_multiplayer_authority(name.to_int())
@@ -219,6 +227,13 @@ func gen_jump_effect():
 	if flip_dir == -1 and rotation < PI/6.0:
 		_flip_h = true
 	main.rpc_id(1, "gen_effect", e_code, pos, rot, _flip_h, 15)
+	
+@rpc("any_peer", "call_local", "reliable")
+func play_audio(audio : AudioStream):
+	var afx : AudioStreamPlayer = AUDIO_FX.instantiate()
+	afx.stream = audio
+	afx.pitch_scale = main.rng.randf_range(0.5, 1.5)
+	main.add_child(afx)
 	
 @onready var jump_particle: CPUParticles2D = $JumpParticle
 func gen_air_jump_effect():
@@ -622,6 +637,7 @@ func _physics_process(delta: float) -> void:
 		jump_timer += delta
 		jump_timer = min(jump_timer, jump_time_max)
 	if (floor_cnt > 0 or jump_cnt > 0) and jump_result == 3:
+		play_audio.rpc(SFX_JUMP)
 		var jump_dir = Vector2(cos(rotation-PI/2.0), sin(rotation-PI/2.0))
 		if floor_cnt <= 0:
 			jump_cnt -= 1
@@ -827,12 +843,14 @@ func _on_body_entered(body: Node) -> void:
 			var hit_point2 = result2.position
 			gen_hit2_effect((hit_point+hit_point2)/2.0)
 		
+const SFX_DIE = preload("uid://cghi1748oyvjd")
 func start_rebirth():
 	linear_velocity = Vector2.ZERO
 	angular_velocity = 0
 	#set_ghost(false)
 	timer_rebirth_start.rpc()
 	
+	play_audio.rpc(SFX_DIE)
 	corpse = false
 	$TimerDissolveDie.start()
 	#gen_dead_particle.rpc()
@@ -893,7 +911,10 @@ func hit(by_player = false, way = Vector2.ZERO):
 	hit_timer = 0.5
 	var ptype = 1 if is_host_player else 2
 	if by_player:
+		play_audio.rpc(SFX_HIT_BY_PLAYER)
 		apply_central_impulse((way * 850.0))
+	else:
+		play_audio.rpc(SFX_HIT)
 	if hp <= 0:
 		#main.gen_crack.rpc(col_3.global_position)
 		if by_player:
