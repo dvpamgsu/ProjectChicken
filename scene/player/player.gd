@@ -423,6 +423,11 @@ var shock_timer = 0.0
 var max_dist
 var first = true
 func _physics_process(delta: float) -> void:
+	
+	if end:
+		freeze = true
+		return
+		
 	find_alter()
 	check_flip()
 	#print(freeze)
@@ -573,9 +578,6 @@ func _physics_process(delta: float) -> void:
 		start_rebirth()
 	
 		
-	if end:
-		freeze = true
-		return
 		
 		
 	if !alive and !corpse:

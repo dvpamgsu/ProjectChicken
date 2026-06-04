@@ -65,7 +65,7 @@ var is_joining : bool = false
 @onready var pp_retro: ColorRect = $CanvasLayer/BackBufferCopy_retro/pp_retro
 @onready var pp_cinema: ColorRect = $CanvasLayer/BackBufferCopy_cinema/pp_cinema
 
-const SFX_BUTTON = preload("uid://cuhxb1h1mj8p1")
+const SFX_BUTTON = preload("uid://dxgdxn2pvl1uo")
 
 
 @export var character_num = 2
@@ -224,6 +224,9 @@ var player_ids = []
 func _on_player_connected(id: int):
 	if not multiplayer.is_server():
 		return
+
+var won_player_num = 1
+var finished = false
 		
 @rpc("any_peer", "call_local", "reliable")
 func win(num):
@@ -248,14 +251,10 @@ func win(num):
 		p.end = true
 		print("freeze " + str(id))
 	game_ui.visible = true
-	if num == 1:
-		var member_name = Steam.getFriendPersonaName(peer.get_steam_id_for_peer_id(p1.name.to_int()))
-		label_win.text = member_name + " won"
-	else:
-		var member_name = Steam.getFriendPersonaName(peer.get_steam_id_for_peer_id(p2.name.to_int()))
-		label_win.text = member_name + " won"
-	$TimerWin.start()
-	
+	won_player_num = num
+	label_win.text = ""
+	$TimerWinDirect.start()
+	finished = true
 
 @rpc("any_peer", "call_remote", "reliable")
 func request_player_info():
@@ -360,6 +359,7 @@ func _process(delta: float) -> void:
 					audiostage.volume_db = -40.0
 					tween.tween_property(audiostage, "volume_db", 0.0, 1.0)
 					audiostage.play()
+		
 		_:
 			if audiostage.playing:
 				var tween = create_tween()
@@ -373,9 +373,12 @@ func _physics_process(delta: float) -> void:
 	if volume_check_timer > 0.0:
 		volume_check_timer -= delta
 	
-	if state != STATE.GAME and state != STATE.GAME_SINGLE and state != STATE.GAME_LOCAL:
+	if (state != STATE.GAME and state != STATE.GAME_SINGLE and
+	 state != STATE.GAME_LOCAL and state != STATE.GAMEWIN and
+	 state != STATE.GAMEWIN_SINGLE and state!= STATE.GAMEWIN_LOCAL and !finished):
 		cam_target.position = Vector2.ZERO
-		camera_2d.position = Vector2.ZERO		
+		camera_2d.position = Vector2.ZERO
+		camera_2d.zoom = Vector2(1.6,1.6)
 		for e in effects:
 			if e:
 				effects.erase(e)
@@ -419,9 +422,10 @@ func _physics_process(delta: float) -> void:
 				if Input.is_action_just_pressed("debug2"):
 					win.rpc(2)
 				
-			camera_2d.position = camera_2d.position.lerp(cam_target.position, 1.0 * delta)
-			if is_camera_action:
-				camera_2d.position = cam_target.position
+			if !finished:
+				camera_2d.position = camera_2d.position.lerp(cam_target.position, 1.0 * delta)
+				if is_camera_action:
+					camera_2d.position = cam_target.position
 			
 			var member_count
 			if state == STATE.GAME:
@@ -429,7 +433,7 @@ func _physics_process(delta: float) -> void:
 			else:
 				member_count = 2
 				
-			if member_count == 2 and players.size() == 2:
+			if member_count == 2 and players.size() == 2 and !finished:
 				var pos_center = Vector2.ZERO
 				var alive_cnt = 0
 				for pk in players:
@@ -491,15 +495,39 @@ func _physics_process(delta: float) -> void:
 					cam_target.position.x = clamp(cam_target.position.x, cam_bl_pos.x + width/2, cam_tr_pos.x - width/2)
 					cam_target.position.y = clamp(cam_target.position.y, cam_tr_pos.y + height/2, cam_bl_pos.y - height/2)
 					
-					if p1.position.x > cam_target.position.x + width/2:
+					if p1.position.x > camera_2d.position.x + width/2:
 						p1.dead()
-					if p2.position.x < cam_target.position.x - width/2:
+					if p2.position.x < camera_2d.position.x - width/2:
 						p2.dead()
-				elif p1 and p2 and is_camera_action:
+				elif p1 and p2 and is_camera_action and !finished:
 					if camera_action_target == 1:
 						cam_target.position = p1.col_3.global_position
 					else:
 						cam_target.position = p2.col_3.global_position
+	if finished:
+		var p1 = null
+		var p2 = null
+		for pk in players:
+			var p = players[pk]
+			if !p:
+				continue
+			if p.is_host_player:
+				p1 = players[pk]
+			else:
+				p2 = players[pk]
+		var target_p
+		if won_player_num == 1:
+			target_p = p1
+		else:
+			target_p = p2
+		if target_p:
+			cam_target.position = target_p.global_position
+			var w = width * 1.6 / camera_2d.zoom.x
+			var h = height * 1.6 / camera_2d.zoom.y
+			cam_target.position.x = clamp(cam_target.position.x, cam_bl_pos.x + w/2, cam_tr_pos.x - w/2)
+			cam_target.position.y = clamp(cam_target.position.y, cam_tr_pos.y + h/2, cam_bl_pos.y - h/2)
+			camera_2d.position += (cam_target.position - camera_2d.position) * 10.0 * delta
+			camera_2d.zoom += (Vector2(2.4,2.4) - camera_2d.zoom) * 2.0 * delta
 						
 func normal_process(delta):
 	pass
@@ -605,6 +633,7 @@ func start_game() -> void:
 	if is_starting:
 		return
 	is_starting = true
+	finished = false
 	var tween = create_tween()
 	tween.tween_property(loading, "modulate", Color(1,1,1,1), 0.5)
 	await tween.finished
@@ -1055,6 +1084,7 @@ const PLAYER_AI = preload("uid://c26cids0j3463")
 var is_single_game = false
 func single_game_start():
 	
+	finished = false
 	var tween = create_tween()
 	tween.tween_property(loading, "modulate", Color(1,1,1,1), 0.5)
 	await tween.finished
@@ -1136,20 +1166,15 @@ func single_win(num):
 		p.end = true
 		print("freeze " + str(id))
 	game_ui.visible = true
-	if num == 1:
-		var member_name = Steam.getPersonaName()
-		if state == STATE.GAMEWIN_LOCAL:
-			member_name = "Player 1"
-		label_win.text = member_name + " won"
-	else:
-		var member_name = "AI"
-		if state == STATE.GAMEWIN_LOCAL:
-			member_name = "Player 2"
-		label_win.text = member_name + " won"
-	$TimerWinSingle.start()
+	won_player_num = num
+	
+	label_win.text = ""
+	finished = true
+	$TimerWinDirect.start()
 	
 func _on_timer_win_single_timeout() -> void:
 	print("on_timer_win_single_timeout")
+	state = STATE.MAIN
 	if stage:
 		stage.queue_free()
 		stage = null
@@ -1191,6 +1216,7 @@ var is_local_game = false
 
 func local_game_start():
 	
+	finished = false
 	var tween = create_tween()
 	tween.tween_property(loading, "modulate", Color(1,1,1,1), 0.5)
 	await tween.finished
@@ -1464,3 +1490,40 @@ func play_audio(audio : AudioStream):
 	afx.stream = audio
 	afx.pitch_scale = rng.randf_range(0.5, 1.5)
 	add_child(afx)
+
+
+func _on_timer_win_direct_timeout() -> void:
+	
+	var num = won_player_num
+	var p1 = null
+	var p2 = null
+	for pk in players:
+		var p = players[pk]
+		if !p:
+			continue
+		if p.is_host_player:
+			p1 = players[pk]
+		else:
+			p2 = players[pk]
+			
+	if state == STATE.GAMEWIN:
+		if num == 1:
+			var member_name = Steam.getFriendPersonaName(peer.get_steam_id_for_peer_id(p1.name.to_int()))
+			label_win.text = member_name + " won"
+		else:
+			var member_name = Steam.getFriendPersonaName(peer.get_steam_id_for_peer_id(p2.name.to_int()))
+			label_win.text = member_name + " won"
+		$TimerWin.start()
+	else:
+		if num == 1:
+			var member_name = Steam.getPersonaName()
+			if state == STATE.GAMEWIN_LOCAL:
+				member_name = "Player 1"
+			label_win.text = member_name + " won"
+		else:
+			var member_name = "AI"
+			if state == STATE.GAMEWIN_LOCAL:
+				member_name = "Player 2"
+			label_win.text = member_name + " won"
+		$TimerWinSingle.start()
+			

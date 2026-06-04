@@ -226,6 +226,12 @@ func gen_fragment_rpc(is_host, hp):
 	main.call_deferred("add_child", f3)
 	
 func instance_death_gen_fragment(is_host, hp):
+	if is_host:
+		if p1 and p1.alive_timer < 0.5:
+			return
+	else:
+		if p2 and p2.alive_timer < 0.5:
+			return
 	for i in range(hp, 0, -1):
 		gen_fragment_rpc.rpc(is_host, i)
 	
@@ -243,7 +249,7 @@ func ui_update(delta):
 				p1.instance_death.connect(instance_death_gen_fragment)
 				p1.rebirth.connect(rebirth)
 			elif !p2:
-				p2 = p	
+				p2 = p
 				p2.hitted.connect(gen_fragment)	
 				p2.instance_death.connect(instance_death_gen_fragment)
 				p2.rebirth.connect(rebirth)

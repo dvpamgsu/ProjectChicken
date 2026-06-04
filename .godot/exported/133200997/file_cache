@@ -1,4 +1,4 @@
-res://scene/main.tscn::344ac1c2d534a6ce8a6dbfafc76f4cf9::1779952415::res://.godot/exported/133200997/export-fa9c8ff5b16a5ec23280afa6577b07ee-main.scn
+res://scene/main.tscn::33d4eddddc26d8b816ab4461420a196a::1780386201::res://.godot/exported/133200997/export-fa9c8ff5b16a5ec23280afa6577b07ee-main.scn
 res://scene/player.tscn::7d531d72d4be807f10c96a477fbdeb86::1779753917::res://.godot/exported/133200997/export-34afcb3bda2393b8f6a0cd71512aeb81-player.scn
 res://scene/player/player.tscn::3e1fc2aa32147a36b63e85581bab1166::1779867662::res://.godot/exported/133200997/export-3e038ebae82c2bbbd20a0c261d1078da-player.scn
 res://samples/softbody2d/attach-to-character-controller/attach.tscn::17137f1aecc80680ab8d8afa339b58fd::1779753917::res://.godot/exported/133200997/export-85c8cc1f2a1438288bf8b33d0380456e-attach.scn
@@ -23,7 +23,7 @@ res://scene/effect/simple_effect.tscn::4e80a24f55eaf1f0fdc449ecf90de32a::1779753
 res://scene/effect/simple_effect_landing.tscn::3726750c84e52b78f318c5069fd6a177::1779753917::res://.godot/exported/133200997/export-30ec266eff07b534c6292a47f90c339f-simple_effect_landing.scn
 res://scene/effect/simple_effect_jump.tscn::5e745ef735489d7409db54f765b6c292::1779753917::res://.godot/exported/133200997/export-dbbaa5a229e6713d5f1d882eabe392cf-simple_effect_jump.scn
 res://theme/theme_bigui.tres::a2c2222108eaaa95970096fdd03e3bdd::1779753917::res://.godot/exported/133200997/export-0fff2ff9e76b037e9c22d796fa603d5a-theme_bigui.res
-res://scene/effect/simple_effect_air_jump.tscn::27ddce6324771ade012efdbbd1122b38::1779753917::res://.godot/exported/133200997/export-27893db95fc792ebb3446416ded214f4-simple_effect_air_jump.scn
+res://scene/effect/simple_effect_air_jump.tscn::7d58717e6d579ca9fb77f3a371b815b8::1780018212::res://.godot/exported/133200997/export-27893db95fc792ebb3446416ded214f4-simple_effect_air_jump.scn
 res://scene/effect/simple_effect_hit_2.tscn::371b2b605805171c8be432d5203a888c::1779753917::res://.godot/exported/133200997/export-735455efcaa3434b15a0f71d01dc7c01-simple_effect_hit_2.scn
 res://scene/effect/simple_effect_hit_1.tscn::63312a7b615b27d071e7b76ea83387a8::1779753917::res://.godot/exported/133200997/export-f148e202f4eb474519849daa65ab512e-simple_effect_hit_1.scn
 res://scene/others/feather.tscn::b3b4032f1e0ff6c9e1ff1b547f79d422::1779753917::res://.godot/exported/133200997/export-2970b921da62bd3c1fe4c91857cdb0c7-feather.scn
@@ -39,10 +39,11 @@ res://scene/stage/fragment_3.tscn::d3df738902fcb8de7f256360624dbb2b::1779753917:
 res://scene/pm/pm_ice.tres::d975dc73d9f626cc11f2824e69318997::1779753917::res://.godot/exported/133200997/export-e16b74ef2c001935ad91d781c68aecee-pm_ice.res
 res://scene/pm/pm_belt.tres::1eaebce09b3471dd85b6ba8e54cd6a22::1779753917::res://.godot/exported/133200997/export-69306dba235ffe100b128d7cb44dce74-pm_belt.res
 res://scene/stage/mine.tscn::84d7945cbdaeae8d969b36b032b7903b::1779753917::res://.godot/exported/133200997/export-7577fdf3f95cc691bbcfef0541251ab0-mine.scn
-res://scene/stage/stage002.tscn::e07ec0ddc0647a41df920793d6f9661b::1779772838::res://.godot/exported/133200997/export-5d2da5f5d5a7cc7ee336ca74c15fa12f-stage002.scn
-res://scene/stage/stage004.tscn::c55d1c06096d30f60d5cc6fcda90dd91::1779953796::res://.godot/exported/133200997/export-4a244f65cab8d5158795ee28f406d028-stage004.scn
+res://scene/stage/stage002.tscn::47480cb76db2a0ef9c52c773ad8a7908::1780032226::res://.godot/exported/133200997/export-5d2da5f5d5a7cc7ee336ca74c15fa12f-stage002.scn
+res://scene/stage/stage004.tscn::64832f7988b8839368b41bcaf45649cb::1780033599::res://.godot/exported/133200997/export-4a244f65cab8d5158795ee28f406d028-stage004.scn
 res://scene/stage/windzone.tscn::1313d893b4538ee7729ceda4be474a74::1779753917::res://.godot/exported/133200997/export-4f4f5a38025a123da575932db5796bb8-windzone.scn
-res://scene/effect/simple_effect_explosion.tscn::4c96e31f80ab244198d331b8ef549ad5::1779753917::res://.godot/exported/133200997/export-da9495ba448a8a4bb3d539aaf7be93bd-simple_effect_explosion.scn
+res://scene/effect/simple_effect_explosion.tscn::fe88f8469cbcceae0e983c432ddd9cf3::1780361945::res://.godot/exported/133200997/export-da9495ba448a8a4bb3d539aaf7be93bd-simple_effect_explosion.scn
 res://scene/burst_dust.tscn::8c5643a04432e27344a823a48ae40556::1779753917::res://.godot/exported/133200997/export-3dad37327e28498905ba3a3633b3498c-burst_dust.scn
 res://scene/others/audio_fx.tscn::a4a4367e972df8aeeac098760f8d27d5::1779941448::res://.godot/exported/133200997/export-1f47e74a9a67ddd8eabbb30f004e94f3-audio_fx.scn
 res://default_bus_layout.tres::99a4859cc3c096e8cc887bf1fa6697c3::1779940631::res://.godot/exported/133200997/export-19246414aa9fb561ced4b8dce477acec-default_bus_layout.res
+res://scene/stage/belt.tscn::79714e689fea67ca01fdf02d50b7d1f6::1780032083::res://.godot/exported/133200997/export-a22ab7b13cb7231c9c7ecc13c5ee2b2c-belt.scn

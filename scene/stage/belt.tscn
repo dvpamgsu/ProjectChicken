@@ -1,0 +1,10 @@
+[gd_scene load_steps=5 format=3 uid="uid://dk6en8ur8k71h"]
+
+[ext_resource type="Script" uid="uid://yaqtpe05f0is" path="res://scene/stage/belt.gd" id="1_kl3h0"]
+[ext_resource type="Texture2D" uid="uid://c24iyct6453fx" path="res://texture/stage/stage002/belt_right_001-Sheet.png" id="5_wdlsl"]
+[ext_resource type="Texture2D" uid="uid://b0iq3mi2pow0e" path="res://texture/stage/stage002/belt_right_002-Sheet.png" id="6_lpg77"]
+[ext_resource type="Texture2D" uid="uid://bnpmbygys2cv2" path="res://texture/stage/stage002/belt_right_003-Sheet.png" id="7_nsuuh"]
+
+[node name="belt" type="Node2D"]
+script = ExtResource("1_kl3h0")
+BELT_SPRITES = [ExtResource("5_wdlsl"), ExtResource("6_lpg77"), ExtResource("7_nsuuh")]

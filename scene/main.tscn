@@ -851,6 +851,10 @@ texture = ExtResource("25_oldxj")
 
 [node name="Cam_target" type="Node2D" parent="."]
 
+[node name="TimerWinDirect" type="Timer" parent="."]
+wait_time = 2.0
+one_shot = true
+
 [node name="TimerWin" type="Timer" parent="."]
 wait_time = 3.0
 one_shot = true
@@ -884,5 +888,6 @@ bus = &"bgm"
 [connection signal="item_selected" from="CanvasLayer/settings/TR_OptionButton" to="." method="_on_tr_option_button_item_selected"]
 [connection signal="pressed" from="CanvasLayer/ButtonBack" to="." method="_on_button_back_pressed"]
 [connection signal="timeout" from="Camera2D/mainimage/Timer" to="Camera2D/mainimage" method="_on_timer_timeout"]
+[connection signal="timeout" from="TimerWinDirect" to="." method="_on_timer_win_direct_timeout"]
 [connection signal="timeout" from="TimerWin" to="." method="_on_timer_win_timeout"]
 [connection signal="timeout" from="TimerWinSingle" to="." method="_on_timer_win_single_timeout"]

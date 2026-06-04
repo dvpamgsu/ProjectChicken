@@ -1,3 +1,4 @@
+Node2D
 Timer
 Sprite2D
 OptionButton
@@ -10,5 +11,4 @@ Button
 AudioStreamPlayer2D
 HScrollBar
 CheckButton
-Node2D
 RayCast2D
